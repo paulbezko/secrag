@@ -260,3 +260,27 @@ def json_memory_loader(uid, conversation_id, session):
                 session.add_ai_message(memory_msg["content"])
 
     return memory
+
+def json_memory_loader_raw(uid, conversation_id):
+    jq_schema=".conversations[].conversation_{}.messages[]?".format(conversation_id)
+    loader = JSONLoader("memory/{}_memory.json".format(uid), jq_schema=jq_schema, text_content=False)
+    documents = loader.load()
+    memory_user = []
+    memory_ai = []
+    # print(documents)
+    if len(documents) > 21:
+        for i in range(1, 20):
+            memory_msg= json.loads(documents[-i].page_content)
+            if memory_msg["role"] == "user":
+                memory_user.append(memory_msg["content"])
+            if memory_msg["role"] == "assistant":
+                memory_ai.append(memory_msg["content"])
+    else:
+        for i in documents:
+            memory_msg= json.loads(i.page_content)
+            if memory_msg["role"] == "user":
+                memory_user.append(memory_msg["content"])
+            if memory_msg["role"] == "assistant":
+                memory_ai.append(memory_msg["content"])
+    # print(memory_user)
+    return memory_user, memory_ai

@@ -17,7 +17,7 @@ def vectorstore_manager(custom_company_filing):
     if os.path.exists(vectorstore_dir):
         vectorstore = FAISS.load_local(vectorstore_dir, embeddings=embeddings, allow_dangerous_deserialization=True)
     else:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=500, length_function=len)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=400, length_function=len)
         md_text = sec_to_md_from_html(custom_company_filing.html)
         chunks = text_splitter.split_text(text=md_text)
         vectorstore = FAISS.from_texts(chunks, embedding=embeddings)
