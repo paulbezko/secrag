@@ -38,7 +38,7 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, ticker, fil
     vectorstore = vectorstore_manager(filing)
 
     # Set up a retriever 
-    retriever = vectorstore.as_retriever(similarity_search_with_score=True)
+    retriever = vectorstore.as_retriever(similarity_search_with_score=True, k=5)
 
     # Create a history-aware retriever 
     #
@@ -71,10 +71,10 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, ticker, fil
             "configurable": {"session_id": str(session)+id_separator+uid, },
             
         },
-    )["answer"]
+    )
     
     append_message_to_json_file(uid, session, {"role": "user", "content": prompt})
-    append_message_to_json_file(uid, session, {"role": "assistant", "content": answer})
+    append_message_to_json_file(uid, session, {"role": "assistant", "content": answer["answer"]})
 
     return answer
 
@@ -94,4 +94,3 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
     json_memory_loader(user_id, conversation_id, store[conversation_id])  
       
     return store[conversation_id]
-
