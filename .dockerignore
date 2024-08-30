@@ -3,8 +3,5 @@ client/node_modules
 server_js/node_modules
 server_js/.env
 
-.venv
-.env
-
-__pycache__
-server/__pycache__
+server_py/.venv
+server_py/.env

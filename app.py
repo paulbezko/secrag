@@ -1,0 +1,7 @@
+from server import create_app
+
+mode = 'dev' # Controls whether the server will use built client static files or not (prod or dev)
+app = create_app(mode)
+
+if __name__ == '__main__':
+    app.run(debug = True)
