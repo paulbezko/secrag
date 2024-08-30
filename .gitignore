@@ -163,4 +163,6 @@ cython_debug/
 
 *.faiss
 *.pkl
-memory/*
+
+dashboard/memory/*.json
+dashboard/memory/vectorstore/

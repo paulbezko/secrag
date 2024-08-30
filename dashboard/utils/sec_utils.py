@@ -13,7 +13,13 @@ def load_sec(ticker, file_number = None):
     debug_print(filing_tl, filing_tl.file_number)
     debug_print(type(filing_tl.filing_date))
     
-    custom_filing = CustomCompanyFiling(file_number=filing_tl.file_number, filing_html=filing_tl.html(), cik=filing_tl.cik, ticker=ticker, filing_date=filing_tl.filing_date)
+    custom_filing = CustomCompanyFiling(
+        file_number=filing_tl.file_number, 
+        filing_html=filing_tl.html(),
+        cik=filing_tl.cik, ticker=ticker, 
+        filing_date=filing_tl.filing_date, 
+        company_name=filing_tl.company
+    )
     return custom_filing
 
 def sec_search(ticker, name, email, file_number = None):
@@ -28,9 +34,10 @@ def sec_search(ticker, name, email, file_number = None):
     
 # This class is made for convenience. It stores all important filing data for the project's implementation
 class CustomCompanyFiling():
-    def __init__(self, file_number, filing_html, cik, ticker, filing_date):
+    def __init__(self, file_number, filing_html, cik, ticker, filing_date, company_name):
         self.ticker = ticker
         self.file_number = file_number
         self.filing_date = filing_date
         self.cik = cik
         self.html = filing_html
+        self.company_name = company_name
