@@ -1,0 +1,353 @@
+*:focus {
+  outline: none;
+}
+
+html {
+  font-family: 'Inter', sans-serif;
+  font-size: 62.5%;
+
+  -webkit-tap-highlight-color: transparent;
+
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  margin: 0;
+}
+
+img {
+  /* object-fit: cover; */
+  /* max-height: inherit; */
+}
+
+.display {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-width: 30rem;
+  background-color: #090909;
+  color: #fff;
+}
+
+.display-full {
+  padding-inline: 2rem;
+  padding-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+.display-margin {
+  height: 100%;
+  width: 100%;
+  max-width: 120rem;
+  flex: 1;
+  padding-inline: 2rem;
+  padding-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+.navbar {
+  width: 100%;
+  height: 4rem;
+}
+
+.flex-1 {flex: 1}
+
+.gap-05 {gap: 0.5rem}
+.gap-1 {gap: 1rem}
+.gap-2 {gap: 2rem}
+.gap-4 {gap: 4rem}
+
+.display-flex-row {display: flex; flex-direction: row;}
+.display-flex-column {display: flex; flex-direction: column;}
+.center {align-items: center; justify-content: center;}
+.text-center {text-align: center;}
+.stretch {width: 100%; flex: 1;}
+
+.width-100 {width: 100%}
+.height-100 {height: 100%}
+
+.align-left {align-items: start;}
+
+* {
+  text-decoration: none;
+}
+
+:root {
+  --color-green: #26B946;
+  --color-red: #FF0000;
+
+  --transition-fast: all 0.3s ease;
+  --transition-medium: all 0.4s ease;
+}
+
+@media (min-width: 800px) {
+  :root {
+    --heading-1: 4.8rem; 
+    --heading-2: 3.6rem;
+    --heading-3: 2.0rem;
+    --text-1: 2.0rem;
+    --text-2: 1.6rem; 
+    --text-3: 1.2rem;
+  }
+}
+
+@media (max-width: 800px) {
+  :root {
+    --heading-1: 4.2rem; 
+    --heading-2: 3.0rem;
+    --heading-3: 1.8rem;
+    --text-1: 1.8rem;
+    --text-2: 1.6rem; 
+    --text-3: 1.2rem;
+  }
+}
+
+.heading-1 {font-size: var(--heading-1); font-weight: 700; line-height: 4.8rem;}
+.heading-2 {font-size: var(--heading-2); font-weight: 700;}
+.heading-3 {font-size: var(--heading-3); font-weight: 700;}
+.text-1 {font-size: var(--text-1);}
+.text-2 {font-size: var(--text-2); line-height: 2rem;}
+.text-3 {font-size: var(--text-3);}
+
+.text {
+  color: #fff;
+}
+
+.text-link, .text-link-discouraged {
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.text-link:hover {
+  color: var(--color-green);
+}
+
+.text-link-discouraged:hover {
+  color: var(--color-red)
+}
+
+.text-error {
+  font-weight: 700;
+  color: var(--color-red);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  padding: 2rem;
+  box-shadow: inset 0px 0px 0px 2px #000000, rgba(101, 106, 111, 0.2) 0px 8px 24px;
+  border-radius: 4rem;
+  background-color: white;
+}
+
+.position-fixed {position: fixed}
+.position-absolute {position: absolute}
+
+.card-helper {
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  max-width: 24rem;
+}
+
+@media (min-width: 800px) {.card-subscription {max-width: 52rem;}}
+@media (max-width: 800px) {.card-subscription {max-width: 42rem; min-width: 33rem;}}
+
+.card-subscribe {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  max-width: 26rem;
+  min-width: 22rem;
+}
+
+.card-clickable {
+  cursor: pointer
+}
+
+.card-clickable-active {
+  box-shadow: inset 0px 0px 0px 4px var(--color-green);
+}
+
+.card-profile {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.bold {font-weight: 700;}
+.medium {font-weight: 500;}
+
+
+
+
+.input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #ffffff;
+  border-radius: 2rem;
+  max-width: 24rem;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: var(--text-3);
+  transition: var(--transition-fast);
+}
+
+.input:hover, .input:focus {
+  border: 2px solid var(--color-green);
+}
+
+
+
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.button {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--text-3);
+  font-weight: 700;
+  
+  padding-block: 1rem;
+  padding-inline: 2rem;
+  
+  border-radius: 2rem;
+  cursor: pointer;
+
+  transition: var(--transition-fast);
+
+  width: fit-content;
+}
+
+.color-green {color: var(--color-green)}
+
+
+.button-cta {
+  background-color: var(--color-green);
+  color: rgb(0, 0, 0);
+  border: 2px solid var(--color-green);
+}
+
+.button-cta:hover {
+  background-color: rgb(0, 0, 0);
+  color: var(--color-green);
+  border: 2px solid var(--color-green);
+}
+
+.button-secondary {
+  background-color: white;
+  border: 2px solid #ffffff;
+}
+
+.button-secondary:hover {
+  border: 2px solid var(--color-green);
+  color: var(--color-green);
+}
+
+.button-discouraged {
+  background-color: white;
+  border: 2px solid var(--color-red);
+  color: var(--color-red);
+}
+
+.button-discouraged:hover {
+  background-color: var(--color-red);
+  color: white;
+}
+
+.button-icon {
+  margin: 0px;
+  padding: 0px;
+  color: #fff;
+  border: 2px solid #ffffff;
+  border-radius: 2rem;
+  cursor: pointer;
+  background-color: rgb(0, 0, 0);
+  width: 4rem;
+  transition: var(--transition-fast);
+}
+
+.button-icon:hover {
+  border: 2px solid var(--color-green);
+  color: var(--color-green);
+}
+
+.tooltip {
+  box-sizing: border-box;
+  background-color: white;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  border: 2px solid #ffffff;
+  border-radius: 2rem;
+}
+
+.z-10 {z-index: 10;}
+.z-20 {z-index: 20;}
+.z-30 {z-index: 30;}
+.z-40 {z-index: 40;}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(1px); /* Adjust the value as needed */
+}
+
+.position-fixed {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.slider-parent {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 2px solid #ffffff;
+  border-radius: 4rem;
+  background-color: white;
+}
+
+.slider-child {
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  text-align: center;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  border-radius: 4rem;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  border: 4px solid #ffffff;
+}
+
+.line {
+  width: 100%;
+  border: 1px solid #ffffff;
+}
+
+.slider-child-active {
+  
+  color: white;
+  background-color: var(--color-green);
+}
+
+@media (min-width: 800px) {
+  .show-on-small {display: none}
+}
+@media (max-width: 800px) {
+  .show-on-large {display: none}
+  .switch-row-to-column {flex-direction: column !important;}
+}
