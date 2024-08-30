@@ -9,22 +9,12 @@ langchain_config.set_debug(False)
 
 from dotenv import load_dotenv
 from flask import Flask, request
-import json
 from flask_socketio import SocketIO
-from flask import Response
 from langchain.callbacks.manager import CallbackManager
 from langchain_community.llms import OpenAI
 from langchain.memory import *
-from langchain_community.document_loaders import TextLoader, JSONLoader
-from langchain_openai import OpenAIEmbeddings
-
-from langchain_text_splitters import CharacterTextSplitter
 from utils.json_utils import *
-from rag import rag_with_memory_and_docs
-
-
-
-
+from dashboard.llm import main_llm_chain
 
 
 app = Flask(__name__)
@@ -145,16 +135,16 @@ def ask_(prompt, uid, conversation_id, socket_id, ticker, filing):
     callback_manager = CallbackManager([CustomStreamingCallbackHandler(id=socket_id)])
     
     # Ask the question to the custom RAG
-    answer = rag_with_memory_and_docs(uid, conversation_id, prompt, callback_manager, ticker, filing)
+    answer = main_llm_chain(uid, conversation_id, prompt, callback_manager, ticker, filing)
     
     # Format output
-    res_dict = {
-        "question": prompt,
-        "answer": answer,
+    # res_dict = {
+    #     "question": prompt,
+    #     "answer": answer,
         
-    }
+    # }
 
-    return res_dict  
+    return answer  
 
 
 if __name__ == '__main__':
