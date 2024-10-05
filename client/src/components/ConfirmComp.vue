@@ -2,55 +2,33 @@
   <div>
     <SpinnerComp v-if="showSpinner"></SpinnerComp>
     <div v-if="showComponent">
-      <div v-if="action === 'resetPasswordBefore'" style="position: absolute" class="z-40">
-        <div class="card card-helper position-fixed" ref="ConfirmCard">
-          <div class="heading-3">Reset Password</div>
-          <input class="input" placeholder="Email" v-model="email"/>
-          <div v-if="error" class="text-3 text-error bold"> {{ error }}</div>
-          <div class="button button-secondary" @click="submit($event)">Submit</div>
-        </div>
-      </div>
-      <div v-if="action === 'changeEmail'" style="position: absolute" class="z-40">
-        <div class="card card-helper position-fixed" ref="ConfirmCard">
-          <div class="heading-3">Change Email</div>
-          <input class="input" v-model="emailNew" type="text" placeholder="New Email">
-          <div class="display-flex-row gap-1 width-100">
-            <input class="input flex-1" type="password" placeholder="Current Password" v-model="password"/>
-            <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
+      <div class="z-40 width-100 flex-row center absolute card-component-center" style="padding-inline: 4rem;">
+        <div class="card-component flex-column center gap-2 card-size-confirm" ref="ConfirmCard">
+          <div class="text-1 text-bold text-center">{{ actions[action].heading }}</div>
+          <div class="text-3 text-center">{{ actions[action].text }}</div>
+          <div v-if="action === 'resetPasswordBefore'" class="flex-row gap-1 width-100">
+            <input class="input" placeholder="Email" v-model="email"/>
+            <div @click="submit($event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
           </div>
-          <div v-if="error" class="text-3 text-error bold"> {{ error }}</div>
-        </div>
-      </div>
-      <div v-if="action === 'changePassword'" style="position: absolute" class="z-40">
-        <div class="card card-helper position-fixed" ref="ConfirmCard">
-          <div class="heading-3">Change Password</div>
-          <input class="input" type="password" placeholder="Current Password" v-model="password"/>
-          <input class="input" type="password" placeholder="New Password" v-model="passwordNew"/>
-          <div class="display-flex-row gap-1 width-100">
-            <input class="input flex-1" type="password" placeholder="Confirm New Password" v-model="passwordNewConfirm"/>
-            <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
+          <div class="flex-column gap-1 center width-100" v-if="action === 'changeEmail' || action === 'changePassword' || action === 'deleteAccount'">
+            <input v-if="action === 'changeEmail' || action === 'changePassword' || action === 'deleteAccount'" class="input" type="password" placeholder="Current Password" v-model="password"/>
+            <input v-if="action === 'changePassword'" class="input" type="password" placeholder="New Password" v-model="passwordNew"/>
+            <div v-if="action === 'changePassword'" class="flex-column gap-1 width-100">
+              <div class="flex-row gap-1 width-100">
+                <input class="input" type="password" placeholder="Confirm New Password" v-model="passwordNewConfirm"/>
+                <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
+              </div>
+              <div v-if="error" class="text-error bold text-center">{{ error }}</div>
+            </div>
+            <div v-if="action === 'changeEmail'" class="flex-column gap-1 width-100">
+              <div class="flex-row gap-1 width-100">
+                <input class="input" type="text" placeholder="New Email" v-model="emailNew"/>
+                <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
+              </div>
+              <div v-if="error" class="text-error bold text-center">{{ error }}</div>
+            </div>
           </div>
-          <div v-if="error" class="text-3 text-error bold"> {{ error }}</div>
-        </div>
-      </div>
-      <div v-if="action === 'signOut'" style="position: absolute" class="z-40">
-        <div class="card card-helper position-fixed" ref="ConfirmCard">
-          <div class="heading-3">Sign Out?</div>
-          <div class="button button-discouraged" @click="submit($event)">Confirm</div>
-        </div>
-      </div>
-      <div v-if="action === 'deleteAccount'" style="position: absolute" class="z-40">
-        <div class="card card-helper position-fixed" ref="ConfirmCard">
-          <div class="heading-3">Delete Account?</div>
-          <div class="text-3">This action is final and cannot be undone. Current subscription will be cancelled.</div>
-          <input v-if="!oneStepDelete" v-model="password" class="input" type="password" placeholder="Current Password"/>
-          <img v-if="oneStepDelete" :src="captchaImage" alt="CAPTCHA Image" style="object-fit: cover; width: 100%; border-radius: 1rem; border: solid 2px black; box-sizing: border-box;">
-          <input v-if="oneStepDelete" class="input" placeholder="Captcha answer" v-model="captcha"/>
-          <div v-if="error" class="text-3 text-error bold"> {{ error }}</div>
-          <div class="display-flex-row gap-1 width-100">
-            <div class="button button-cta flex-1" @click="closeCard()">Go Back</div>
-            <div class="button button-discouraged flex-1" @click="submit($event)">Confirm</div>
-          </div>
+          <div v-if="action === 'signOut' || action === 'deleteAccount'" class="button button-secondary" @click="submit($event)">Confirm</div>
         </div>
       </div>
     </div>
@@ -71,6 +49,28 @@ export default {
     action: {type: String, required: true}
   },
   data() {return {
+    actions: {
+      'resetPasswordBefore': {
+        'heading': 'Reset Password',
+        'text': 'We will send you an email with a link to reset your password.'
+      },
+      'changeEmail': {
+        'heading': 'Change Email',
+        'text': 'We will send you an email with a link to confirm your new email address.'
+      },
+      'changePassword': {
+        'heading': 'Change Password',
+        'text': 'Please enter your current password and a new password.'
+      },
+      'signOut': {
+        'heading': 'Sign Out',
+        'text': 'Are you sure you want to sign out?'
+      },
+      'deleteAccount': {
+        'heading': 'Delete Account',
+        'text': 'This action is final and cannot be undone. Current subscription will be cancelled.'
+      },
+    },
     showComponent: false,
     showSpinner: false,
     email: '', 
@@ -136,6 +136,7 @@ export default {
           const response = await axios.post(`${config.apiUrl}/api/edit-user`, {action: 'changePassword', token: localStorage.getItem('_u'), password: this.password, passwordNew: this.passwordNew})      
           if (response.data.error) {this.error = response.data.error; return}
           this.$emit('success');
+          
         }
         else if (this.action === 'signOut') {
           this.$emit('success');
@@ -175,8 +176,8 @@ export default {
         }
       }
       catch (error) {console.log(error)}
-      finally {this.showSpinner = false}
-      event.stopPropagation();
+      finally {this.showSpinner = false;}
+      event.stopPropagation()
     }
   },
 

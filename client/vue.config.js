@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+const webdata = require('./src/webdata.json');
 module.exports = defineConfig({
   devServer: {
     allowedHosts: "all"
@@ -8,7 +9,7 @@ module.exports = defineConfig({
       entry: 'src/main.js',
       template: 'public/index.html',
       filename: 'index.html',
-      title: 'SkelTal',
+      title: webdata.projectName,
     },
   },
 });

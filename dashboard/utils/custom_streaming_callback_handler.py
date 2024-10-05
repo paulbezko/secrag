@@ -15,10 +15,11 @@ class CustomStreamingCallbackHandler(StreamingStdOutCallbackHandler):
         self.socket_id = id
         
     def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-        sys.stdout.write(token) # Modify the behavior here
+        # sys.stdout.write(token) # Modify the behavior here
         # print(" TOK ")
-        # emit("ai_token", token, namespace="/", to=self.socket_id)
-        sys.stdout.flush()
+        if self.socket_id != None:
+            emit("ai_token", token, namespace="/", to=self.socket_id)
+        # sys.stdout.flush()
 
     @streaming_call_bp.route('/streaming/call')
     def stream_chat_gpt():

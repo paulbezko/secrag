@@ -1,105 +1,137 @@
-import { createApp } from 'vue'
+import { createApp } from 'vue';
 import { createStore } from 'vuex';
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 import { config } from '@/config';
 import axios from 'axios';
-import App from './App.vue'
+import App from './App.vue';
 
-// This works, everything in here is needed
-const store = createStore({state: {_u: null}});
+// Define Vuex store
+const store = createStore({
+  state: {
+    _u: null,
+    isAuthenticated: false,
+    isSubscribed: false,
+  },
+  mutations: {
+    setAuthentication(state, status) {
+      state.isAuthenticated = status;
+    },
+    setIsSubscribed(state, status) {
+      state.isSubscribed = status;
+    },
+    setSubscription(state, subscription) {
+      state.subscription = subscription;
+    },
+  },
+});
 
 // Route declarations
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    {path: '/',                 component: () => import('./views/HomeView.vue')},
-    {path: '/login',            component: () => import('./views/LoginView.vue')},
-    {path: '/signup',           component: () => import('./views/SignupView.vue')},
-    {path: '/handle-supabase',  component: () => import('./views/HandleSupabaseView.vue')},
-    {path: '/reset-password',   component: () => import('./views/ResetPasswordView.vue')},
-    {path: '/pricing',          component: () => import('./views/PricingView.vue')},
-    {path: '/about-us',         component: () => import('./views/AboutUsView.vue')},
-    {path: '/faq',              component: () => import('./views/FAQView.vue')},
-    {path: '/contact',          component: () => import('./views/ContactView.vue')},
-    {path: '/subscribe',        component: () => import('./views/SubscribeView.vue'), meta: { requiresAuthentication: true }}, // protected
-    {path: '/dashboard',        component: () => import('./views/DashboardView.vue'), meta: { requiresAuthentication: true, requiresSubscription: true }}, // protected
-    {path: '/change-email',     component: () => import('./views/ChangeEmailView.vue'), meta: { requiresAuthentication: true }}, // protected,
-    {path: '/:pathMatch(.*)',   component: () => import('./views/404View.vue')}
-  ]
-})
+    { path: '/', component: () => import('./views/HomeView.vue') },
+    { path: '/terms-and-conditions', component: () => import('./views/TermsAndConditionsView.vue') },
+    { path: '/login', component: () => import('./views/LoginView.vue') },
+    { path: '/signup', component: () => import('./views/SignupView.vue') },
+    { path: '/handle-supabase', component: () => import('./views/HandleSupabaseView.vue') },
+    { path: '/reset-password', component: () => import('./views/ResetPasswordView.vue') },
+    { path: '/subscribe', component: () => import('./views/SubscribeView.vue'), meta: { requiresAuthentication: true } },
+    { path: '/dashboard', component: () => import('./views/DashboardView.vue'), meta: { requiresAuthentication: true, requiresSubscription: true } },
+    { path: '/change-email', component: () => import('./views/ChangeEmailView.vue'), meta: { requiresAuthentication: true } },
+    { path: '/:pathMatch(.*)', component: () => import('./views/404View.vue') },
+  ],
+  scrollBehavior(to) {
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' };
+    }
+    return { left: 0, top: 0 };
+  },
+});
 
 // The routing masterpiece
 router.beforeEach(async (to, from, next) => {
-
-  const token = localStorage.getItem('_u'); // (Try to) Get the saved token before each request
+  const token = localStorage.getItem('_u'); // Get the saved token before each request
 
   if (token) {
-    let response
-    response = await axios.get(`${config.apiUrl}/api/router?token=` + token)  // Verify if the token is legit
-    if (response.data.critical) {localStorage.removeItem('_u'); return next('/')}
-    
-    if (response.data.authenticated) {
-      if (response.data.onboarding) {if (to.path !== '/signup') {return next('/signup')}} 
-      else {if (to.path === '/signup' || to.path === '/login') {return next('/dashboard')}}
+    let response;
+    response = await axios.get(`${config.apiUrl}/api/router?token=` + token); // Verify if the token is legit
+
+    if (response.data.critical) {
+      localStorage.removeItem('_u');
+      return next('/'); // Redirect to home if token is critical
     }
 
-  // Avoid infinite redirects by allowing access to /signup if authenticated and onboarding
-  if (to.path === '/signup' && !response.data.authenticated) {
-    return next();
+    if (response.data.authenticated) {
+      store.commit('setAuthentication', true); // Update Vuex state
+
+      // Get user subscription info
+      const navbarInfo = await getNavbarInfo();
+      store.commit('setIsSubscribed', navbarInfo.isSubscribed);
+      if (navbarInfo.subscription) {
+        store.commit('setSubscription', navbarInfo.subscription);
+      }
+
+      // Redirect to onboarding if necessary
+      if (response.data.onboarding) {
+        if (to.path !== '/signup') {
+          return next('/signup');
+        }
+      } else {
+        if (to.path === '/signup' || to.path === '/login') {
+          return next('/dashboard');
+        }
+      }
+
+      // Check if user is trying to access the dashboard
+      if (to.path === '/dashboard') {
+        if (navbarInfo.isSubscribed === false) {
+          return next('/subscribe'); // Redirect to subscribe if not subscribed
+        }
+      }
+
+      // Check for other routes requiring authentication or subscription
+      if (to.meta.requiresSubscription && navbarInfo.isSubscribed === false) {
+        return next('/subscribe'); // Redirect if subscription is required
+      }
+
+      return next(); // Allow access if everything checks out
+    }
+
+    if (to.meta.requiresAuthentication) {
+      return next('/login'); // Redirect to login if authentication is required
+    }
+    
+    return next(); // Proceed for non-protected routes
   }
 
-    // Apparently needed to avoid infinite redirects, go figure
-    if (to.path === '/signup') {return next()}
-
-    // If the user is onboarding, lock him within /signup route
-    else {
-      if (to.meta.requiresAuthentication) {
-        if (response.data.authenticated === true) { // If requires authentication and authenticated
-
-          if (to.path === '/subscribe') {
-            response = await axios.get(`${config.apiUrl}/api/get-user-data`, {params: {token: localStorage.getItem('_u')}})  // Get user data
-            localStorage.setItem('_u', response.data.token)
-            if (response.data.subscription !== 'none') { // If user wants to access /subscribe while already subscribed, redirect to /profile
-              return next('/dashboard');
-            }
-          }
-          if (to.path === '/dashboard') {
-            response = await axios.get(`${config.apiUrl}/api/get-user-data`, {params: {token: localStorage.getItem('_u')}})
-            localStorage.setItem('_u', response.data.token)
-            if (response.data.subscription == 'none') { // If user wants to access /subscribe while already subscribed, redirect to /profile
-              return next('/subscribe');
-            }
-          }
-          if (to.meta.requiresSubscription) {
-            if (response.data.subscription !== 'none') {
-              return next()
-            } return next('/subscribe') // If user wants to access any route that requires subscription, redirect to /subscribe
-          } return next()
-        } return next('/login') // If users token is invalid, redirect to /login
-      } return next()
-    }
-  } 
   if (to.meta.requiresAuthentication) {
-    return next('/login') // If user wants to access any route that requires authentication, redirect to /login
-  } 
-  next()
-})
+    return next('/login'); // Redirect to login if user is unauthenticated
+  }
+  
+  next(); // Proceed to next middleware or route
+});
 
-function getNavbarInfo() { // Get user authentication and subscription status
+function getNavbarInfo() {
   return new Promise((resolve, reject) => {
-    const token = localStorage.getItem('_u'); // Try to get the token from localStorage
-    if (token) { // Get user data if token exists
+    const token = localStorage.getItem('_u');
+    if (token) {
       axios.get(`${config.apiUrl}/api/get-user-data`, { params: { token: token } })
-      .then(response => {const subscription = response.data.subscription !== 'none'; resolve({ subscription })})
-      .catch(error => {alert('Error retrieving user data:', error); reject(error)})} 
-    else {resolve({ subscription: false })} // If no token exists, user is not subscribed
+        .then(response => {
+          const isSubscribed = response.data.subscription !== 'none';
+          const subscription = response.data.subscription ? response.data.subscription : null;
+          resolve({ isSubscribed, subscription });
+        })
+        .catch(error => {
+          alert('Error retrieving user data:', error);
+          reject(error);
+        });
+    } else {
+      resolve({ isSubscribed: false, subscription: null }); // If no token exists, user is not subscribed
+    }
   });
 }
 
-export default getNavbarInfo;
-
-// Run app | npm run serve
-const app = createApp(App)
-app.use(store)
-app.use(router)
-app.mount('#app')
+const app = createApp(App);
+app.use(store);
+app.use(router);
+app.mount('#app');

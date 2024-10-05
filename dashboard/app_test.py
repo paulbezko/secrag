@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import scrolledtext
 from app import ask_
 import traceback
+import json
 from utils.json_utils import json_memory_loader_raw
 
 root = tk.Tk()
@@ -69,18 +70,21 @@ def load_chat():
             chat_field.tag_config('ai', foreground='green')
     except Exception as e:
         print(str(e))
+        print(traceback.format_exc())
         chat_field.insert(tk.END, "Error: " + str(e) + "\n", "error")
+
  
 # Prints context used for RAG 
 def print_context(context):
     context_field.delete('1.0', tk.END)
     for i in context:
        context_field.insert(tk.END, i.page_content + "\n\n ----------------------- \n") 
+ 
        
 # Triggers ReAct chain
 def submit_prompt():
     try:
-        prompt_output = ask_(prompt.get(), uid.get(), conversation_id.get(), None, ticker.get(), filing.get())
+        prompt_output = ask_(prompt.get(), uid.get(), conversation_id.get(), None, ticker.get(), filing.get(), 10000, 3, 8, 3)
         print_context(prompt_output["rag_context"])
         print("\n# RAG output")
         print(prompt_output["rag_output"])
@@ -109,6 +113,12 @@ submit_button.grid(row=6, column=1, sticky = "w")
 chat_field.tag_config('user', foreground='black')
 chat_field.tag_config('ai', foreground='green')
 chat_field.tag_config('error', foreground='red')
+
+prompt.set("table of contents")
+uid.set("bot.test.paul@gmail.com")
+conversation_id.set("RCKT-2024")
+ticker.set("RCKT")
+filing.set("2024")
 
 root.mainloop()
 
