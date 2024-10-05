@@ -1,8 +1,9 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 from captcha.image import ImageCaptcha
 from datetime import datetime, timezone, timedelta
-from .utils import get_user_data, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp
-from flask import Blueprint, render_template, send_from_directory, request, current_app, jsonify
+from .utils import get_user_data, get_user_data_stripe, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp
+from flask import Blueprint, render_template, send_from_directory, request, current_app, jsonify, render_template_string
+
 
 import supabase
 import random
@@ -36,6 +37,7 @@ def get_user_data_get():
         'name': user['name'],
         'auth_type': user['auth_type'],
         'subscription': user['subscription'],
+        'subscription_tokens_left': user['subscription_tokens_left'], #########################################################
         'stripe_subscription_id': user['stripe_subscription_id'],
         'stripe_user_id': user['stripe_user_id'],
     }
@@ -47,6 +49,7 @@ def get_user_data_get():
         'name': user_info['name'],
         'auth_type': user_info['auth_type'],
         'subscription': user_info['subscription'],
+        'subscription_tokens_left': user['subscription_tokens_left'] #########################################################
         }
 
 
@@ -106,7 +109,7 @@ def signup_get():
 
     # Compare current time with expiry time
     if not check_timestamp(email_payload['expiry']): return {'error': 'linkExpired'}
-    if get_user_data(email_payload['email']): return {'critical': 'User has already been set up'}
+    if get_user_data(email_payload['email']): return {'critical': 'userExists'}
 
     execute_query("INSERT INTO users (email) VALUES (%s)", (email_payload['email'],))
 
@@ -114,8 +117,7 @@ def signup_get():
     user_info['onboarding'] = True
 
     token = encode_token(user_info)
-    return {'token': token, 'action': 'signUpAfter'}
-
+    return {'token': token}
 
 
 @routes.route('/login', methods=['POST'])
@@ -124,9 +126,9 @@ def login_post():
     try: user = get_user_data(request.json.get('email').lower())
     except: return {'error': 'Error retrieving user data'}
 
-    if not user: return {'error': 'User not found'}
-    if user['auth_type'] != 'password': return {'error': 'Account exists, but the authentication method is incorrect. Try other methods.'}
-    if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Invalid credentials'}
+    if not user: return {'error': 'userNotFound'}
+    if user['auth_type'] != 'password': return {'error': 'authMethodIncorrect'}
+    if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'invalidCredentials'}
 
     user_info = {
         'email': user['email'],
@@ -198,7 +200,8 @@ def authenticate_post():
             request.json.get('email').lower(), request.json.get('name'), 
             request.json.get('auth_type'), request.json.get('id')
             ))
-        
+    elif user['auth_type'] != 'google': return {'error': 'authMethodIncorrect'}    
+    
     token = encode_token({'email': request.json.get('email').lower()})
     return {'token': token}
 
@@ -239,6 +242,25 @@ def subscribe_post():
 
         session = stripe.billing_portal.Session.create(customer = user_info['stripe_user_id'], return_url = f"{current_app.config['REDIRECT_URL']}/dashboard",)
         return {'sessionUrl': session['url']}
+
+    elif request.json.get('operation') == 'replenishTokens':
+
+        user = get_user_data(user_info['email'])
+        customer = user['stripe_user_id']
+
+        session = stripe.checkout.Session.create(
+            customer=customer,
+            payment_method_types=['card', 'ideal'],
+            line_items=[{
+                'price': current_app.config[f'STRIPE_PRODUCT_REPLENISH'], 
+                'quantity': 1
+                }],
+            mode='payment',
+            allow_promotion_codes = True,
+            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
+            cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
+        )
+        return {'sessionUrl': session['url']}
     
 
 @routes.route('/webhook', methods=['POST'])
@@ -248,13 +270,30 @@ def webhook_post():
     response = event['data']['object']
 
     try:
-        if event['type'] == 'customer.subscription.created' or event['type'] == 'customer.subscription.updated':
-            if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: product = 'basic'
-            elif response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: product = 'premium'
-            execute_query("UPDATE users SET subscription = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s", (product, response['id'], response['customer']))
+        if event['type'] == 'checkout.session.completed': 
+
+            user = get_user_data_stripe(response['customer'])
+
+
+            execute_query("UPDATE users SET subscription_tokens_left = %s WHERE stripe_user_id = %s", (int(user['subscription_tokens_left']) + 1200, response['customer']))
+
+        elif event['type'] == 'customer.subscription.created' or event['type'] == 'customer.subscription.updated':
+
+            try: user = get_user_data_stripe(response['customer'])
+            except: return {'error': 'Error retrieving user data'}
+
+            if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: 
+                tokens = 1200
+                product = 'basic'
+            elif response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: 
+                tokens = 2400
+                product = 'premium'
+            
+            execute_query("UPDATE users SET subscription = %s, subscription_tokens_left = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s", (product, int(user['subscription_tokens_left']) + tokens, response['id'], response['customer']))
 
         elif response['type'] == 'customer.subscription.deleted':
-            execute_query("UPDATE users SET subscription = 'none', stripe_subscription_id = NULL WHERE stripe_user_id = %s", (response['customer'],))
+            execute_query("UPDATE users SET subscription = 'none', subscription_tokens_left = 0, stripe_subscription_id = NULL WHERE stripe_user_id = %s", (response['customer'],))
+
 
     except KeyError: pass
 
@@ -379,3 +418,201 @@ Message: {request.json.get('message')}
         send_email_from_template(email = current_app.config['MAIL_CONTACT_USER'], template = 'contact', payload = payload)
         return {}
     except: return {'error': 'Error sending message.'}
+
+
+@routes.route('/get-policy', methods=['GET'])
+def get_policy_get():
+
+    policy = request.args.get('policy')
+
+    with open(f"policies/{policy}.md", encoding="utf-8", mode="r") as f:
+        content = f.read()
+
+    variables = {
+        "project_name": "SECRag",
+        "company_name": "Manart",
+        "email_support": "secrag.info@gmail.com"
+    }
+
+    return render_template_string(content, **variables)
+
+
+
+
+@routes.route('/get-filing-selection-data', methods=['GET'])
+def get_filing_selection_data_get():
+
+    try: user_info = decode_token(request.args.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('filing_selection_data.json', 'r') as f: filing_selection_data = json.load(f)
+    popular_filings = filing_selection_data['popular_filings']
+    if user_info['subscription'] == 'basic': popular_filings = [filing for filing in popular_filings if '10Q' not in filing]
+
+    return {'popularFilings': popular_filings[:3], 'availableFilings': filing_selection_data['available_filings']}
+
+
+
+@routes.route('/get-chats', methods=['GET'])
+def get_chats_get():
+
+    try: user_info = decode_token(request.args.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('memory.json', 'r') as f: memory = json.load(f)
+    chats = list(reversed(memory[user_info['email']].keys()))
+
+    return {'chats': chats}
+
+
+
+@routes.route('/get-messages', methods=['GET'])
+def get_messages_get():
+
+    try: user_info = decode_token(request.args.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('memory.json', 'r') as f: memory = json.load(f)
+    messages = memory[user_info['email']][request.args.get('chat')]['messages']
+    return {'messages': messages}
+
+
+
+@routes.route('/new-chat', methods=['POST'])
+def new_chat_post():
+
+    try: user_info = decode_token(request.json.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    print(user_info['subscription_tokens_left'])
+
+    token_cost_chat = 20
+    if int(user_info['subscription_tokens_left']) < token_cost_chat: return {'error': 'Insufficient Tokens'}
+
+    with open('memory.json', 'r') as f: memory = json.load(f)
+    memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
+    with open('memory.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    
+    execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
+
+    return {'success': True}
+
+
+
+@routes.route('/get-list-tickers', methods=['GET'])
+def get_list_tickers():
+
+    try: user_info = decode_token(request.args.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('filing_selection_data.json', 'r') as f: filing_selection_data = json.load(f)
+
+    return {'tickers': list(filing_selection_data['available_filings'].keys()), 'popularFilings': filing_selection_data['popular_filings'][:3]}
+
+
+
+@routes.route('/get-info-by-ticker', methods=['GET'])
+def get_info_by_ticker():
+
+    try: user_info = decode_token(request.args.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('filing_selection_data.json', 'r') as f: filing_selection_data = json.load(f)
+
+    return {'info': filing_selection_data['available_filings'][request.args.get('ticker')]}
+
+
+
+from edgar import *
+set_identity("paul.bezko@hotmail.com")
+
+@routes.route('/get-filing', methods=['GET'])
+def get_filing_get():
+
+    try: user_info = decode_token(request.args.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('memory.json', 'r') as f: memory = json.load(f)
+
+    ticker, year, form_raw = request.args.get('chat').split('-')
+    filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
+    if form_raw == '10K': form = '10-K'
+    elif '10Q' in form_raw: form = '10-Q'
+
+    try: 
+        with open(f'filings/{ticker.upper()}-{year}-{form_raw}.html', 'r') as f: html = f.read()
+        return {'html': html}
+    
+    except:
+        try:
+            html = Company(ticker).get_filings(form=form, date=filing_date)[0].html()
+
+            # GETTING TOKEN ESTIMATION
+            # markdown = Company(ticker).get_filings(form=form, date=filing_date)[0].markdown()
+            # word_count = len(markdown.split())
+            # print(f"Words in filing: {word_count}")
+            # words_to_tokens_multiplier = 1.3
+            # openai_cost_per_token = 0.001
+            # markup_multiplier = 10
+            # tokens = round(round(word_count * words_to_tokens_multiplier) * openai_cost_per_token * markup_multiplier)
+            # print(f"Calculated tokens: {tokens}")
+
+            with open(f'filings/{ticker.upper()}-{year}-{form_raw}.html', 'w') as f: f.write(html)
+            return {'html': html}
+        
+        except Exception as error:
+            return {'error': 'Error getting filing: ' + error}
+
+
+
+@routes.route('/delete-chat', methods=['POST'])
+def delete_chat_post():
+
+    try: user_info = decode_token(request.json.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('memory.json', 'r') as f: memory = json.load(f)
+    del memory[user_info['email']][request.json.get('chat')]
+    with open('memory.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    return {'success': True}
+
+
+
+from . import socketio
+from openai import OpenAI
+client = OpenAI(api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS")
+
+@routes.route('/new-message', methods=['POST'])
+def new_message_post():
+
+    try: user_info = decode_token(request.json.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    token_cost_message = 4
+    if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
+
+    with open('memory.json', 'r') as f: memory = json.load(f)
+    memory[user_info['email']][request.json.get('chat')]['messages'].append({"role": 'user', "content": request.json.get('message')})
+
+    stream = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": request.json.get('message')}], stream=True)
+
+    buffer = ""
+    for chunk in stream:
+        content = chunk.choices[0].delta.content
+        if content is not None: buffer += content
+        socketio.emit('llm_response', {'word': chunk.choices[0].delta.content})
+
+    memory[user_info['email']][request.json.get('chat')]['messages'].append({"role": 'assistant', "content": buffer})
+    with open('memory.json', 'w') as f: json.dump(memory, f, indent=2)
+    
+    execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
+
+    return {'success': True}
+
+
+# Handle a connection event
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')

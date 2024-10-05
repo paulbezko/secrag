@@ -47,6 +47,7 @@ def send_email_from_template(email, template, payload):
         email_message['Subject'] = subject
         email_message['From'] = current_app.config['MAIL_SENDER_USER']
         email_message['To'] = email
+        print(email)
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
             smtp_server.login(current_app.config['MAIL_SENDER_USER'], current_app.config['MAIL_SENDER_PASS'])
             smtp_server.send_message(email_message)
@@ -56,12 +57,37 @@ def send_email_from_template(email, template, payload):
 
 
 def get_user_data(email, retries=3):
+
     attempt = 0
     while attempt < retries:
         try:
             connection = current_app.config['DB_CONNECTION']
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+                return cursor.fetchone()
+        
+        except (OperationalError, InterfaceError) as conn_error:
+            print(f"Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}")
+            attempt += 1
+            reconnect_to_db()
+            time.sleep(2)  # Optional delay before retrying
+        
+        except Exception as error:
+            print('Error [Get User Data]:', error)
+            break
+    
+    print("Failed to retrieve user data after multiple attempts.")
+    return None
+
+
+def get_user_data_stripe(stripe_user_id, retries=3):
+
+    attempt = 0
+    while attempt < retries:
+        try:
+            connection = current_app.config['DB_CONNECTION']
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM users WHERE stripe_user_id = %s", (stripe_user_id,))
                 return cursor.fetchone()
         
         except (OperationalError, InterfaceError) as conn_error:
