@@ -8,13 +8,15 @@ import psycopg2
 import stripe
 import os
 
-load_dotenv()
+load_dotenv('../.env', override=True)
 flask_key_secret = os.getenv('flask_key_secret')
+
+from flask_socketio import SocketIO, emit
+socketio = SocketIO(cors_allowed_origins="*")
 
 def create_app(mode):
 
     from .routes import routes
-
     app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist')
 
     # Allowing CORS
@@ -60,11 +62,13 @@ def create_app(mode):
     app.config['STRIPE_PRODUCT_BASIC_YEARLY'] = os.getenv('STRIPE_PRODUCT_BASIC_YEARLY')
     app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_MONTHLY')
     app.config['STRIPE_PRODUCT_PREMIUM_YEARLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_YEARLY')
+    app.config['STRIPE_PRODUCT_REPLENISH'] = os.getenv('STRIPE_PRODUCT_REPLENISH')
 
     stripe.api_key = os.environ.get('STRIPE_KEY_TEST')
     supabase = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
     # Registering routes
     app.register_blueprint(routes, url_prefix='/api/')
+    socketio.init_app(app)
 
     return app
