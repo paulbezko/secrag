@@ -1,78 +1,91 @@
 <template>
-  <div class="display display-flex-column center">
+  <div class="flex-column center width-100 gap-8" style="min-height: 100vh; justify-content: start; padding-inline: 4rem; padding-bottom: 4rem;">
     <SpinnerComp v-if="showSpinner"></SpinnerComp>
-    <div class="display-margin display-flex-column">
-      <NavbarComp :authenticated="true" :subscribed="false"/>
-      <div class="display-flex-column height-100 flex-1 center width-100">
-        <div class="display-flex-column gap-2 center width-100">
-          <div class="heading-2 text-center">Subscribe to SkelTal</div>
-          
-          <div class="display-flex-column gap-2 width-100 height-100 card-subscription">
-            <div class="slider-parent">
-              <div id="slider-yearly" @click="handleClickPeriod('yearly')" class="slider-child display-flex-column">
-                <div class="text-2">Pay Yearly</div>
-                <div class="text-3">2 months free</div>
-              </div>
-              <div id="slider-monthly" @click="handleClickPeriod('monthly')" class="slider-child text-3 slider-child-active">
-                <div class="text-2">Pay Monthly</div>
-              </div>
-            </div>
-            <div class="display-flex-row gap-2 width-100 center show-on-large">
-              <div class="card card-subscribe display-flex-column center" style="position: relative">
-                <div class="tooltip display-flex-row center position-absolute text-3 gap-05" style="top: -15px"><div class="fa-solid fa-fire text-3"></div>Most Popular</div>
-                <div class="heading-2 display-flex-row" style="align-items: baseline;">{{ priceBasic }}<div class="text-2 bold">/mo</div></div>
-                <div class="text-2 bold">Basic</div>
-                <div class="text-3 text-center">The most basic stuff, you know</div>
-                <div class="line"></div>
-                <div class="display-flex-column gap-1" style="align-items: start; padding-block: 1rem;">
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 1</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 2 longer</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 3 even longer</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 4 shorter</div>
-                </div>
-                <button class="button button-cta" @click="subscribe('basic')">Subscribe Basic</button>
-              </div>
-              <div class="card card-subscribe display-flex-column center">
-                <div class="heading-2 display-flex-row" style="align-items: baseline;">{{ pricePremium }}<div class="text-2 bold">/mo</div></div>
-                <div class="text-2 bold">Premium</div>
-                <div class="text-3 text-center">The more premium stuff, you know</div>
-                <div class="line"></div>
-                <div class="display-flex-column gap-1" style="align-items: start; padding-block: 1rem;">
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 1</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 2 longer</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 3 even longer</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 4 shorter</div>
-                </div>
-                <button class="button button-secondary" @click="subscribe('premium')">Subscribe Premium</button>
-              </div>
-            </div>
-
-            <div class="display-flex-column gap-2 show-on-small">
-              <div class="display-flex-row gap-2 width-100 height-100 center">
-                <div id="card-basic" @click="handleClickSubscription('basic')" class="card card-subscribe-small display-flex-column center card-clickable card-clickable-active flex-1" style="position: relative">
-                  <div class="tooltip display-flex-row center position-absolute text-3 gap-05" style="top: -15px"><div class="fa-solid fa-fire text-3"></div>Most Popular</div>
-                  <div class="heading-2 display-flex-row" style="align-items: baseline;">{{ priceBasic }}<div class="text-2 bold">/mo</div></div>
-                  <div class="text-2 bold">Basic</div>
-                  <div class="text-3 text-center">The most basic stuff, you know</div>
-                </div>
-                <div id="card-premium" @click="handleClickSubscription('premium')" class="card card-subscribe-small display-flex-column center card-clickable flex-1">
-                  <div class="heading-2 display-flex-row" style="align-items: baseline;">{{ pricePremium }}<div class="text-2 bold">/mo</div></div>
-                  <div class="text-2 bold">Premium</div>
-                  <div class="text-3 text-center">The more premium stuff, you know</div>
-                </div>
-              </div>
-              <div class="card">
-                <div class="display-flex-column gap-1" style="align-items: start; padding-block: 1rem;">
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 1</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 2 longer</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 3 even longer</div>
-                  <div class="text-2 display-flex-row center gap-1"><div class="fa-solid fa-circle-check text-1 color-green"></div>Item 4 shorter</div>
-                </div>
-              </div>
-              <button class="button button-cta" style="width: 100%; border-radius: 2rem;" @click="subscribe(subscriptionType)">Subscribe to {{ subscriptionType }}</button>
-            </div>
-
+    <NavbarComp :authenticated="true" :subscribed="false"/>
+      <div class="flex-column center gap-4" style="max-width: 70rem;">
+      <div class="heading text-center">Start Your Journey to Smarter Filings</div>
+      <div class="text-2 text-center">Get more from SEC filings with the plan that fits your workflow.</div>
+      <div class="flex-column gap-2 width-100">
+        <div class="flex-row card width-100 gap-4" style="padding: 1rem;">
+          <div class="card-nested width-100 flex-column center" :class="{ active: subscriptionIsYearly }" @click="selectSubscriptionYearly">
+            <b class="text-1">Yearly</b>
+            <div class="text-2 text-center flex-row gap-05" style="align-items: baseline;"><div class="text-1">20%</div> Off</div>
           </div>
+          <div class="card-nested width-100 flex-column center" :class="{ active: !subscriptionIsYearly }" @click="selectSubscriptionMonthly">
+            <b class="text-1">Monthly</b>
+          </div>
+        </div>
+        <div class="flex-row gap-2 width-100 show-on-large">
+          <div class="flex-column card center gap-1 width-100">
+            <div class="text-2 flex-row" style="align-items: baseline;">
+              <div class="flex-row gap-05" style="align-items: baseline;">
+                <b style="font-size: var(--subheading)">€</b>
+                <b style="font-size: var(--heading);">{{ subscriptionIsYearly ? subscriptionItemsWithAnnual.Basic.priceAnnual : subscriptionItems.Basic.priceMonthly }}</b>
+              </div>/mo
+            </div>
+            <div class="text-1">{{ subscriptionItems.Basic.name }}</div>
+            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+            <div class="flex-column gap-1">
+              <div v-for="(feature, index) in subscriptionItems.Basic.features" :key="index">
+                <div class="flex-row gap-1 text-3">
+                  <div class="fa-solid fa-square-check text-2" style="color: var(--color-blue)"></div>
+                  {{ feature }}
+                </div>
+              </div>
+            </div>
+            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+            <div class="button button-secondary" @click="subscribe('basic')">Join {{ subscriptionItems.Basic.name }}</div>
+          </div>
+          <div class="flex-column card center gap-1 width-100">
+            <div class="text-2 flex-row" style="align-items: baseline;">
+              <div class="flex-row gap-05" style="align-items: baseline;">
+                <b style="font-size: var(--subheading)">€</b>
+                <b style="font-size: var(--heading);">{{ subscriptionIsYearly ? subscriptionItemsWithAnnual.Premium.priceAnnual : subscriptionItems.Premium.priceMonthly }}</b>
+              </div>/mo
+            </div>
+            <div class="text-1">{{ subscriptionItems.Premium.name }}</div>
+            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+            <div class="flex-column gap-1">
+              <div v-for="(feature, index) in subscriptionItems.Premium.features" :key="index">
+                <div class="flex-row gap-1 text-3">
+                  <div class="fa-solid fa-square-check text-2" style="color: var(--color-blue)"></div>
+                  {{ feature }}
+                </div>
+              </div>
+            </div>
+            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+            <div class="button button-primary" @click="subscribe('premium')">Join {{ subscriptionItems.Premium.name }}</div>
+          </div>
+        </div>
+        <div class="flex-row gap-2 show-on-small">
+          <div class="flex-row card width-100 gap-4" style="padding: 1rem;">
+            <div class="card-nested width-100 flex-column center" :class="{ active: subscriptionIsBasic }" @click="selectSubscriptionBasic">
+              <b class="text-1" style="color: var(--color-blue)">{{ subscriptionItems.Basic.name }}</b>
+            </div>
+            <div class="card-nested width-100 flex-column center" :class="{ active: !subscriptionIsBasic }" @click="selectSubscriptionPremium">
+              <b class="text-1" style="color: var(--color-yellow)">{{ subscriptionItems.Premium.name }}</b>
+            </div>
+          </div>
+        </div>
+        <div class="card flex-column center gap-1 width-100 show-on-small" style="padding-top: 3rem;">
+          <div class="text-2 flex-row" style="align-items: baseline;">
+              <div class="flex-row gap-05" style="align-items: baseline;">
+                <b style="font-size: var(--heading)">€</b>
+                <b style="font-size: var(--heading);">{{ subscriptionIsBasic ? (subscriptionIsYearly ? subscriptionItemsWithAnnual.Basic.priceAnnual : subscriptionItems.Basic.priceMonthly) : (subscriptionIsYearly ? subscriptionItemsWithAnnual.Premium.priceAnnual : subscriptionItems.Premium.priceMonthly) }}</b>
+              </div>/mo
+            </div>
+          <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+          <div class="flex-column gap-1">
+            <div v-for="(feature, index) in (subscriptionIsBasic ? subscriptionItems.Basic.features : subscriptionItems.Premium.features)" :key="index">
+              <div class="flex-row gap-1 text-2" style="align-items: center;">
+                <div class="fa-solid fa-square-check text-2" style="color: var(--color-blue)"></div>
+                {{ feature }}
+              </div>
+            </div>
+          </div>
+          <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+          <div v-if="subscriptionIsBasic" class="button button-secondary" @click="subscribe('basic')">Join {{ subscriptionItems.Basic.name }}</div>
+          <div v-if="!subscriptionIsBasic" class="button button-primary" @click="subscribe('premium')">Join {{ subscriptionItems.Premium.name }}</div>
         </div>
       </div>
     </div>
@@ -85,6 +98,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { config } from '@/config';
 import axios from 'axios';
 import SpinnerComp from '@/components/SpinnerComp.vue';
+import webdata from '../webdata.json'
 
 export default {
   components: {
@@ -93,18 +107,34 @@ export default {
   },
   data() {return {
     stripePromise: null, 
+    showSpinner: false,
+    subscriptionItems: webdata.subscriptionItems,
+    subscriptionIsYearly: true,
+    periodType: 'yearly',
+    subscriptionIsBasic: false,
     subscriptionType: 'basic',
-    priceBasic: 20,
-    pricePremium: 40,
-    periodType: 'monthly',
-    showSpinner: false
+    projectName: webdata.projectName,
   }},
+  computed: {
+    subscriptionItemsWithAnnual() {
+      return {
+        "Basic": {
+          ...this.subscriptionItems.Basic,
+          priceAnnual: (this.subscriptionItems.Basic.priceMonthly * 0.8)
+        },
+        "Premium": {
+          ...this.subscriptionItems.Premium,
+          priceAnnual: (this.subscriptionItems.Premium.priceMonthly * 0.8)
+        }
+      };
+    }
+  },
   mounted() {
     this.initializeStripe()
   },
   methods: {
     async initializeStripe() {
-      try {this.stripePromise = loadStripe('pk_test_51PtWwQGjSxKJrDncatm1lbb4MnM0umSDHU41hWh12HuIlkNwyl29qKdisowDY7UZazwI4HUnIDhLh9j17upYBTsA002jNz2GUG')} 
+      try {this.stripePromise = loadStripe(webdata.stripeKey)} 
       catch (error) {console.error('Error initializing Stripe:', error)}
     },
 
@@ -122,40 +152,11 @@ export default {
 
       stripe.redirectToCheckout({sessionId: response.data.sessionId})
     },
-    handleClickPeriod(type) {
-      const yearlySlider = document.getElementById('slider-yearly');
-      const monthlySlider = document.getElementById('slider-monthly');
 
-      yearlySlider.classList.remove('slider-child-active');
-      monthlySlider.classList.remove('slider-child-active');
-
-      if (type === 'yearly') {
-        this.periodType = 'yearly'
-        this.priceBasic = 17
-        this.pricePremium = 33
-        yearlySlider.classList.add('slider-child-active');
-      } else if (type === 'monthly') {
-        this.periodType = 'monthly'
-        this.priceBasic = 20
-        this.pricePremium = 40
-        monthlySlider.classList.add('slider-child-active');
-      }
-    },
-    handleClickSubscription(type) {
-      const basicSubscription = document.getElementById('card-basic');
-      const premiumSubscription = document.getElementById('card-premium');
-
-      basicSubscription.classList.remove('card-clickable-active');
-      premiumSubscription.classList.remove('card-clickable-active');
-
-      if (type === 'basic') {
-        this.subscriptionType = 'basic'
-        basicSubscription.classList.add('card-clickable-active');
-      } else if (type === 'premium') {
-        this.subscriptionType = 'premium'
-        premiumSubscription.classList.add('card-clickable-active');
-      }
-    },
+    selectSubscriptionYearly() {this.subscriptionIsYearly = true; this.periodType = 'yearly'},
+    selectSubscriptionMonthly() {this.subscriptionIsYearly = false; this.periodType = 'monthly'},
+    selectSubscriptionBasic() {this.subscriptionIsBasic = true;},
+    selectSubscriptionPremium() {this.subscriptionIsBasic = false;},
   }
 }
 </script>

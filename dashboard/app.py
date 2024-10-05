@@ -8,14 +8,15 @@ langchain_config.set_verbose(False)
 langchain_config.set_debug(False)
 
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Blueprint, Flask, request
 from flask_socketio import SocketIO
 from langchain.callbacks.manager import CallbackManager
 from langchain_community.llms import OpenAI
 from langchain.memory import *
-from utils.json_utils import *
-from dashboard.llm import main_llm_chain
+from .utils.json_utils import *
+from .utils.llm import main_llm_chain
 
+dashboard_llm_bp = Blueprint('dashboard_llm', __name__, template_folder='templates')
 
 app = Flask(__name__)
 
@@ -25,14 +26,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['OPENAI_API_KEY'] = ''
 
 load_dotenv(".env", override=True)
-# loader = TextLoader("documents/new_doc.txt")
-# documents = loader.load()
-# text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-# docs = text_splitter.split_documents(documents)
-# embeddings = OpenAIEmbeddings()
-memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True,  output_key='answer')
 
-from utils.custom_streaming_callback_handler import CustomStreamingCallbackHandler, streaming_call_bp
+from .utils.custom_streaming_callback_handler import CustomStreamingCallbackHandler, streaming_call_bp
 
 app.register_blueprint(streaming_call_bp)
  
@@ -48,104 +43,26 @@ def ask():
     ticker = request.args.get('ticker')
     filing = request.args.get('filing')
     
-    return ask_(prompt, uid, conversation_id, socket_id, ticker, filing)
-
-    # # We do not know what document is the request for if there is no ticker, filing, and conversation ID
-    # if (ticker == None and filing == None) and conversation_id == None:
-    #     res_dict = {"error": "Missing Ticker or Filing for conversation initialization"}
-    #     return res_dict
-        
-    # # Get ticker information from the memory if conversation ID is known
-    # elif (ticker == None and filing == None) and conversation_id != None:
-    #     ticker, filing = retrieve_conversation_filing_info(uid, conversation_id)
-        
-    # # Load most recent filing if only ticker information is supplied
-    # if ticker and not filing:
-    #     sec_filing = load_sec(ticker)
-    #     filing = sec_filing.file_number
-
-    # # All logic for handling conversations (new or existing) is outsourced to its own function
-    # # The output is the conversation ID
-    # conversation_id = conversation_handler_json(uid, conversation_id, prompt, ticker, filing)
-
-    # # Some useful in the future code from examples
-    #     # projectId = request.args.get('projectId', default="0")
-    #     # sender = request.args.get('ip', default='00000')  
-    #     # collection_name = "collection-" + str(1)
-    
-    # # Load conversation memory file
-    # # USELESS???
-    # _, conversation_id = init_load_json_file_memory(uid, conversation_id, prompt, ticker, filing)
-    
-    # # Define callback manager for output tokens
-    # callback_manager = CallbackManager([CustomStreamingCallbackHandler(id=socket_id)])
-    
-    # # Ask the question to the custom RAG
-    # answer = rag_with_memory_and_docs(uid, conversation_id, prompt, callback_manager, ticker, filing)
-    
-    # # Format output
-    # res_dict = {
-    #     "question": prompt,
-    #     "answer": answer,
-    # }
-
-    # return res_dict      
+    return ask_(prompt, uid, conversation_id, socket_id, ticker, filing)    
 
 
 
-def ask_(prompt, uid, conversation_id, socket_id, ticker, filing):
-    
-    # # Retrieve GET args:
-    # prompt = request.args.get('prompt')
-    # uid = request.args.get('uid')
-    # conversation_id = request.args.get('cid')
-    # socket_id = request.args.get('socket_id')
-    # ticker = request.args.get('ticker')
-    # filing = request.args.get('filing')
-    
+def ask_(prompt, uid, conversation_id, socket_id, ticker, filing_year, chunk_size = 10000, chunk_overlap = 3, k = 8, table_prepend_k = 3, ready_filing = None):
 
     # We do not know what document is the request for if there is no ticker, filing, and conversation ID
-    if (not ticker and not filing) and conversation_id == None:
-        res_dict = {"error": "Missing Ticker or Filing for conversation initialization"}
+    if (not ticker or not filing_year):
+        res_dict = {"error": "Missing Ticker or Filing Year"}
         return res_dict
         
-    # Get ticker information from the memory if conversation ID is known
-    elif (not ticker and not filing) and conversation_id != None:
-        ticker, filing = retrieve_conversation_filing_info(uid, conversation_id)
-        
-    # Load most recent filing if only ticker information is supplied
-    if ticker and not filing:
-        sec_filing = load_sec(ticker)
-        filing = sec_filing.file_number
-
-    # All logic for handling conversations (new or existing) is outsourced to its own function
-    # The output is the conversation ID
-    conversation_id = conversation_handler_json(uid, conversation_id, prompt, ticker, filing)
-
-    # Some useful in the future code from examples
-        # projectId = request.args.get('projectId', default="0")
-        # sender = request.args.get('ip', default='00000')  
-        # collection_name = "collection-" + str(1)
-    
-    # Load conversation memory file
-    # USELESS???
-    _, conversation_id = init_load_json_file_memory(uid, conversation_id, prompt, ticker, filing)
+    conversation_id = "{}-{}".format(ticker.upper(), str(filing_year))    
     
     # Define callback manager for output tokens
     callback_manager = CallbackManager([CustomStreamingCallbackHandler(id=socket_id)])
     
     # Ask the question to the custom RAG
-    answer = main_llm_chain(uid, conversation_id, prompt, callback_manager, ticker, filing)
-    
-    # Format output
-    # res_dict = {
-    #     "question": prompt,
-    #     "answer": answer,
-        
-    # }
+    answer = main_llm_chain(uid, conversation_id, prompt, callback_manager, ticker, filing_year, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
 
     return answer  
-
 
 if __name__ == '__main__':
     

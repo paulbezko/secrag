@@ -1,43 +1,39 @@
 <template>
-  <div class="display">
+  <div class="flex-column width-100 center" style="padding-inline: 4rem;">
     <SpinnerComp v-if="showSpinner"></SpinnerComp>
-    <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess" /></div>
-    <div class="display display-flex-column center" v-if="stage === 'signUpBefore'">
-      <router-link to="/" class="fa-solid fa-xmark text text-1 text-link" style="position: absolute; top: 2rem; left: 2rem;"></router-link>
-      <div class="display-flex-column center height-100">
-        <div class="display-flex-column center gap-2" style="max-width: 24rem;">
-          <div class="heading-2">Sign Up</div>
-          <div class="text-3" style="width: 24rem; text-align: center;">Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.</div>
-          <div class="display-flex-column center gap-1 width-100">
-            <div class="display-flex-row gap-1 width-100">
-              <input class="input flex-1" v-model="email" type="email" placeholder="Email">
-              <button @click="signupPassword('signUpBefore', $event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
-            </div>
+    <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess"/></div>
+    <div v-if="showSuccess" class="backdrop z-30" @click="handleCloseConfirm"></div>
+    <div v-if="stage === 'signUpBefore'" class="display display-flex-column center">
+      <router-link to="/" class="fa-solid fa-xmark text-1" style="position: absolute; top: 2rem; left: 2rem;"></router-link>
+      <div class="flex-column center width-100 gap-2" style="max-width: 50rem;">
+        <div class="heading text-center">Welcome to {{ projectName }}</div>
+        <div class="text-2 text-center">Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.</div>
+        <div class="flex-column center gap-2 width-100" style="max-width: 40rem;">
+          <div class="flex-row gap-1 width-100">
+            <input class="input" v-model="email" type="email" placeholder="Email">
+            <div @click="signupPassword('signUpBefore', $event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
           </div>
-          <div v-if="error" class="text-3 text-error">{{error}}</div>
-          <div class="text-link text-3 display-flex-row bold gap-05 center" @click="signupGoogle()"><div class="fa-brands fa-google text-3"></div>Sign up with Google</div>
-          <div class="text-3 text-center">By signing up you agree to our <router-link class="text text-3 text-link" to="/signup">Terms and Conditions.</router-link></div>
+          <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
         </div>
+        <div class="text-3 text-bold flex-row gap-1 center text-link" @click="signupGoogle()"><div class="fa-brands fa-google text-3"></div>Sign In with Google</div>
       </div>
-      <div class="text text-3 width-100 text-center" style="position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%)">Have an account already? <router-link class="text text-3 text-link bold" to="/login">Login</router-link></div>
-      <div v-if="showSuccess" class="backdrop z-30" @click="handleCloseSuccess"></div>
+      <div class="text-4 flex-column center absolute width-100 gap-05" style="bottom: 2rem; left: 50%; transform: translateX(-50%)">
+        <div class="flex-row center gap-05">Have an account already? <router-link class="text-4 text-link" to="/login">Login</router-link></div>
+        <div class="text-4 text-center">By signing up you agree to our <router-link to="/terms-and-conditions" class="text-4">Terms and Conditions</router-link></div>
+      </div>
     </div>
-    <div v-if="stage === 'signUpAfter'">
-      <div class="display display-flex-column center">
-        <div class="display-flex-column center">
-          <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; padding: 1rem;">
-            <div class="heading-2">Sign Up</div>
-            <div class="text-3" style="width: 24rem; text-align: center;">{{ signup_heading_1 }}</div>
-            <div class="display-flex-column center gap-1 width-100">
-              <input class="input" v-model="name" type="text" placeholder="Name">
-              <input class="input" v-model="password" type="password" placeholder="Password">
-              <div class="display-flex-row gap-1 width-100">
-                <input class="input flex-1" v-model="passwordConfirm" type="password" placeholder="Confirm Password">
-                <button @click="signupPassword('signUpAfter')" class="fa-solid fa-arrow-right text-2 button-icon"></button>
-              </div>
-            </div>
-            <div v-if="error" class="text-3 text-error">{{error}}</div>
+    <div v-if="stage === 'signUpAfter'" class="display display-flex-column center">
+      <div class="flex-column center width-100 gap-2" style="max-width: 50rem;">
+        <div class="heading text-center">Welcome to {{ projectName }}</div>
+        <div class="text-2 text-center">Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.</div>
+        <div class="flex-column center gap-1 width-100" style="max-width: 40rem;">
+          <input class="input" v-model="name" type="text" placeholder="Name">
+          <input class="input" v-model="password" type="password" placeholder="Password">
+          <div class="flex-row gap-1 width-100">
+            <input class="input" v-model="passwordConfirm" type="password" placeholder="Confirm Password">
+            <div @click="signupPassword('signUpAfter', $event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
           </div>
+          <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
         </div>
       </div>
     </div>
@@ -45,6 +41,7 @@
 </template>
 
 <script>
+import webdata from '../webdata.json'
 import axios from 'axios';
 import SuccessComp from '../components/SuccessComp.vue';
 import SpinnerComp from '../components/SpinnerComp.vue';
@@ -58,6 +55,7 @@ export default {
     SpinnerComp
   },
   data() {return {
+    projectName: webdata.projectName,
     stage: '', 
     action: '',
     email: '',
@@ -121,8 +119,8 @@ export default {
       }
     },
     async signupGoogle() {
-      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiemtzcWFrdG15bXJzcXJndmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg4MTkyNjQsImV4cCI6MjAzNDM5NTI2NH0.d2PgiDLfP5AVPBaJM_s--TgTfIAErZu0FmdHuPV-5Fs'
-      const SUPABASE_URL = 'https://jbzksqaktmymrsqrgvfo.supabase.co'
+      const SUPABASE_KEY = webdata.supabaseKey
+      const SUPABASE_URL = webdata.supabaseURL
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
       await supabase.auth.signInWithOAuth({provider: 'google', "options": {"redirectTo": `${config.webUrl}/handle-supabase`}})
     },

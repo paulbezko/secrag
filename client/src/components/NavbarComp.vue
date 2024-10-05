@@ -1,40 +1,42 @@
 <template>
-  <div class="display-flex-row width-100" style="padding-block: 2rem;">
-    <div class="display-flex-row width-100" style="justify-content: space-between;">
-      <div class="display-flex-row gap-2">
-        <router-link class="text text-2 text-link medium" to="/">SecRag</router-link>
-        <div class="text text-2 text-link medium" style="color: transparent" v-if="authenticated && !subscribed">Dashboard</div>
-        <router-link class="text text-2 text-link medium show-on-large" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
+  <div class="flex-row width-100" style="padding-block: 2rem; max-width: 112rem;">
+    <div class="flex-row width-100" style="justify-content: space-between;">
+      <div class="flex-row center gap-2">
+        <router-link class="text-3 text-bold text-link" to="/">{{projectName}}</router-link>
+        <div class="text-3" style="color: transparent" v-if="authenticated && !subscribed">Dashboard</div>
+        <router-link class="text-3 show-on-large text-link" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
       </div>
-      <div class="display-flex-row gap-2 show-on-large">
-        <router-link class="text text-2 text-link medium" to="/pricing">Pricing</router-link>
-        <router-link class="text text-2 text-link medium" to="/about-us">About Us</router-link>
-        <router-link class="text text-2 text-link medium" to="/faq">FAQ</router-link>
+      <div class="flex-row center gap-2 show-on-large">
+        <router-link class="text-3 text-link" to="/#about">About</router-link>
+        <router-link class="text-3 text-link" to="/#faq">FAQ</router-link>
+        <router-link class="text-3 text-link" to="/#contact">Contact</router-link>
       </div>
-      <div class="display-flex-row gap-2 show-on-large">
-        <router-link class="text text-2 text-link medium" v-if="!authenticated" to="/login">Login</router-link>
-        <router-link class="text text-2 text-link medium" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
-        <div class="text text-2 text-link medium" style="color: transparent" v-if="authenticated && subscribed">Subscribe</div>
-        <div class="text text-2 text-link medium" v-if="authenticated" @click="toggleProfile">Profile</div>
+      <div class="flex-row gap-2 show-on-large">
+        <router-link class="button button-secondary" v-if="!authenticated" to="/login">Sign In</router-link>
+        <router-link class="text-3 text-link" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
+        <div class="text-3" style="color: transparent" v-if="authenticated && subscribed">Subscribe</div>
+        <div class="text-3 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>
       </div>
-      <div class="display-flex-row gap-2 show-on-small">
-        <div class="fa-solid fa-bars text-1 text-link" @click="toggleDropdown()"></div>
+      <div class="flex-row gap-2 show-on-small">
+        <div class="fa-solid fa-ellipsis-vertical text-1 text-link" @click="toggleDropdown()"></div>
       </div>
     </div>
 
     <component :is="profileComp"></component>
 
     <transition>
-      <div v-if="showDropdown" class="card show-on-small z-30" style="position:absolute; top:1rem; right:1rem;">
-        <router-link class="text text-2 text-link medium" v-if="authenticated && subscribed"  to="/dashboard">Dashboard</router-link>
+      <div v-if="showDropdown" class="card-component card-component-navbar flex-column gap-1 show-on-small z-30 width-100" style="max-width: 16rem; top:2rem; right:2rem;">
+        <router-link class="text-2" v-if="authenticated && subscribed"  to="/dashboard">Dashboard</router-link>
+        <hr class="width-100" v-if="authenticated && subscribed" style="border-top: 1px solid var(--color-grey)">
         <div v-if="authenticated && subscribed" ></div>
-        <router-link class="text text-2 text-link medium" to="/pricing">Pricing</router-link>
-        <router-link class="text text-2 text-link medium" to="/about-us">About Us</router-link>
-        <router-link class="text text-2 text-link medium" to="/faq">FAQ</router-link>
-        <div></div>
-        <router-link class="text text-2 text-link medium" v-if="!authenticated" to="/login">Login</router-link>
-        <router-link class="text text-2 text-link medium" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
-        <div class="text text-2 text-link medium" v-if="authenticated" @click="toggleProfile">Profile</div>
+        <router-link class="text-2" @click="toggleDropdown()" to="/#about">About</router-link>
+        <router-link class="text-2" @click="toggleDropdown()" to="/#faq">FAQ</router-link>
+        <router-link class="text-2" @click="toggleDropdown()" to="/#contact">Contact</router-link>
+        <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+        <router-link class="text-2" v-if="!authenticated" to="/signup">Sign Up</router-link>
+        <router-link class="text-2" v-if="!authenticated" to="/login">Login</router-link>
+        <router-link class="text-2" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
+        <div class="text-2 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>
       </div>
     </transition>
 
@@ -47,6 +49,7 @@
 
 <script>
 import ProfileComp from './ProfileComp.vue';
+import webdata from '../webdata.json'
 
 export default {
   components: {
@@ -58,7 +61,8 @@ export default {
   },
   data() {return {
     showProfile: false,
-    showDropdown: false
+    showDropdown: false,
+    projectName: webdata.projectName,
   }},
   computed: {
     profileComp() {return this.showProfile ? 'ProfileComp' : null},
