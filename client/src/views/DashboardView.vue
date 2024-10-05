@@ -173,6 +173,7 @@ export default {
       selectedTicker: '', // Initialize selected ticker
       selectedYear: '', // Initialize selected year
       selectedFiling: '',
+      socketId: '',
       currentChat: '',
       currentMessages: [],
       newChat: true,
@@ -230,8 +231,7 @@ export default {
     selectFiling(option) {this.selectedFiling = option;},
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {console.log("Socket connected: ", socket.id)});
-      socket.on("disconnect", () => {console.log("Socket disconnected")});
+      socket.on("connect", () => {(this.socketId = socket.id)});
       socket.on("llm_response", (data) => {
         if (data && data.word) {
           this.llmResponseBuffer += data.word; // Append new word to buffer
@@ -355,7 +355,6 @@ export default {
     },
 
     async sendMessage(refName) {
-      // Check if the Enter key was pressed without Shift (allow Shift+Enter for new lines)
 
       if (this.isSmallScreen && this.filingShown) {this.toggleFilingView();}
 
@@ -364,17 +363,25 @@ export default {
 
       if (this.newMessage.trim() !== '') {
 
+        this.currentMessages.push({ role: 'user', content: this.newMessage });
+        this.assistantMessageIndex = this.currentMessages.length;
+        this.llmResponseBuffer = '';
+        this.currentMessages[this.assistantMessageIndex] = { role: 'assistant', content: null };
+        let payloadMessage = this.newMessage
+        this.newMessage = ''; // Clear the input message
+        this.newChat = false;
+        
         this.$nextTick(() => {
           this.adjustTextareaHeight('textarea'); // Adjust the height after message is sent
+          this.scrollToBottom(); // Scroll to the bottom after the message is added
         });
-
-        let payloadMessage = this.newMessage;
 
         try {
           let response = await axios.post(`${config.apiUrl}/api/new-message`, {
             token: localStorage.getItem('_u'),
             chat: this.currentChat,
-            message: payloadMessage
+            message: payloadMessage,
+            socketId: this.socketId
           });
 
           if (response.data.error) {
@@ -382,24 +389,7 @@ export default {
             else (alert(response.data.error))
             return;
           }
-
-          this.currentMessages.push({ role: 'user', content: this.newMessage });
-          this.newMessage = ''; // Clear the input message
-
-        } catch (error) {
-          console.error('Error sending message:', error); return;
-        }
-        
-        this.$nextTick(() => {
-          this.scrollToBottom(); // Scroll to the bottom after the message is added
-        });
-
-        // Prepare assistant response handling
-        this.assistantMessageIndex = this.currentMessages.length;
-        this.llmResponseBuffer = '';
-        this.currentMessages[this.assistantMessageIndex] = { role: 'assistant', content: null };
-
-        this.newChat = false; // Mark that we're in an active chat
+        } catch (error) {console.error('Error sending message:', error); return;}
       }
     },
     renderMarkdown(content) {
@@ -408,7 +398,6 @@ export default {
     },
     updateAssistantMessage() {
       // Update the existing assistant message
-      
       if (this.assistantMessageIndex !== null) {
         if (this.llmResponseBuffer.trim()) {
           this.currentMessages[this.assistantMessageIndex].content = marked(this.llmResponseBuffer);
@@ -424,13 +413,9 @@ export default {
         textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px'; // Limit max-height to 160px
       }
     },
-
-
-
     toggleSidebar() {
       this.sidebarShown = !this.sidebarShown;
     },
-
     toggleNewChat() {
       this.newChat = true;
       this.currentMessages = [];
@@ -459,12 +444,13 @@ export default {
         this.error = 'Chat already exists';
         return;
       }
-
+      console.log(this.selectedFiling)
       try {
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
           chat: newChatName,
-          filingDate: this.selectedFiling.split(' ')[1]
+          filingDate: this.selectedFiling.split(' ')[1],
+          ticker: this.selectedTicker
         });
 
         if (response.data.error) {

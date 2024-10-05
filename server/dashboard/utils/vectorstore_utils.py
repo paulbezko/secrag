@@ -21,7 +21,7 @@ load_dotenv(".env", override=True)
 # supported_text_splitters = ["recursive_character", "markdown", "edgartools"]
 supported_text_splitters = ["edgartools"]
 
-def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 5000, chunk_overlap = 1000, k = 1, table_prepend_k = 3, splitter_mode = "edgartools"):
+def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 10000, chunk_overlap = 3, k = 1, table_prepend_k = 3, splitter_mode = "edgartools"):
     """
     Manages vectorstore for a given filing and configuration.
 
@@ -40,7 +40,7 @@ def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 5000, chunk_o
     # Initialize metadata model
     metadata_model = {
         "ticker": filing.ticker, 
-        "year": filing.filing_year,
+        "date": filing.filing_date,
         "chunk_size": chunk_size,
         "chunk_overlap": chunk_overlap,
         "table_prepend_k": table_prepend_k
@@ -67,17 +67,17 @@ def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 5000, chunk_o
             chunks = filing.as_documents(chunk_size, chunk_overlap, table_prepend_k)
             vectorstore.add_documents(chunks)
             vectorstore.save_local(vectorstore_dir)
-            print(f"Updated Grand-vectorstore for {filing.ticker}-{filing.filing_year}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+            print(f"Updated Grand-vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
         # Case when embedding already exists       
         else:
-            print(f"Embedding already exists for {filing.ticker}-{filing.filing_year}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+            print(f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
     # Create vectorstore if it doesn't exist
     else:
         # Create new embedding and vectorstore, and save the vectorstore 
         chunks = filing.as_documents(chunk_size, chunk_overlap, table_prepend_k)
         vectorstore = FAISS.from_documents(chunks, embedding=embeddings)
         vectorstore.save_local(vectorstore_dir)
-        print(f"Created Grand-vectorstore, added {filing.ticker}-{filing.filing_year}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+        print(f"Created Grand-vectorstore, added {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
 
     return vectorstore
 

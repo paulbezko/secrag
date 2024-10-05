@@ -14,6 +14,10 @@ from .vectorstore_utils import vectorstore_manager, load_sec
 from .debug import debug_print
 from .sec_utils import *
 
+from server import socketio
+
+from flask_socketio import emit
+
 # Get the current directory of the script
 current_dir = str(os.path.dirname(os.path.abspath(__file__)))
 
@@ -179,7 +183,7 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : Cu
 
     # Returns financials contexts according to needs of the prompt
     financials_contexts = process_need_for_financials(vectorstore, need_for_financials, metadata_model)
-    print("Retrieved financials number:",len(financials_contexts))
+    print("Retrieved financials number:", len(financials_contexts))
 
     # Initialized for returning separate context objects (Documents) for debugging
     contexts_as_objects = financials_contexts
@@ -204,7 +208,7 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : Cu
 
 
     # Added a callback manager to stream the output to the client
-    qa_llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='', callback_manager=callback_manager)
+    qa_llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='')
     
     # Initialize the QA chain 
     question_answer_chain = qa_prompt | qa_llm
@@ -212,13 +216,16 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : Cu
     debug_print(session, id_separator, uid)
 
     # Grand-finale
-    answer = question_answer_chain.invoke(
-        {"input": prompt, "ticker": filing.ticker, "filing": filing.file_number, "context":final_contexts},
-    )
+    buffer = ''
+    socket_id = callback_manager
+    for chunk in question_answer_chain.stream({"input": prompt, "ticker": filing.ticker, "filing": filing.file_number, "context": final_contexts}):
+        buffer += chunk.content
+        socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
+        
 
     return {
         "context": contexts_as_objects,
-        "answer": answer.content
+        "answer": buffer
     }
 
 

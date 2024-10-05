@@ -1,0 +1,360 @@
+{
+  "planetchars@gmail.com": {
+    "AMPH-2021-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AMPH-2021-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "CWGL-2019-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! CWGL-2019-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "assy"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you might be asking about \"assy,\" which could refer to various topics. Could you please clarify what you mean? For example, are you referring to an assembly in programming, a specific subject like assessment, or something else entirely?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test successful! How can I assist you today?"
+        }
+      ]
+    },
+    "AAL-2007-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAL-2007-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test successful! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test again'"
+        },
+        {
+          "role": "assistant",
+          "content": "It looks like you might want to run a test or check something. How can I assist you further?"
+        }
+      ]
+    },
+    "AASP-2012-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AASP-2012-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        }
+      ]
+    },
+    "AADI-2018-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AADI-2018-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAT-2015-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAT-2015-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAT-2016-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAT-2016-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAPL-2011-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAPL-2011-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAP-2006-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAP-2006-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system. How can I assist you today? If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system. If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system. How can I assist you today? If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system. How can I assist you today? If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
+        }
+      ]
+    },
+    "AAPL-2016-10K": {
+      "filing_date": "2016-10-26",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAPL-2016-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "what is the document about"
+        },
+        {
+          "role": "assistant",
+          "content": "I need more context to provide an accurate response. Could you please specify which document you are referring to?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It includes various risk factors, financial performance details, and information about the company's operations, including its reliance on key personnel, exposure to global economic conditions, and the impact of international operations on its business. If you have any specific questions or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It discusses various risk factors that could impact the company's business, financial condition, and operating results, including reliance on key personnel, potential disruptions from political events and natural disasters, competition in the technology industry, and fluctuations in foreign currency exchange rates, among others. If you have any specific questions or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It discusses various risk factors that could impact the company's business, financial condition, and operating results, including reliance on key personnel, potential disruptions from political events and natural disasters, competition in the technology market, and financial performance risks related to currency fluctuations and credit exposure. If you have any specific questions or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding this filing, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It discusses various risk factors affecting the company's business, including reliance on key personnel, potential impacts from political events and natural disasters, fluctuations in revenue and operating results, stock price volatility, foreign currency risks, credit risks, tax liabilities, and competition in the technology market. The filing also outlines the company's financial performance, liquidity, and capital resources. If you have any specific questions about the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It includes various risk factors, financial performance details, and information about the company's operations, including its reliance on key personnel, exposure to global economic conditions, and the impact of international operations on its business. If you have any specific questions or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. If you have any specific questions or need further information regarding the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": ""
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC filing (Form 10-K) for the fiscal year ended September 24, 2016. This filing includes detailed financial information, risk factors, and other disclosures relevant to the company's operations and financial condition. If you have specific questions about the content or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": ""
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from the SEC filing for Apple Inc. (ticker: AAPL, filing number: 001-36743). This filing includes financial statements, risk factors, and other relevant information about the company's performance and operations for the fiscal year ended September 24, 2016. If you have specific questions about the content or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": ""
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from the SEC filing for Apple Inc. (ticker: AAPL, filing number: 001-36743). If you have any specific questions or need information regarding the content of this filing, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": ""
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from the SEC filing for Apple Inc. (ticker: AAPL, filing number: 001-36743). This filing includes financial statements, risk factors, and other relevant information about the company's performance and operations for the fiscal year ended September 24, 2016. If you have specific questions about the content or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It discusses various risk factors affecting the company's business, including reliance on key personnel, potential impacts from political events and natural disasters, fluctuations in revenue and operating results, stock price volatility, foreign currency risks, credit risks, tax liabilities, and competition in the technology market. The filing also outlines the company's financial performance, liquidity, and capital resources. If you have any specific questions about the content, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "tyest"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s 2016 Form 10-K filing with the SEC. This document outlines various risk factors, business strategies, and operational details relevant to the company's performance and market conditions. If you have specific questions about the content or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "The context provided is from Apple Inc.'s SEC 10-K filing for the year 2016. It includes various risk factors, financial performance details, and information about the company's operations, including its reliance on key personnel, exposure to global economic conditions, and the impact of international operations on its business. If you have any specific questions or need further information, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "what are the risks outlined in the form"
+        },
+        {
+          "role": "assistant",
+          "content": "The risks outlined in the SEC filing for Apple Inc. (ticker: AAPL) include:\n\n1. **Global and Regional Economic Conditions**: Economic uncertainty can adversely affect consumer and business spending, impacting demand for the Company's products and services.\n\n2. **Financial Market Turmoil**: Financial instability can lead to credit market tightening, affecting the Company's operations and its partners' ability to finance purchases.\n\n3. **Competitive Markets**: The Company operates in highly competitive markets with aggressive pricing and rapid technological changes, which may hinder its ability to compete effectively.\n\n4. **Product Introduction and Transition Risks**: The Company must manage frequent product introductions and transitions, which can be unpredictable and may not meet market expectations.\n\n5. **Dependence on Distributors and Resellers**: The Company's reliance on third-party distributors and resellers poses risks if these partners face financial difficulties or change their business strategies.\n\n6. **International Operations Risks**: The Company faces risks related to compliance with international laws, economic conditions, and political instability in foreign markets.\n\n7. **Retail Store Operations**: The Company's retail stores require significant investment and are subject to various operational risks, including economic downturns.\n\n8. **Investment in New Strategies and Acquisitions**: New business strategies or acquisitions may disrupt ongoing operations and present unforeseen risks.\n\n9. **Information Technology System Failures**: The Company is vulnerable to IT system failures and network disruptions, which can impact operations and customer data security.\n\n10. **Cybersecurity Risks**: Breaches of the Company's information technology systems could damage relationships with customers and partners and harm the Company's reputation.\n\n11. **Data Protection Compliance**: The Company must comply with various data protection laws, and noncompliance could result in legal liabilities.\n\n12. **Dependence on Key Personnel**: The Company's success relies on the availability of key personnel, and competition for skilled employees is intense.\n\n13. **Impact of Political Events and Natural Disasters**: Political instability, war, terrorism, and natural disasters can disrupt operations and affect demand for products.\n\n14. **Fluctuations in Revenue and Operating Results**: The Company's financial performance can fluctuate due to various factors, including product demand and market conditions.\n\n15. **Stock Price Volatility**: The Company's stock price is subject to significant volatility, which can impact investor confidence.\n\n16. **Foreign Currency Exchange Risks**: Changes in currency exchange rates can affect the Company's sales and earnings, particularly in international markets.\n\n17. **Credit Risk**: The Company faces credit risk related to trade receivables and investments, which can be heightened during economic downturns.\n\n18. **Tax Rate Changes**: Changes in tax rates or tax legislation could adversely affect the Company's financial condition and results.\n\n19. **Inventory and Asset Risks**: The Company faces risks related to inventory obsolescence and the valuation of long-lived assets.\n\n20. **Supply Chain Risks**: The Company relies on a limited number of suppliers for components, which can lead to supply shortages and pricing risks.\n\n21. **Quality Control Issues**: The Company may experience quality problems with its products, which can harm sales and reputation.\n\n22. **Dependence on Third-Party Content**: The Company relies on third-party digital content, which may not always be available on favorable terms.\n\n23. **Support from Third-Party Developers**: The availability of third-party software applications is crucial for the Company's products, and a decline in support could impact sales.\n\nThese risks can materially affect the Company's business, financial condition, operating results, and stock price."
+        }
+      ]
+    },
+    "AAAU-2021-10K": {
+      "filing_date": "2021-03-26",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAAU-2021-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAAU-2019-10K": {
+      "filing_date": "2019-03-15",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAAU-2019-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    }
+  }
+}
