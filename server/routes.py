@@ -462,7 +462,7 @@ def get_filing_selection_data_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('filing_selection_data.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('server/dashboard/filing_db/filing_db.json', 'r') as f: filing_selection_data = json.load(f)
     popular_filings = filing_selection_data['popular_filings']
     if user_info['subscription'] == 'basic': popular_filings = [filing for filing in popular_filings if '10Q' not in filing]
 
@@ -476,7 +476,7 @@ def get_chats_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('memory.json', 'r') as f: memory = json.load(f)
+    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
     chats = list(reversed(memory[user_info['email']].keys()))
 
     return {'chats': chats}
@@ -489,28 +489,30 @@ def get_messages_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('memory.json', 'r') as f: memory = json.load(f)
+    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
     messages = memory[user_info['email']][request.args.get('chat')]['messages']
     return {'messages': messages}
 
 
 
+from server.dashboard.utils.sec_utils import load_sec
+from server.dashboard.utils.vectorstore_utils import vectorstore_manager
 @routes.route('/new-chat', methods=['POST'])
 def new_chat_post():
 
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    print(user_info['subscription_tokens_left'])
-
     token_cost_chat = 20
     if int(user_info['subscription_tokens_left']) < token_cost_chat: return {'error': 'Insufficient Tokens'}
 
-    with open('memory.json', 'r') as f: memory = json.load(f)
+    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
     memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
-    with open('memory.json', 'w') as f: json.dump(memory, f, indent=2)
-
+    with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
     
+    filing = load_sec(request.json.get('ticker'), request.json.get('filingDate'))
+    vectorstore_manager(filing)
+
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
 
     return {'success': True}
@@ -523,7 +525,7 @@ def get_list_tickers():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('filing_selection_data.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('server/dashboard/filing_db/filing_db.json', 'r') as f: filing_selection_data = json.load(f)
 
     return {'tickers': list(filing_selection_data['available_filings'].keys()), 'popularFilings': filing_selection_data['popular_filings'][:3]}
 
@@ -535,7 +537,7 @@ def get_info_by_ticker():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('filing_selection_data.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('server/dashboard/filing_db/filing_db.json', 'r') as f: filing_selection_data = json.load(f)
 
     return {'info': filing_selection_data['available_filings'][request.args.get('ticker')]}
 
@@ -550,7 +552,7 @@ def get_filing_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('memory.json', 'r') as f: memory = json.load(f)
+    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
 
     ticker, year, form_raw = request.args.get('chat').split('-')
     filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
@@ -558,28 +560,18 @@ def get_filing_get():
     elif '10Q' in form_raw: form = '10-Q'
 
     try: 
-        with open(f'filings/{ticker.upper()}-{year}-{form_raw}.html', 'r') as f: html = f.read()
+        with open(f'server/filings/{ticker.upper()}-{year}-{form_raw}.html', 'r') as f: html = f.read()
         return {'html': html}
     
     except:
         try:
             html = Company(ticker).get_filings(form=form, date=filing_date)[0].html()
 
-            # GETTING TOKEN ESTIMATION
-            # markdown = Company(ticker).get_filings(form=form, date=filing_date)[0].markdown()
-            # word_count = len(markdown.split())
-            # print(f"Words in filing: {word_count}")
-            # words_to_tokens_multiplier = 1.3
-            # openai_cost_per_token = 0.001
-            # markup_multiplier = 10
-            # tokens = round(round(word_count * words_to_tokens_multiplier) * openai_cost_per_token * markup_multiplier)
-            # print(f"Calculated tokens: {tokens}")
-
-            with open(f'filings/{ticker.upper()}-{year}-{form_raw}.html', 'w') as f: f.write(html)
+            with open(f'server/filings/{ticker.upper()}-{year}-{form_raw}.html', 'w') as f: f.write(html)
             return {'html': html}
         
         except Exception as error:
-            return {'error': 'Error getting filing: ' + error}
+            return {'error': 'Error getting filing: ' + str(error)}
 
 
 
@@ -589,9 +581,9 @@ def delete_chat_post():
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('memory.json', 'r') as f: memory = json.load(f)
+    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
     del memory[user_info['email']][request.json.get('chat')]
-    with open('memory.json', 'w') as f: json.dump(memory, f, indent=2)
+    with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
 
     return {'success': True}
 
@@ -599,6 +591,8 @@ def delete_chat_post():
 
 from . import socketio
 from openai import OpenAI
+from server.dashboard.app import ask_
+from flask_socketio import emit
 client = OpenAI(api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS")
 
 @routes.route('/new-message', methods=['POST'])
@@ -610,20 +604,11 @@ def new_message_post():
     token_cost_message = 4
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
-    with open('memory.json', 'r') as f: memory = json.load(f)
-    memory[user_info['email']][request.json.get('chat')]['messages'].append({"role": 'user', "content": request.json.get('message')})
+    ticker, year, filing = request.json.get('chat').split("-")
+    socket_id = request.json.get('socketId')
 
-    stream = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": request.json.get('message')}], stream=True)
+    ask_(request.json.get('message'), user_info['email'], request.json.get('chat'), socket_id, ticker, year)
 
-    buffer = ""
-    for chunk in stream:
-        content = chunk.choices[0].delta.content
-        if content is not None: buffer += content
-        socketio.emit('llm_response', {'word': chunk.choices[0].delta.content})
-
-    memory[user_info['email']][request.json.get('chat')]['messages'].append({"role": 'assistant', "content": buffer})
-    with open('memory.json', 'w') as f: json.dump(memory, f, indent=2)
-    
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
 
     return {'success': True}
@@ -632,4 +617,4 @@ def new_message_post():
 # Handle a connection event
 @socketio.on('connect')
 def handle_connect():
-    print('Client connected')
+    print(f'Client connected:', request.sid)

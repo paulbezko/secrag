@@ -49,20 +49,22 @@ def ask():
 
 def ask_(prompt, uid, conversation_id, socket_id, ticker, filing_year, chunk_size = 10000, chunk_overlap = 3, k = 8, table_prepend_k = 3, ready_filing = None):
 
+    print(socket_id)
+
     # We do not know what document is the request for if there is no ticker, filing, and conversation ID
     if (not ticker or not filing_year):
         res_dict = {"error": "Missing Ticker or Filing Year"}
         return res_dict
         
-    conversation_id = "{}-{}".format(ticker.upper(), str(filing_year))    
+    # conversation_id = "{}-{}-10K".format(ticker.upper(), str(filing_year))    
     
     # Define callback manager for output tokens
-    callback_manager = CallbackManager([CustomStreamingCallbackHandler(id=socket_id)])
+    callback_manager = socket_id
     
     # Ask the question to the custom RAG
     answer = main_llm_chain(uid, conversation_id, prompt, callback_manager, ticker, filing_year, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
 
-    return answer  
+    return answer
 
 if __name__ == '__main__':
     

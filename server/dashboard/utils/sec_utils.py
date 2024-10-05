@@ -22,7 +22,7 @@ parent_dir = str(parent_dir)
 
 # This class is made for convenience. It stores all important filing data for the project's implementation
 class CustomCompanyFiling():
-    def __init__(self, filing, markdown, file_number, filing_html, cik, ticker, filing_date, company_name, filing_year, balance_sheet = None, income_statement = None, cash_flow_statement = None, statement_of_comprehensive_income = None, statement_of_changes_in_equity = None):
+    def __init__(self, filing, markdown, file_number, filing_html, cik, ticker, filing_date, company_name, balance_sheet = None, income_statement = None, cash_flow_statement = None, statement_of_comprehensive_income = None, statement_of_changes_in_equity = None):
         self.filing = filing 
         self.ticker = ticker
         self.markdown = markdown
@@ -31,7 +31,6 @@ class CustomCompanyFiling():
         self.cik = cik
         self.html = filing_html
         self.company_name = company_name
-        self.filing_year = filing_year
         self.balance_sheet = balance_sheet,
         self.statement_of_comprehensive_income = statement_of_comprehensive_income
         self.statement_of_changes_in_equity = statement_of_changes_in_equity
@@ -100,7 +99,7 @@ def get_filing_years_for_ticker(ticker):
 
     return years
 
-def get_filing_for_a_year(filings, year):
+def get_filing_for_a_year(filings, filing_date):
     """
     Finds a filing for a given year
     
@@ -112,12 +111,12 @@ def get_filing_for_a_year(filings, year):
         CompanyFiling: A CompanyFiling object for the given year
     """
     for filing in filings:
-        if compare_year(filing.filing_date, year):
+        if compare_year(filing.filing_date, filing_date):
             return filing
 
 
 # Load SEC filing
-def load_sec(ticker, filing_year = None):
+def load_sec(ticker, filing_date):
     """
     Load a custom CompanyFiling object from a ticker symbol and year
     
@@ -125,7 +124,7 @@ def load_sec(ticker, filing_year = None):
     ----------
     ticker : str
         The ticker symbol of the company to retrieve
-    filing_year : int, optional
+    filing_date : int, optional
         The year of the filing to retrieve. If not provided, the latest filing will be retrieved
     
     Returns
@@ -136,8 +135,10 @@ def load_sec(ticker, filing_year = None):
 
     # Lowercase the ticker
     ticker = ticker.lower()
-    
-    filing_tl = sec_search(ticker=ticker, name="marks", email="marksdocenko@outlook.com", filing_year=filing_year)
+
+    print(filing_date)
+
+    filing_tl = sec_search(ticker=ticker, name="marks", email="marksdocenko@outlook.com", filing_date=filing_date)
 
     # Try retrieving financials. If it fails, return None    
     financials = try_or(lambda: Financials(filing_tl.xbrl()))
@@ -156,7 +157,6 @@ def load_sec(ticker, filing_year = None):
         cik=filing_tl.cik, 
         ticker=ticker, 
         filing_date=filing_tl.filing_date, 
-        filing_year = filing_year,
         company_name=filing_tl.company,
         balance_sheet=balance_sheet,
         income_statement=income_statement,
@@ -168,7 +168,7 @@ def load_sec(ticker, filing_year = None):
     return custom_filing
 
 
-def sec_search(ticker, name, email, filing_year = None):
+def sec_search(ticker, name, email, filing_date):
     """
     Search for a company's latest 10-K filing using the EDGAR API.
 
@@ -180,7 +180,7 @@ def sec_search(ticker, name, email, filing_year = None):
         The name of the person making the query
     email : str
         The email address of the person making the query
-    filing_year : int, optional
+    filing_date : int, optional
         The year of the filing to search for. If not provided, the latest filing will be returned
 
     Returns
@@ -192,12 +192,9 @@ def sec_search(ticker, name, email, filing_year = None):
     set_identity("{} {}".format(name, email))
 
     try:
-        filings = Company(ticker).get_filings(form="10-K")
-        if filing_year:
-            return get_filing_for_a_year(filings, filing_year)
-        else:
-            return filings[0]
-        return filings
+        print(ticker, filing_date)
+        filing = Company(ticker).get_filings(form="10-K", date=filing_date)[0]
+        return filing
     except AttributeError:
         raise Exception("Invalid ticker - {}".format(ticker))
 
@@ -400,7 +397,7 @@ def filing_splitter(filing : CustomCompanyFiling, fin_statements, chunk_size = 1
     # Initialize metadata model
     metadata_model = {
         "ticker": filing.ticker, 
-        "year": filing.filing_year,
+        "date": filing.filing_date,
         "chunk_size": chunk_size,
         "chunk_overlap": chunk_overlap,
         "table_prepend_k": table_prepend_k,

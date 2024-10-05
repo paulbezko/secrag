@@ -13,13 +13,14 @@ streaming_call_bp = Blueprint('streaming_call', __name__, template_folder='templ
 class CustomStreamingCallbackHandler(StreamingStdOutCallbackHandler):
     def __init__(self, id):
         self.socket_id = id
+
+    def get_socket_id(self):
+        return self.socket_id
         
     def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-        # sys.stdout.write(token) # Modify the behavior here
-        # print(" TOK ")
+
         if self.socket_id != None:
-            emit("ai_token", token, namespace="/", to=self.socket_id)
-        # sys.stdout.flush()
+            emit('llm_response', {'word': token}, to=self.socket_id)
 
     @streaming_call_bp.route('/streaming/call')
     def stream_chat_gpt():
@@ -46,7 +47,6 @@ def chat_gpt_helper(prompt, projectId, sender):
         )
 
         result = llm_chain.run(prompt)
-        print(result)
 
     except Exception as e:
         print(e)
