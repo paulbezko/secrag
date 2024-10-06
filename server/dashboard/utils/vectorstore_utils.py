@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 from dotenv import load_dotenv
 from langchain_community.vectorstores import FAISS
@@ -21,7 +22,18 @@ load_dotenv(".env", override=True)
 # supported_text_splitters = ["recursive_character", "markdown", "edgartools"]
 supported_text_splitters = ["edgartools"]
 
-def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 10000, chunk_overlap = 3, k = 1, table_prepend_k = 3, splitter_mode = "edgartools"):
+def vectorstore_manager(
+        filing : FilingInfo, 
+        new_chat : bool,
+
+        # Optional args
+        
+        chunk_size = 10000, 
+        chunk_overlap = 3, 
+        k = 1, 
+        table_prepend_k = 3, 
+        splitter_mode = "edgartools"
+    ):
     """
     Manages vectorstore for a given filing and configuration.
 
@@ -41,6 +53,8 @@ def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 10000, chunk_
     metadata_model = {
         "ticker": filing.ticker, 
         "date": filing.filing_date,
+        "form": filing.filing_type,
+        "year": filing.filing_year,
         "chunk_size": chunk_size,
         "chunk_overlap": chunk_overlap,
         "table_prepend_k": table_prepend_k
@@ -60,21 +74,24 @@ def vectorstore_manager(filing : CustomCompanyFiling, chunk_size = 10000, chunk_
         # Load vectorstore
         vectorstore = FAISS.load_local(vectorstore_dir, embeddings=embeddings, allow_dangerous_deserialization=True)
         # Check if embedding already exists for a given filing and embedding config
-        check_for_existing_embeddings = vectorstore.similarity_search("", k=3, filter=metadata_model)
-        # Case when embedding does not exist
-        if len(check_for_existing_embeddings) == 0:
-            # Add new embedding
-            chunks = filing.as_documents(chunk_size, chunk_overlap, table_prepend_k)
-            vectorstore.add_documents(chunks)
-            vectorstore.save_local(vectorstore_dir)
-            print(f"Updated Grand-vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
-        # Case when embedding already exists       
-        else:
-            print(f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+        if new_chat:
+            check_for_existing_embeddings = vectorstore.similarity_search("", k=3, filter=metadata_model)
+            # Case when embedding does not exist
+            if len(check_for_existing_embeddings) == 0:
+                filing_object_for_embedding = load_sec(filing)
+                # Add new embedding
+                chunks = filing_object_for_embedding.as_documents(chunk_size, chunk_overlap, table_prepend_k)
+                vectorstore.add_documents(chunks)
+                vectorstore.save_local(vectorstore_dir)
+                print(f"Updated Grand-vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+            # Case when embedding already exists       
+            else:
+                print(f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
     # Create vectorstore if it doesn't exist
     else:
         # Create new embedding and vectorstore, and save the vectorstore 
-        chunks = filing.as_documents(chunk_size, chunk_overlap, table_prepend_k)
+        filing_object_for_embedding = load_sec(filing)
+        chunks = filing_object_for_embedding.as_documents(chunk_size, chunk_overlap, table_prepend_k)
         vectorstore = FAISS.from_documents(chunks, embedding=embeddings)
         vectorstore.save_local(vectorstore_dir)
         print(f"Created Grand-vectorstore, added {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")

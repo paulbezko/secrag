@@ -1,4 +1,5 @@
 
+import sys
 from dotenv import load_dotenv
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
@@ -51,7 +52,7 @@ def generate_usage_meta(cb):
     return usage_meta
 
 
-def main_llm_chain(uid, session, prompt, callback_manager, ticker, file_year, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3, ready_filing = None):
+def main_llm_chain(uid, session, prompt, filing_info : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3, ready_filing = None):
     """
     Main function to generate output from LLM given user prompt, SEC filing context, and chat history (STOPPED SUPPORT FOR CHAT HISTORY).
 
@@ -90,7 +91,7 @@ def main_llm_chain(uid, session, prompt, callback_manager, ticker, file_year, ch
     if ready_filing:
         filing = ready_filing
     else: 
-        filing = load_sec(ticker, file_year)
+        filing = filing_info
     
     # Disabled public agent and combinator
     public_db_agent_output = None
@@ -98,7 +99,7 @@ def main_llm_chain(uid, session, prompt, callback_manager, ticker, file_year, ch
 
     # Callback for usage data retrieval
     with get_openai_callback() as cb:
-        rag_output = rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing, chunk_size, chunk_overlap, k, table_prepend_k)
+        rag_output = rag(prompt, filing, socket_id, chunk_size, chunk_overlap, k, table_prepend_k)
 
     # Store as conversation memory
     append_message_to_json_file(uid, session, {"role": "user", "content": prompt})
@@ -128,7 +129,7 @@ def main_llm_chain(uid, session, prompt, callback_manager, ticker, file_year, ch
         }        
 
   
-def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : CustomCompanyFiling, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3):
+def rag(prompt, filing : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3):
     """
     This function implements the RAG agent with memory and documents. It takes a user prompt and generates an answer
     based on the context of the SEC filing with the given ticker and year. The context is retrieved in chunks and
@@ -154,6 +155,8 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : Cu
     # Initialize metadata model for retrieving context for particular filing
     metadata_model = {
         "ticker": filing.ticker, 
+        "date": filing.filing_date,
+        "form": filing.filing_type,
         "year": filing.filing_year,
         "chunk_size": chunk_size,
         "chunk_overlap": chunk_overlap,
@@ -176,7 +179,7 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : Cu
     need_for_financials = [contextual_answer.balance_sheet, contextual_answer.cash_flow_statement, contextual_answer.income_statement, contextual_answer.statement_of_changes_in_equity, contextual_answer.statement_of_comprehensive_income]
 
     # Integrated new SEC splitter 
-    vectorstore = vectorstore_manager(filing, chunk_size=chunk_size, chunk_overlap=chunk_overlap, k=k, table_prepend_k=table_prepend_k)
+    vectorstore = vectorstore_manager(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, k=k, table_prepend_k=table_prepend_k)
     
     # Intialize final contexts string to be used by the QA
     final_contexts = ""
@@ -212,16 +215,17 @@ def rag_with_memory_and_docs(uid, session, prompt, callback_manager, filing : Cu
     
     # Initialize the QA chain 
     question_answer_chain = qa_prompt | qa_llm
-    
-    debug_print(session, id_separator, uid)
 
     # Grand-finale
     buffer = ''
-    socket_id = callback_manager
-    for chunk in question_answer_chain.stream({"input": prompt, "ticker": filing.ticker, "filing": filing.file_number, "context": final_contexts}):
+
+    for chunk in question_answer_chain.stream({"input": prompt, "ticker": filing.ticker, "filing_type": filing.filing_type, "filing_date": filing.filing_date, "context": final_contexts}):
         buffer += chunk.content
         socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
-        
+        # sys.stdout.write(chunk.content)
+        # sys.stdout.flush()
+    
+    # print("\n")
 
     return {
         "context": contexts_as_objects,
