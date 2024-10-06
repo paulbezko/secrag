@@ -27,6 +27,9 @@ load_dotenv(".env", override=True)
 # set_debug(True)
 set_verbose(True)
 
+# Initialize LLM
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='')
+
 # Pydantic model for the Contextual Question LLM
 class ContextualOutput(BaseModel):
     """Key words and Chapter descriptions"""
@@ -38,6 +41,8 @@ class ContextualOutput(BaseModel):
     statement_of_changes_in_equity: bool
     statement_of_comprehensive_income: bool
 
+class DetermineRAGNecessety(BaseModel):
+    required: bool
 
 def generate_usage_meta(cb):
     """Fucntion to transform the callback object into a json-like dictionary"""
@@ -87,23 +92,29 @@ def main_llm_chain(uid, session, prompt, human_prompts_history, filing_info : Fi
         Dictionary containing the input, output, context, and usage metadata
     """
 
-    # Load filing data from SEC
-    if ready_filing:
-        filing = ready_filing
-    else: 
-        filing = filing_info
     
+
     # Disabled public agent and combinator
     public_db_agent_output = None
     combined_output = None
 
     # Callback for usage data retrieval
     with get_openai_callback() as cb:
-        rag_output = rag(prompt, human_prompts_history, filing, socket_id, chunk_size, chunk_overlap, k, table_prepend_k)
+        rag_needed = determine_rag_need(prompt, human_prompts_history)
+        if rag_needed:
+            # Load filing data from SEC
+            if ready_filing:
+                filing = ready_filing
+            else: 
+                filing = filing_info
+    
+            output = rag(prompt, human_prompts_history, filing, socket_id, chunk_size, chunk_overlap, k, table_prepend_k)
+        else: 
+            output = general_llm(prompt, human_prompts_history, socket_id)
 
     # Store as conversation memory
     append_message_to_json_file(uid, session, {"role": "user", "content": prompt})
-    append_message_to_json_file(uid, session, {"role": "assistant", "content": rag_output["answer"]})  
+    append_message_to_json_file(uid, session, {"role": "assistant", "content": output["answer"]})  
 
     # Generate usage meta for performance assessment
     usage_meta = generate_usage_meta(cb) 
@@ -112,8 +123,8 @@ def main_llm_chain(uid, session, prompt, human_prompts_history, filing_info : Fi
         # CURRENTLY STOPPED SUPPORTING
         return {
             "input" : prompt,
-            "rag_context" : rag_output["context"],
-            "rag_output" : rag_output["answer"],
+            "rag_context" : output["context"],
+            "rag_output" : output["answer"],
             "public_db_agent_output" : public_db_agent_output.content,
             "react_output" : combined_output.content,
             "usage_meta" : usage_meta
@@ -121,14 +132,41 @@ def main_llm_chain(uid, session, prompt, human_prompts_history, filing_info : Fi
     else:
         return {
             "input" : prompt,
-            "rag_context" : rag_output["context"],
-            "rag_output" : rag_output["answer"],
+            "rag_context" : output["context"],
+            "rag_output" : output["answer"],
             "public_db_agent_output" : "",
-            "react_output" : rag_output["answer"],
+            "react_output" : output["answer"],
             "usage_meta" : usage_meta
         }        
 
-  
+def determine_rag_need(prompt, human_prompts_history):
+
+
+    # Integrated Pydantic
+    llm_rag_necessety = rag_need_prompt | llm.with_structured_output(DetermineRAGNecessety)
+
+    answer = llm_rag_necessety.invoke({
+        "prompt" : prompt,
+        "human_prompts_history": human_prompts_history
+    })
+
+    return answer.required
+
+
+def general_llm(prompt, human_prompts_history, socket_id):
+    buffer = ""
+    general_llm_chain = general_llm_prompt | llm
+    for chunk in general_llm_chain.stream({"human_prompts_history":human_prompts_history, "prompt":prompt}):
+        buffer += chunk.content
+        # socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
+        sys.stdout.write(chunk.content)
+        sys.stdout.flush()
+    return {
+        "context": "None",
+        "answer": buffer
+    }
+
+
 def rag(prompt, human_prompts_history, filing : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3):
     """
     This function implements the RAG agent with memory and documents. It takes a user prompt and generates an answer
@@ -163,18 +201,16 @@ def rag(prompt, human_prompts_history, filing : FilingInfo, socket_id, chunk_siz
         "table_prepend_k": table_prepend_k
     }
 
-    # Initialize LLM
-    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='')
-
     # Integrated Pydantic
     llm_contextual = contextualize_q_prompt | llm.with_structured_output(ContextualOutput)
 
     # Chain for generating retriever input
     contextual_answer = llm_contextual.invoke({
         "prompt" : prompt,
-        "chapter_descriptions_list" : tenK_descriptions # Currently only supports 10-k
+        "chapter_descriptions_list" : tenK_descriptions, # Currently only supports 10-k
+        "human_prompts_history" : human_prompts_history
     })
-
+    print("KEYWORDS: ", contextual_answer.keywords)
     # The answer will contain booleans for financial statements needs
     need_for_financials = [contextual_answer.balance_sheet, contextual_answer.cash_flow_statement, contextual_answer.income_statement, contextual_answer.statement_of_changes_in_equity, contextual_answer.statement_of_comprehensive_income]
 
@@ -208,13 +244,9 @@ def rag(prompt, human_prompts_history, filing : FilingInfo, socket_id, chunk_siz
             # Add only unique contexts
             if piece[0].page_content not in final_contexts:
                 final_contexts += piece[0].page_content + "\n"
-
-
-    # Added a callback manager to stream the output to the client
-    qa_llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='')
     
     # Initialize the QA chain 
-    question_answer_chain = qa_prompt | qa_llm
+    question_answer_chain = qa_prompt | llm
 
     # Grand-finale
     buffer = ''
