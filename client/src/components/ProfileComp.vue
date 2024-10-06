@@ -97,7 +97,6 @@ export default {
       action: '',
       subscription: '',
       tokensLeft: 0,
-      maxTokens: '',
       subscribed: false,
       limitSettings: false,
       error: ''
@@ -115,12 +114,7 @@ export default {
         this.name = response.data.name;
         this.subscription = response.data.subscription;
         this.tokensLeft = response.data.subscription_tokens_left;
-        if (this.subscription) {
-          if (this.subscription === 'basic') {this.maxTokens = 1200}
-          else if (this.subscription === 'premium') {this.maxTokens = 2400}
-          this.subscription = toTitleCase(response.data.subscription);
-          this.tokensLeftFraction = this.tokensLeft / this.maxTokens * 100
-        }
+        if (this.subscription) {this.subscription = toTitleCase(response.data.subscription);}
         if (response.data.subscription !== 'none') {this.subscribed = true}
         this.showSpinner = false
         this.showComponent = true
@@ -128,7 +122,6 @@ export default {
       .catch(error => {
         console.error('Error getting user data:', error);
       });
-    
   },
   methods: {
     async manageSubscription() {

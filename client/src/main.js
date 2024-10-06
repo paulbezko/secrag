@@ -11,6 +11,8 @@ const store = createStore({
     _u: null,
     isAuthenticated: false,
     isSubscribed: false,
+    subscription: null,
+    subscriptionTokensLeft: null
   },
   mutations: {
     setAuthentication(state, status) {
@@ -22,6 +24,9 @@ const store = createStore({
     setSubscription(state, subscription) {
       state.subscription = subscription;
     },
+    setSubscriptionTokensLeft(state, subscriptionTokensLeft) {
+      state.subscriptionTokensLeft = subscriptionTokensLeft;
+    }
   },
 });
 
@@ -69,6 +74,7 @@ router.beforeEach(async (to, from, next) => {
       store.commit('setIsSubscribed', navbarInfo.isSubscribed);
       if (navbarInfo.subscription) {
         store.commit('setSubscription', navbarInfo.subscription);
+        store.commit('setSubscriptionTokensLeft', navbarInfo.subscriptionTokensLeft);
       }
 
       // Redirect to onboarding if necessary
@@ -119,7 +125,8 @@ function getNavbarInfo() {
         .then(response => {
           const isSubscribed = response.data.subscription !== 'none';
           const subscription = response.data.subscription ? response.data.subscription : null;
-          resolve({ isSubscribed, subscription });
+          const subscriptionTokensLeft = response.data.subscription_tokens_left ? response.data.subscription_tokens_left : null;
+          resolve({ isSubscribed, subscription, subscriptionTokensLeft });
         })
         .catch(error => {
           alert('Error retrieving user data:', error);
