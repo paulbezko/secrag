@@ -85,13 +85,11 @@ def ask_(
     return answer
 
 def create_filing_info_for_new_chat(conversation_id, filing_date) -> FilingInfo:
-    supported_filing_forms = ["10K", "10Q"]
+
     ticker, filing_year, conversation_id_filing_form = conversation_id.split("-")
-    if conversation_id_filing_form in supported_filing_forms:
-        if conversation_id_filing_form == "10K": filing_type = "10-K"
-        elif "10Q" in conversation_id_filing_form: filing_type = "10-Q"
-    else:
-        raise Exception(f"Unsupported filing type {conversation_id_filing_form}")
+    if conversation_id_filing_form == "10K": filing_type = "10-K"
+    elif "10Q" in conversation_id_filing_form: filing_type = "10-Q"
+    else: raise Exception(f"Unsupported filing type {conversation_id_filing_form}")
     
     filing_info = FilingInfo(ticker=ticker, filing_date=filing_date, filing_type=filing_type, filing_year=filing_year) 
     return filing_info  
