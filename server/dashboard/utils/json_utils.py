@@ -57,14 +57,13 @@ def store_usage_info_data(uid, conversation_id, usage_meta):
     with open(parent_dir + "/" + "usage_db/usage_db.json", "r") as f:
         usage_db = json.load(f)
     current_time = datetime.now().strftime('%Y-%m-%d : %H-%M-%S')
-    if uid not in usage_db: usage_db[uid] = []
-
+    if uid not in usage_db: usage_db[uid] = {}
+    if conversation_id not in usage_db[uid]: usage_db[uid][conversation_id] = []
     datapoint = {
-        "chat":conversation_id,
         "time":current_time,
-        "usage_meta": usage_meta
+        "usage_meta": usage_meta["total"]
     }
-    usage_db[uid] = [datapoint] + usage_db[uid]
+    usage_db[uid][conversation_id] = [datapoint] + usage_db[uid][conversation_id]
 
     with open(parent_dir + "/" + "usage_db/usage_db.json", "w") as f:
         json.dump(usage_db, f, indent=4)
