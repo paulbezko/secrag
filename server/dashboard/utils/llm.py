@@ -52,7 +52,7 @@ def generate_usage_meta(cb):
     return usage_meta
 
 
-def main_llm_chain(uid, session, prompt, filing_info : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3, ready_filing = None):
+def main_llm_chain(uid, session, prompt, human_prompts_history, filing_info : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3, ready_filing = None):
     """
     Main function to generate output from LLM given user prompt, SEC filing context, and chat history (STOPPED SUPPORT FOR CHAT HISTORY).
 
@@ -99,7 +99,7 @@ def main_llm_chain(uid, session, prompt, filing_info : FilingInfo, socket_id, ch
 
     # Callback for usage data retrieval
     with get_openai_callback() as cb:
-        rag_output = rag(prompt, filing, socket_id, chunk_size, chunk_overlap, k, table_prepend_k)
+        rag_output = rag(prompt, human_prompts_history, filing, socket_id, chunk_size, chunk_overlap, k, table_prepend_k)
 
     # Store as conversation memory
     append_message_to_json_file(uid, session, {"role": "user", "content": prompt})
@@ -129,7 +129,7 @@ def main_llm_chain(uid, session, prompt, filing_info : FilingInfo, socket_id, ch
         }        
 
   
-def rag(prompt, filing : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3):
+def rag(prompt, human_prompts_history, filing : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap = 1000, k = 3, table_prepend_k = 3):
     """
     This function implements the RAG agent with memory and documents. It takes a user prompt and generates an answer
     based on the context of the SEC filing with the given ticker and year. The context is retrieved in chunks and
@@ -219,7 +219,7 @@ def rag(prompt, filing : FilingInfo, socket_id, chunk_size = 5000, chunk_overlap
     # Grand-finale
     buffer = ''
 
-    for chunk in question_answer_chain.stream({"input": prompt, "ticker": filing.ticker, "filing_type": filing.filing_type, "filing_date": filing.filing_date, "context": final_contexts}):
+    for chunk in question_answer_chain.stream({"input": prompt, "ticker": filing.ticker, "filing_type": filing.filing_type, "filing_date": filing.filing_date, "context": final_contexts, "human_prompts_history": human_prompts_history}):
         buffer += chunk.content
         socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
         # sys.stdout.write(chunk.content)

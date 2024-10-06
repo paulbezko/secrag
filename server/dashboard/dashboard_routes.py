@@ -54,6 +54,7 @@ def ask():
 
 def ask_(
         prompt, 
+        human_prompts_history,
         uid, 
         conversation_id, 
         socket_id, 
@@ -80,7 +81,7 @@ def ask_(
   
     
     # Ask the question to the custom RAG
-    answer = main_llm_chain(uid, conversation_id, prompt, filing_info, socket_id, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
+    answer = main_llm_chain(uid, conversation_id, prompt, human_prompts_history, filing_info, socket_id, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
 
     return answer
 

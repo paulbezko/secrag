@@ -33,7 +33,9 @@ contextualize_q_prompt = ChatPromptTemplate.from_messages(
 qa_system_prompt = """You are an assistant for question-answering tasks. \
 Use the following pieces of retrieved context to answer the question. \
 Do not recommend review SEC 10-k filings. \
-    
+
+previous human prompts: {human_prompts_history}
+
 context from SEC 10-k filing:
 {context}"""
 
