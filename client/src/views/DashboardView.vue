@@ -95,7 +95,8 @@
             <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1">
               <!-- <div class="fa-solid fa-gamepad text-1"></div> -->
               <img src="../assets/fintel.png" class="bot-image">
-              <div class="text-chat chat-message-assistant" v-html="renderMarkdown(message.content)"></div>
+              <div class="loading-dots" v-if="assistantMessageLoading"></div>
+              <div class="text-chat chat-message-assistant" v-html="renderMarkdown(message.content)" v-if="!assistantMessageLoading"></div>
             </div>
             <div v-else class="flex-row width-100" style="justify-content: flex-end;">
               <div class="chat-message-user text-chat">{{ message.content }}</div>
@@ -179,6 +180,7 @@ export default {
       newChat: true,
       newMessage: '',
       message: '',
+      assistantMessageLoading: false,
       showConfirm: false,
       confirmAction: '',
       confirmLoading: false,
@@ -365,6 +367,7 @@ export default {
 
         this.currentMessages.push({ role: 'user', content: this.newMessage });
         this.assistantMessageIndex = this.currentMessages.length;
+        this.assistantMessageLoading = true;
         this.llmResponseBuffer = '';
         this.currentMessages[this.assistantMessageIndex] = { role: 'assistant', content: null };
         let payloadMessage = this.newMessage
@@ -400,6 +403,7 @@ export default {
       // Update the existing assistant message
       if (this.assistantMessageIndex !== null) {
         if (this.llmResponseBuffer.trim()) {
+          this.assistantMessageLoading = false;
           this.currentMessages[this.assistantMessageIndex].content = marked(this.llmResponseBuffer);
           this.$nextTick(() => {this.scrollToBottomInstant()});
         }
@@ -517,4 +521,40 @@ export default {
 .slide-leave-to {
   transform: translateX(100%);
 }
+
+
+.loading-dots {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  position: fixed;
+  width: 100%;
+  gap: 20px
+}
+
+.loading-dot {
+  animation: dot ease-in-out 1.5s infinite;
+  background-color: grey;
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+}
+
+.loading-dot:nth-of-type(2) {
+  animation-delay: 0.25s;
+}
+
+.loading-dot:nth-of-type(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes dot {
+  0% { background-color: grey; transform: scale(1); }
+  50% { background-color: #000; transform: scale(1.3); }
+  100% { background-color: grey; transform: scale(1); }
+}
+
 </style>
+
