@@ -1,39 +1,5 @@
 {
   "planetchars@gmail.com": {
-    "AMPH-2021-10K": {
-      "filing_date": null,
-      "messages": [
-        {
-          "role": "assistant",
-          "content": "Hello Paul Bezkorovainij! AMPH-2021-10K is embedded and ready for discussion. How can I help you today?"
-        }
-      ]
-    },
-    "CWGL-2019-10K": {
-      "filing_date": null,
-      "messages": [
-        {
-          "role": "assistant",
-          "content": "Hello Paul Bezkorovainij! CWGL-2019-10K is embedded and ready for discussion. How can I help you today?"
-        },
-        {
-          "role": "user",
-          "content": "assy"
-        },
-        {
-          "role": "assistant",
-          "content": "It seems like you might be asking about \"assy,\" which could refer to various topics. Could you please clarify what you mean? For example, are you referring to an assembly in programming, a specific subject like assessment, or something else entirely?"
-        },
-        {
-          "role": "user",
-          "content": "test"
-        },
-        {
-          "role": "assistant",
-          "content": "Test successful! How can I assist you today?"
-        }
-      ]
-    },
     "AAL-2007-10K": {
       "filing_date": null,
       "messages": [
@@ -56,15 +22,6 @@
         {
           "role": "assistant",
           "content": "It looks like you might want to run a test or check something. How can I assist you further?"
-        }
-      ]
-    },
-    "AASP-2012-10K": {
-      "filing_date": null,
-      "messages": [
-        {
-          "role": "assistant",
-          "content": "Hello Paul Bezkorovainij! AASP-2012-10K is embedded and ready for discussion. How can I help you today?"
         },
         {
           "role": "user",
@@ -73,15 +30,14 @@
         {
           "role": "assistant",
           "content": "Test received! How can I assist you today?"
-        }
-      ]
-    },
-    "AADI-2018-10K": {
-      "filing_date": null,
-      "messages": [
+        },
+        {
+          "role": "user",
+          "content": "write a big markdown message"
+        },
         {
           "role": "assistant",
-          "content": "Hello Paul Bezkorovainij! AADI-2018-10K is embedded and ready for discussion. How can I help you today?"
+          "content": "Sure! Here's a structured markdown message that covers various topics. You can modify the content as needed.\n\n```markdown\n# Welcome to Our Community!\n\nHello everyone! \ud83d\udc4b\n\nWe are excited to have you here in our community. This message aims to provide you with all the information you need to get started and engaged.\n\n---\n\n## Table of Contents\n\n1. [About Us](#about-us)\n2. [Community Guidelines](#community-guidelines)\n3. [How to Contribute](#how-to-contribute)\n4. [Upcoming Events](#upcoming-events)\n5. [Resources](#resources)\n6. [Contact Us](#contact-us)\n\n---\n\n## About Us\n\nWe are a group of passionate individuals dedicated to sharing knowledge and engaging in meaningful discussions. Our mission is to create a supportive environment where everyone can learn and grow together.\n\n### Our Values\n\n- **Inclusivity**: We welcome everyone, regardless of their background.\n- **Respect**: Treat others as you would like to be treated.\n- **Continuous Learning**: We believe in the power of knowledge sharing.\n\n---\n\n## Community Guidelines\n\nTo ensure a positive experience for all members, please adhere to the following guidelines:\n\n- **Be Respectful**: Always communicate kindly and constructively.\n- **Stay On Topic**: Keep discussions relevant to the community's focus.\n- **No Spamming**: Avoid posting irrelevant links or promotions.\n\nFor a more detailed overview, please check our [Community Guidelines Document](#).\n\n---\n\n## How to Contribute\n\nWe love contributions from all members! Here are a few ways you can get involved:\n\n- **Join Discussions**: Share your thoughts and insights on ongoing topics.\n- **Share Resources**: Post articles, videos, or tools that you find beneficial.\n- **Host a Workshop**: If you have expertise in a specific area, consider leading a workshop!\n\n### Contribution Process\n\n1. **Identify a Topic**: Choose something you're passionate about.\n2. **Propose Your Idea**: Share your proposal in the \"Ideas\" thread.\n3. **Gather Feedback**: Engage with community members to refine your idea.\n4. **Execute Your Plan**: Start your contribution and enjoy the process!\n\n---\n\n## Upcoming Events\n\nWe have some exciting events lined up! Mark your calendars!\n\n- **Weekly Discussion**: Every Wednesday at 6 PM EST\n- **Monthly Workshop**: Last Saturday of each month\n- **Annual Conference**: Join us for our big event on June 15, 2024!\n\nFor more details, visit the [Events Page](#).\n\n---\n\n## Resources\n\nHere are some valuable resources to help you:\n\n- [Community Blog](#) - Regular updates and articles.\n- [Knowledge Base](#) - A curated collection of tutorials and guides.\n- [Help Center](#) - Frequently Asked Questions (FAQs) and support.\n\n---\n\n## Contact Us\n\nIf you have any questions or need assistance, feel free to reach out to us:\n\n- **Email**: support@community.com\n- **Forum**: Post in the \"Help\" section of our forum.\n- **Social Media**: Follow us on [Twitter](#), [Facebook](#), and [Instagram](#).\n\n---\n\nThank you for being a part of our community! We look forward to your contributions and can't wait to see what we can achieve together!\n\nHappy engaging! \ud83c\udf89\n\n```\n\nFeel free to edit any sections or add more information that suits your needs!"
         }
       ]
     },
@@ -94,30 +50,12 @@
         }
       ]
     },
-    "AAT-2016-10K": {
-      "filing_date": null,
-      "messages": [
-        {
-          "role": "assistant",
-          "content": "Hello Paul Bezkorovainij! AAT-2016-10K is embedded and ready for discussion. How can I help you today?"
-        }
-      ]
-    },
     "AAPL-2011-10K": {
       "filing_date": null,
       "messages": [
         {
           "role": "assistant",
           "content": "Hello Paul Bezkorovainij! AAPL-2011-10K is embedded and ready for discussion. How can I help you today?"
-        }
-      ]
-    },
-    "AAP-2006-10K": {
-      "filing_date": null,
-      "messages": [
-        {
-          "role": "assistant",
-          "content": "Hello Paul Bezkorovainij! AAP-2006-10K is embedded and ready for discussion. How can I help you today?"
         },
         {
           "role": "user",
@@ -125,7 +63,7 @@
         },
         {
           "role": "assistant",
-          "content": "It seems like you're testing the system. How can I assist you today? If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
+          "content": "Test received! How can I assist you today?"
         },
         {
           "role": "user",
@@ -133,23 +71,7 @@
         },
         {
           "role": "assistant",
-          "content": "It seems like you're testing the system. If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
-        },
-        {
-          "role": "user",
-          "content": "test"
-        },
-        {
-          "role": "assistant",
-          "content": "It seems like you're testing the system. How can I assist you today? If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
-        },
-        {
-          "role": "user",
-          "content": "test"
-        },
-        {
-          "role": "assistant",
-          "content": "It seems like you're testing the system. How can I assist you today? If you have any specific questions or need information related to the SEC filing for Advance Auto Parts (ticker: AAP), feel free to ask!"
+          "content": "Test received! How can I assist you today?"
         }
       ]
     },
@@ -335,6 +257,22 @@
         {
           "role": "assistant",
           "content": "The risks outlined in the SEC filing for Apple Inc. (ticker: AAPL) include:\n\n1. **Global and Regional Economic Conditions**: Economic uncertainty can adversely affect consumer and business spending, impacting demand for the Company's products and services.\n\n2. **Financial Market Turmoil**: Financial instability can lead to credit market tightening, affecting the Company's operations and its partners' ability to finance purchases.\n\n3. **Competitive Markets**: The Company operates in highly competitive markets with aggressive pricing and rapid technological changes, which may hinder its ability to compete effectively.\n\n4. **Product Introduction and Transition Risks**: The Company must manage frequent product introductions and transitions, which can be unpredictable and may not meet market expectations.\n\n5. **Dependence on Distributors and Resellers**: The Company's reliance on third-party distributors and resellers poses risks if these partners face financial difficulties or change their business strategies.\n\n6. **International Operations Risks**: The Company faces risks related to compliance with international laws, economic conditions, and political instability in foreign markets.\n\n7. **Retail Store Operations**: The Company's retail stores require significant investment and are subject to various operational risks, including economic downturns.\n\n8. **Investment in New Strategies and Acquisitions**: New business strategies or acquisitions may disrupt ongoing operations and present unforeseen risks.\n\n9. **Information Technology System Failures**: The Company is vulnerable to IT system failures and network disruptions, which can impact operations and customer data security.\n\n10. **Cybersecurity Risks**: Breaches of the Company's information technology systems could damage relationships with customers and partners and harm the Company's reputation.\n\n11. **Data Protection Compliance**: The Company must comply with various data protection laws, and noncompliance could result in legal liabilities.\n\n12. **Dependence on Key Personnel**: The Company's success relies on the availability of key personnel, and competition for skilled employees is intense.\n\n13. **Impact of Political Events and Natural Disasters**: Political instability, war, terrorism, and natural disasters can disrupt operations and affect demand for products.\n\n14. **Fluctuations in Revenue and Operating Results**: The Company's financial performance can fluctuate due to various factors, including product demand and market conditions.\n\n15. **Stock Price Volatility**: The Company's stock price is subject to significant volatility, which can impact investor confidence.\n\n16. **Foreign Currency Exchange Risks**: Changes in currency exchange rates can affect the Company's sales and earnings, particularly in international markets.\n\n17. **Credit Risk**: The Company faces credit risk related to trade receivables and investments, which can be heightened during economic downturns.\n\n18. **Tax Rate Changes**: Changes in tax rates or tax legislation could adversely affect the Company's financial condition and results.\n\n19. **Inventory and Asset Risks**: The Company faces risks related to inventory obsolescence and the valuation of long-lived assets.\n\n20. **Supply Chain Risks**: The Company relies on a limited number of suppliers for components, which can lead to supply shortages and pricing risks.\n\n21. **Quality Control Issues**: The Company may experience quality problems with its products, which can harm sales and reputation.\n\n22. **Dependence on Third-Party Content**: The Company relies on third-party digital content, which may not always be available on favorable terms.\n\n23. **Support from Third-Party Developers**: The availability of third-party software applications is crucial for the Company's products, and a decline in support could impact sales.\n\nThese risks can materially affect the Company's business, financial condition, operating results, and stock price."
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "tset"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you might have entered a typo. If you're trying to ask a question or need information on a specific topic, please let me know how I can assist you!"
         }
       ]
     },
@@ -344,6 +282,38 @@
         {
           "role": "assistant",
           "content": "Hello Paul Bezkorovainij! AAAU-2021-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It looks like you're testing! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test successful! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
         }
       ]
     },
@@ -353,6 +323,102 @@
         {
           "role": "assistant",
           "content": "Hello Paul Bezkorovainij! AAAU-2019-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It looks like you're testing the system! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test successful! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "tet"
+        },
+        {
+          "role": "assistant",
+          "content": "It looks like you typed \"tet.\" Could you please provide more context or clarify what you need help with?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It looks like you're testing the system! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test successful! How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "Test received! How can I assist you today?"
         }
       ]
     }

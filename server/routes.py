@@ -491,7 +491,8 @@ def get_messages_get():
 
     with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
     messages = memory[user_info['email']][request.args.get('chat')]['messages']
-    return {'messages': messages}
+    filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
+    return {'messages': messages, 'filing_date': filing_date}
 
 
 
@@ -515,7 +516,10 @@ def new_chat_post():
 
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
 
-    return {'success': True}
+    user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_chat
+    token = encode_token(user_info)
+
+    return {'token': token}
 
 
 
@@ -593,6 +597,7 @@ from . import socketio
 from openai import OpenAI
 from server.dashboard.app import ask_
 from flask_socketio import emit
+import time
 client = OpenAI(api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS")
 
 @routes.route('/new-message', methods=['POST'])
@@ -604,17 +609,31 @@ def new_message_post():
     token_cost_message = 4
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
-    ticker, year, filing = request.json.get('chat').split("-")
-    socket_id = request.json.get('socketId')
+    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
+    memory[user_info['email']][request.json.get('chat')]['messages'].append({"role": 'user', "content": request.json.get('message')})
 
-    ask_(request.json.get('message'), user_info['email'], request.json.get('chat'), socket_id, ticker, year)
+    stream = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": request.json.get('message')}], stream=True)
 
+    time.sleep(3)
+
+    buffer = ""
+    for chunk in stream:
+        content = chunk.choices[0].delta.content
+        if content is not None: buffer += content
+        socketio.emit('llm_response', {'word': chunk.choices[0].delta.content})
+
+    memory[user_info['email']][request.json.get('chat')]['messages'].append({"role": 'assistant', "content": buffer})
+    with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
+    
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
 
-    return {'success': True}
+    user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_message
+    token = encode_token(user_info)
+
+    return {'token': token}
 
 
 # Handle a connection event
 @socketio.on('connect')
 def handle_connect():
-    print(f'Client connected:', request.sid)
+    print(f'Client connected:')

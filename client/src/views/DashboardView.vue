@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-column width-100 center gap-1 padding-sidebar-dashboard" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden">
+  <div class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
     <component :is="profileComp"></component>
@@ -8,7 +8,7 @@
     <div v-if="showConfirm && confirmLoading" class="card-component absolute z-20">
       <SpinnerCompInside></SpinnerCompInside>
     </div>
-    <div v-if="showConfirm && confirmSuccess" class="card-component absolute z-20">
+    <div v-if="showConfirm && confirmSuccess" class="card-component absolute z-20 flex-row center text-2 gap-1">Chat Deleted
       <div class="fa-circle-check fa-solid text-1" style="color: var(--color-green)"></div>
     </div>
     <div v-if="showConfirm && confirmAction === 'deleteChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
@@ -25,7 +25,7 @@
 
     <!-- Sidebar Section -->
     <transition name="slide">
-      <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
+      <div class="sidebar flex-column gap-1 shadow-wide z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
         <div class="flex-column space-between height-100">
           <div class="flex-column gap-1">
             <div class="flex-row gap-2" style="padding-inline: 1rem;">
@@ -35,8 +35,8 @@
             <div class="flex-column gap-1">
               <div class="text-bold" :class="isSmallScreen ? 'text-2' : 'text-3'" style="padding-inline: 1rem;">Chat History</div>
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
-                <li class="text-link text-4 chat-history-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)">
-                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="currentChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can"></div></div>
+                <li class="text-4 chat-history-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
+                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="currentChat === chat || hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can text-link"></div></div>
                 </li>
               </ul>
             </div>
@@ -73,7 +73,7 @@
       <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
       <div class="button button-primary" @click="createChat('selection', '')">Create Chat</div>
       <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-      <div class="text-3">Or choose one of the Popular Filings</div>
+      <div class="text-3">Or choose one of the Recent Filings</div>
       <div class="flex-row gap-1">
         <div class="flex-row gap-2 width-100" v-for="(filing, index) in (popularFilings)" :key="index">
           <div class="card card-clickable flex-column center" @click="createChat('card', filing)">
@@ -90,21 +90,28 @@
     <!-- Chat Section -->
     <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem;">
-        <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" ref="chatContainer">
-          <div v-for="(message, index) in currentMessages" :key="index" :class="{'text-chat': message.role === 'assistant', 'text-chat': message.role === 'user'}">
-            <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1">
-              <!-- <div class="fa-solid fa-gamepad text-1"></div> -->
-              <img src="../assets/fintel.png" class="bot-image">
-              <div class="loading-dots" v-if="assistantMessageLoading"></div>
-              <div class="text-chat chat-message-assistant" v-html="renderMarkdown(message.content)" v-if="!assistantMessageLoading"></div>
-            </div>
-            <div v-else class="flex-row width-100" style="justify-content: flex-end;">
-              <div class="chat-message-user text-chat">{{ message.content }}</div>
+        <div v-if="!filingShown || !isSmallScreen" class="shadow-wide chat-container text-inter height-100" ref="chatContainer">
+          <SpinnerCompInside v-if="chatLoading"></SpinnerCompInside>
+          <div v-else>
+            <div v-for="(message, index) in currentMessages" :key="index" :class="{'text-chat': message.role === 'assistant', 'text-chat': message.role === 'user'}">
+              <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1">
+                <!-- <div class="fa-solid fa-gamepad text-1"></div> -->
+                <img src="../assets/fintel.png" class="bot-image">
+                <div class="loading-dots" v-if="assistantMessageLoading && index === assistantMessageIndex">
+                  <span class="loading-dot"></span>
+                  <span class="loading-dot"></span>
+                  <span class="loading-dot"></span>
+                </div>
+                <div class="text-chat chat-message-assistant" v-html="renderMarkdown(message.content)" v-if="!assistantMessageLoading || index !== assistantMessageIndex"></div>
+              </div>
+              <div v-else class="flex-row width-100" style="justify-content: flex-end;">
+                <div class="chat-message-user text-chat">{{ message.content }}</div>
+              </div>
             </div>
           </div>
         </div>
         <!-- Filing Container Small -->
-        <div class="filing-container flex-column center" ref="filingContainer" @scroll="handleScroll" v-if="filingShown && isSmallScreen" >
+        <div class="filing-container shadow-wide flex-column center" ref="filingContainer" @scroll="handleScroll" v-if="filingShown && isSmallScreen" >
           <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
           <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
         </div>
@@ -157,7 +164,7 @@ export default {
   components: {ProfileComp, SpinnerCompInside},
   computed: {
     profileComp() {return this.showProfile ? 'ProfileComp' : null},
-    ...mapState(['subscription']),
+    ...mapState(['subscription', 'subscriptionTokensLeft']),
   },
   data() {
     return {
@@ -166,6 +173,7 @@ export default {
       showProfile: false,
       popularFilings: [],
       chats: [],
+      hoveredChat: null,
       availableFilings: {},
       tickerInfo: {},
       tickerOptions: [],
@@ -181,12 +189,14 @@ export default {
       newMessage: '',
       message: '',
       assistantMessageLoading: false,
+      chatLoading: false,
       showConfirm: false,
       confirmAction: '',
       confirmLoading: false,
       confirmSuccess: false,
       sidebarShown: false,
       filingShown: false,
+      filingDate: '',
       chatHistoryHeight: '0px',
       isSmallScreen: window.innerWidth <= 800, // Initial check for screen size
       llmResponseBuffer: '', // Buffer for storing incoming words
@@ -233,7 +243,7 @@ export default {
     selectFiling(option) {this.selectedFiling = option;},
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {(this.socketId = socket.id)});
+      socket.on("connect", () => {console.log(socket.id); (this.socketId = socket.id)});
       socket.on("llm_response", (data) => {
         if (data && data.word) {
           this.llmResponseBuffer += data.word; // Append new word to buffer
@@ -299,17 +309,22 @@ export default {
     selectChat(chat) {
       this.newChat = false;
       this.currentChat = chat;
+      this.chatLoading = true;
 
       axios.get(`${config.apiUrl}/api/get-messages`, {
         params: { token: localStorage.getItem('_u'), 'chat': chat }
       })
       .then(response => {
         this.currentMessages = response.data.messages;
-        // Scroll to bottom after messages are loaded
-        this.$nextTick(() => {this.scrollToBottomInstant()});
+        this.filingDate = response.data.filing_date
+        
       })
       .catch(error => {
         console.error('Error getting messages:', error);
+      })
+      .finally(() => {
+        this.chatLoading = false; // Ensure chatLoading is false after messages are loaded
+        this.$nextTick(() => {this.scrollToBottomInstant()});
       });
 
       this.filingLoading = true
@@ -325,6 +340,7 @@ export default {
       });
 
       if (this.isSmallScreen) {this.toggleSidebar();}
+      
     },
 
     scrollToBottom() {
@@ -384,7 +400,8 @@ export default {
             token: localStorage.getItem('_u'),
             chat: this.currentChat,
             message: payloadMessage,
-            socketId: this.socketId
+            socketId: this.socketId,
+            filingDate: this.filingDate
           });
 
           if (response.data.error) {
@@ -448,7 +465,6 @@ export default {
         this.error = 'Chat already exists';
         return;
       }
-      console.log(this.selectedFiling)
       try {
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
@@ -524,36 +540,33 @@ export default {
 
 
 .loading-dots {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  height: 100%;
-  position: fixed;
-  width: 100%;
-  gap: 20px
+  display: inline-flex; /* Inline flex to align with text */
+  align-items: center;  /* Vertically center the dots */
+  justify-content: flex-start; /* Align dots next to the message */
+  gap: .5rem;  /* Adjust the gap between the dots */
 }
 
 .loading-dot {
   animation: dot ease-in-out 1.5s infinite;
   background-color: grey;
   display: inline-block;
-  height: 20px;
-  width: 20px;
+  height: .5rem; /* Adjust the size to better fit the text */
+  width: .5rem;
   border-radius: 50%;
 }
 
 .loading-dot:nth-of-type(2) {
-  animation-delay: 0.25s;
-}
-
-.loading-dot:nth-of-type(3) {
   animation-delay: 0.5s;
 }
 
+.loading-dot:nth-of-type(3) {
+  animation-delay: 1s;
+}
+
 @keyframes dot {
-  0% { background-color: grey; transform: scale(1); }
-  50% { background-color: #000; transform: scale(1.3); }
-  100% { background-color: grey; transform: scale(1); }
+  0% { background-color: var(--color-grey); transform: scale(1); }
+  50% { background-color: var(--color-grey-dark); transform: scale(1.25); }
+  100% { background-color: var(--color-grey); transform: scale(1); }
 }
 
 </style>

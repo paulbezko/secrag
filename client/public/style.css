@@ -5,7 +5,9 @@ html {
 
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  
 }
+
 
 html::-webkit-scrollbar {display: none;}
 
@@ -62,7 +64,9 @@ hr {
   margin: 0;
 }
 
+/* .vignette {box-shadow: inset 0 0 40px 20px var(--color-grey);} */
 .shadow {box-shadow: 0px 0px 40px var(--color-grey)}
+.shadow-wide {box-shadow: 0px 0px 200px 2px var(--color-grey);}
 
 @media (min-width: 800px) {
   :root {
@@ -323,9 +327,9 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   font-size: var(--text-3);
   font-family: 'Inter', sans-serif !important;
-  background-color: var(--color-yellow-highlight); /* Yellow highlight background */
-  -webkit-text-fill-color: var(--color-grey-dark); /* Keep the text color */
-  box-shadow: inset 0px 0px 0px 2px var(--color-yellow); /* Add yellow border */
+  background-color: var(--color-yellow-highlight);
+  -webkit-text-fill-color: var(--color-grey-dark);
+  box-shadow: inset 0px 0px 0px 2px var(--color-yellow); 
   border: 1px solid var(--color-yellow);
   font-size: var(--text-3);
 }
@@ -408,7 +412,6 @@ select option {
   gap: 1rem;
   overflow-y: scroll;
   scrollbar-width: none; /* Firefox */
-  /* Ensure it doesn't grow beyond the available space */
 }
 
 /* For Chrome, Edge, and Safari */
@@ -424,16 +427,21 @@ select option {
 }
 
 .chat-message-assistant {
+  padding-top: 1rem;
   max-width: 75%;
 }
 
-.chat-message-assistant > :first-child {
+.chat-message-assistant > * {
+  margin: 0;
+}
+
+/* .chat-message-assistant > :first-child {
   margin-top: 0;
 }
 
 .chat-message-assistant > :last-child {
   margin-bottom: 0;
-}
+} */
 
 .chat-input {
   width: 100%;
@@ -525,6 +533,16 @@ select option {
   cursor: pointer;
 }
 
+.chat-history-element .fa-trash-can {
+  opacity: 0.6; /* Default visibility */
+  transition: opacity 0.2s;
+}
+
+.chat-history-element:hover .fa-trash-can,
+.chat-history-element.active .fa-trash-can {
+  opacity: 1; /* Fully visible on hover or active */
+}
+
 .chat-history::-webkit-scrollbar {
   width: 8px; /* Width of the scrollbar */
 }
@@ -603,17 +621,3 @@ select option {
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
 }
-
-.progress-bar {
-  width: 100%;
-  height: 1rem; /* Adjust the height to your preference */
-  border-radius: 2rem; /* Optional for rounded corners */
-  background-color: #e0e0e0;
-}
-
-.progress-bar::-webkit-progress-value {
-  border-radius: 2rem;
-  background-color: var(--color-yellow); /* Change the progress bar color */
-}
-
-progress::-webkit-progress-bar {background-color: var(--color-grey); border-radius: 2rem;}
