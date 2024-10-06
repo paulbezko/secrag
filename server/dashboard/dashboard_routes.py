@@ -1,6 +1,8 @@
 
 import warnings
 
+from .utils.sec_utils import FilingInfo
+
 warnings.filterwarnings("ignore")
 from langchain_core import globals as langchain_config
 langchain_config.set_verbose(False)
@@ -50,19 +52,64 @@ def ask():
 
 
 
-def ask_(prompt, uid, conversation_id, socket_id, ticker, filing_year, chunk_size = 10000, chunk_overlap = 3, k = 8, table_prepend_k = 3, ready_filing = None):
+def ask_(
+        prompt, 
+        uid, 
+        conversation_id, 
+        socket_id, 
+        filing_date, 
+        
+        # Optional args
+        chunk_size = 10000, 
+        chunk_overlap = 3, 
+        k = 8, 
+        table_prepend_k = 3, 
+        ready_filing = None
+        ):
+
+    print(socket_id)
 
     # We do not know what document is the request for if there is no ticker, filing, and conversation ID
-    if (not ticker or not filing_year):
-        res_dict = {"error": "Missing Ticker or Filing Year"}
-        return res_dict
-        
-    conversation_id = "{}-{}".format(ticker.upper(), str(filing_year))    
+    # if (not ticker or not filing_date or not filing_type):
+    #     res_dict = {"error": "Missing Ticker or Filing Year or Filing Type"}
+    #     return res_dict
     
-    # Define callback manager for output tokens
-    callback_manager = CallbackManager([CustomStreamingCallbackHandler(id=socket_id)])
+    filing_type = "10-K"
+
+    filing_info = create_filing_info_for_new_chat(conversation_id, filing_date)
+  
     
     # Ask the question to the custom RAG
-    answer = main_llm_chain(uid, conversation_id, prompt, callback_manager, ticker, filing_year, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
+    answer = main_llm_chain(uid, conversation_id, prompt, filing_info, socket_id, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
 
-    return answer  
+    return answer
+
+def create_filing_info_for_new_chat(conversation_id, filing_date) -> FilingInfo:
+    supported_filing_forms = ["10K", "10Q"]
+    ticker, filing_year, conversation_id_filing_form = conversation_id.split("-")
+    if conversation_id_filing_form in supported_filing_forms:
+        if conversation_id_filing_form == "10K": filing_type = "10-K"
+        elif "10Q" in conversation_id_filing_form: filing_type = "10-Q"
+    else:
+        raise Exception(f"Unsupported filing type {conversation_id_filing_form}")
+    
+    filing_info = FilingInfo(ticker=ticker, filing_date=filing_date, filing_type=filing_type, filing_year=filing_year) 
+    return filing_info  
+
+if __name__ == '__main__':
+    
+    prompt = "What is the market segmentation"
+    uid = "planetchars@gmail.com"
+    conversation_id = "AAPL-2016-10K"
+    filing_date = "2016-10-26"
+    socket_id = None
+
+    # Return error on LoadSEC
+    ask_(
+        prompt = prompt,
+        uid = uid,
+        conversation_id = conversation_id, 
+        filing_date = filing_date
+    )
+    # socketio.run(app=app, host='0.0.0.0', debug=True, port=5000) # The variable can be used cause you imported definitions??
+

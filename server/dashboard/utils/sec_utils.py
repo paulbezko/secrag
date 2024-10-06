@@ -20,14 +20,23 @@ parent_dir = os.path.dirname(current_dir)
 # Convert to string if needed
 parent_dir = str(parent_dir)
 
+class FilingInfo():
+    def __init__(self, ticker, filing_date, filing_type, filing_year) -> None:
+        self.ticker = ticker
+        self.filing_date = filing_date
+        self.filing_type = filing_type
+        self.filing_year = filing_year
+
 # This class is made for convenience. It stores all important filing data for the project's implementation
 class CustomCompanyFiling():
-    def __init__(self, filing, markdown, file_number, filing_html, cik, ticker, filing_date, company_name, balance_sheet = None, income_statement = None, cash_flow_statement = None, statement_of_comprehensive_income = None, statement_of_changes_in_equity = None):
+    def __init__(self, filing, markdown, file_number, filing_html, cik, ticker, filing_date, filing_year, company_name, filing_type = "10-K", balance_sheet = None, income_statement = None, cash_flow_statement = None, statement_of_comprehensive_income = None, statement_of_changes_in_equity = None):
         self.filing = filing 
         self.ticker = ticker
+        self.filing_type = filing_type
         self.markdown = markdown
         self.file_number = file_number
         self.filing_date = filing_date
+        self.filing_year = filing_year
         self.cik = cik
         self.html = filing_html
         self.company_name = company_name
@@ -116,7 +125,7 @@ def get_filing_for_a_year(filings, filing_date):
 
 
 # Load SEC filing
-def load_sec(ticker, filing_date):
+def load_sec(filing_info : FilingInfo):
     """
     Load a custom CompanyFiling object from a ticker symbol and year
     
@@ -132,13 +141,13 @@ def load_sec(ticker, filing_date):
     CustomCompanyFiling
         A custom CompanyFiling object with the specified ticker and year
     """
-
+    print("LOAD SEC")
     # Lowercase the ticker
-    ticker = ticker.lower()
+    ticker = filing_info.ticker.lower()
 
-    print(filing_date)
+    print(filing_info.filing_date)
 
-    filing_tl = sec_search(ticker=ticker, name="marks", email="marksdocenko@outlook.com", filing_date=filing_date)
+    filing_tl = sec_search(ticker=ticker, name="marks", email="marksdocenko@outlook.com", filing_date=filing_info.filing_date, filing_type=filing_info.filing_type)
 
     # Try retrieving financials. If it fails, return None    
     financials = try_or(lambda: Financials(filing_tl.xbrl()))
@@ -155,8 +164,10 @@ def load_sec(ticker, filing_date):
         filing_html = "",
         markdown = filing_tl.markdown(),
         cik=filing_tl.cik, 
-        ticker=ticker, 
-        filing_date=filing_tl.filing_date, 
+        ticker=filing_info.ticker, 
+        filing_type=filing_info.filing_type,
+        filing_date=filing_info.filing_date, 
+        filing_year=str(filing_tl.filing_date.year),
         company_name=filing_tl.company,
         balance_sheet=balance_sheet,
         income_statement=income_statement,
@@ -168,7 +179,7 @@ def load_sec(ticker, filing_date):
     return custom_filing
 
 
-def sec_search(ticker, name, email, filing_date):
+def sec_search(ticker, name, email, filing_date, filing_type = "10-K"):
     """
     Search for a company's latest 10-K filing using the EDGAR API.
 
@@ -193,7 +204,7 @@ def sec_search(ticker, name, email, filing_date):
 
     try:
         print(ticker, filing_date)
-        filing = Company(ticker).get_filings(form="10-K", date=filing_date)[0]
+        filing = Company(ticker).get_filings(form=filing_type, date=filing_date)[0]
         return filing
     except AttributeError:
         raise Exception("Invalid ticker - {}".format(ticker))
@@ -398,11 +409,14 @@ def filing_splitter(filing : CustomCompanyFiling, fin_statements, chunk_size = 1
     metadata_model = {
         "ticker": filing.ticker, 
         "date": filing.filing_date,
+        "form": filing.filing_type,
+        "year": filing.filing_year,
         "chunk_size": chunk_size,
         "chunk_overlap": chunk_overlap,
         "table_prepend_k": table_prepend_k,
         "chapter_description": ""
     }
+    print(f"Metadata model for SEC SPLITTER: \n\n {metadata_model}")
 
     # Generate chunks for financials
     for key, _ in fin_statements.items():

@@ -493,16 +493,14 @@ def get_messages_get():
 
     with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
     messages = memory[user_info['email']][request.args.get('chat')]['messages']
-    filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
-    return {'messages': messages, 'filing_date': filing_date}
+    return {'messages': messages}
 
 
 
-from server.dashboard.utils.sec_utils import load_sec
 from server.dashboard.utils.vectorstore_utils import vectorstore_manager
 @routes.route('/new-chat', methods=['POST'])
 def new_chat_post():
-    
+
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
 
@@ -513,15 +511,12 @@ def new_chat_post():
     memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
     with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
     
-    filing = create_filing_info_for_new_chat(conversation_id=request.json.get('chat'),filing_date=request.json.get('filingDate'))
+    filing = create_filing_info_for_new_chat(request.json.get("chat"), request.json.get("filingDate"))
     vectorstore_manager(filing, new_chat=True)
 
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
 
-    user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_chat
-    token = encode_token(user_info)
-
-    return {'token': token}
+    return {'success': True}
 
 
 
@@ -597,9 +592,8 @@ def delete_chat_post():
 
 from . import socketio
 from openai import OpenAI
-from server.dashboard.dashboard_routes import ask_
+from server.dashboard.app import ask_
 from flask_socketio import emit
-import time
 client = OpenAI(api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS")
 
 @routes.route('/new-message', methods=['POST'])
@@ -611,23 +605,17 @@ def new_message_post():
     token_cost_message = 4
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
-    ask_(
-        prompt=request.json.get('message'), 
-        uid=user_info["email"],
-        conversation_id=request.json.get('chat'), 
-        socket_id=request.json.get('socketId'), 
-        filing_date=request.json.get('filingDate')
-    )
-    
+    ticker, year, filing = request.json.get('chat').split("-")
+    socket_id = request.json.get('socketId')
+
+    ask_(request.json.get('message'), user_info['email'], request.json.get('chat'), socket_id, ticker, year)
+
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
 
-    user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_message
-    token = encode_token(user_info)
-
-    return {'token': token}
+    return {'success': True}
 
 
 # Handle a connection event
 @socketio.on('connect')
 def handle_connect():
-    print(f'Client connected:')
+    print(f'Client connected:', request.sid)

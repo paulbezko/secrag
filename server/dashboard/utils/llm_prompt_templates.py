@@ -43,7 +43,7 @@ qa_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", qa_system_prompt),
         # MessagesPlaceholder("chat_history"),
-        ("human", "{input}\n\nThe context is from the following SEC filing: (ticker: {ticker}, filing: {filing})"),
+        ("human", "{input}\n\nThe context is from the following SEC filing: (ticker: {ticker}, filing type: {filing_type}, filing date: {filing_date})"),
     ]
 )
 
