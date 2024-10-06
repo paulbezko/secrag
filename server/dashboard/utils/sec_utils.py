@@ -9,7 +9,10 @@ import json
 from token_count import TokenCount
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from .misc_utils import try_or, compare_year
+from .misc_utils import try_or, compare_year, RateLimiter
+
+# Initialize the rate limiter for EDGAR requests
+rate_limiter = RateLimiter(rate_limit=2)
 
 # Get the current directory of the script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -123,6 +126,15 @@ def get_filing_for_a_year(filings, filing_date):
         if compare_year(filing.filing_date, filing_date):
             return filing
 
+
+def load_sec_thread_limited(filing_info : FilingInfo):
+    rate_limiter.acquire()
+    try:
+        load_sec_result = load_sec(filing_info)
+        return load_sec_result
+
+    finally:
+        rate_limiter.release()   
 
 # Load SEC filing
 def load_sec(filing_info : FilingInfo):
