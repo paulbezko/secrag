@@ -78,7 +78,7 @@ def vectorstore_manager(
             check_for_existing_embeddings = vectorstore.similarity_search("", k=3, filter=metadata_model)
             # Case when embedding does not exist
             if len(check_for_existing_embeddings) == 0:
-                filing_object_for_embedding = load_sec(filing)
+                filing_object_for_embedding = load_sec_thread_limited(filing)
                 # Add new embedding
                 chunks = filing_object_for_embedding.as_documents(chunk_size, chunk_overlap, table_prepend_k)
                 vectorstore.add_documents(chunks)
@@ -90,7 +90,7 @@ def vectorstore_manager(
     # Create vectorstore if it doesn't exist
     else:
         # Create new embedding and vectorstore, and save the vectorstore 
-        filing_object_for_embedding = load_sec(filing)
+        filing_object_for_embedding = load_sec_thread_limited(filing)
         chunks = filing_object_for_embedding.as_documents(chunk_size, chunk_overlap, table_prepend_k)
         vectorstore = FAISS.from_documents(chunks, embedding=embeddings)
         vectorstore.save_local(vectorstore_dir)
