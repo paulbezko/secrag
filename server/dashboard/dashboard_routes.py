@@ -87,7 +87,6 @@ def ask_(
 
     return answer
 
-def store_usage_info_data():
 
 def create_filing_info_for_new_chat(conversation_id, filing_date) -> FilingInfo:
 
