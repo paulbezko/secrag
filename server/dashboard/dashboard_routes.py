@@ -73,7 +73,10 @@ def ask_(
     # Ask the question to the custom RAG
     answer = main_llm_chain(uid, conversation_id, prompt, human_prompts_history, filing_info, socket_id, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
 
+    store_usage_info_data(uid, conversation_id, answer["usage_meta"])
+
     return answer
+
 
 def create_filing_info_for_new_chat(conversation_id, filing_date) -> FilingInfo:
 

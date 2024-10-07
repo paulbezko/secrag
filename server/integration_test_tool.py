@@ -1,6 +1,18 @@
 import threading
 from dashboard.dashboard_routes import ask_
 from dashboard.utils.sec_utils import load_sec_thread_limited, FilingInfo
+from dashboard.utils.json_utils import store_usage_info_data
+
+def usage_db_test():
+    usage_meta = {
+        "total" : {
+            "cost" : 0,
+            "tokens" : 0,
+            "prompt_tokens" : 0,
+            "completion_tokens" : 0
+        }
+    }
+    store_usage_info_data("test", "test", usage_meta)
 
 def sec_rate_limit_test():
     # Create threads for multiple requests
@@ -32,7 +44,7 @@ def ask_test():
     )
 
 if __name__ == '__main__':
-    sec_rate_limit_test()
+    usage_db_test()
 
 
     
