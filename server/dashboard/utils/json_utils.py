@@ -1,5 +1,6 @@
 
 
+from datetime import datetime
 import json
 import os
 from langchain_community.document_loaders import JSONLoader
@@ -35,6 +36,38 @@ def append_message_to_json_file(user_id, conversation_id, new_message):
     data[user_id][conversation_id]["messages"].append(new_message)
 
     save_json_file_memory(data)
+
+def store_usage_info_data(uid, conversation_id, usage_meta):
+    '''    
+    structure_example = {
+        "uid" : [
+            {
+                "conversation_id": conversation_id,
+                "time": time,
+                "usage_meta": {
+                    "cost": total_cost,
+                    "tokens": total_tokens,
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens
+                }
+            }
+        ]
+    }
+    '''
+    with open(parent_dir + "/" + "usage_db/usage_db.json", "r") as f:
+        usage_db = json.load(f)
+    current_time = datetime.now().strftime('%Y-%m-%d : %H-%M-%S')
+    if uid not in usage_db: usage_db[uid] = {}
+    if conversation_id not in usage_db[uid]: usage_db[uid][conversation_id] = []
+    datapoint = {
+        "time":current_time,
+        "usage_meta": usage_meta["total"]
+    }
+    usage_db[uid][conversation_id] = [datapoint] + usage_db[uid][conversation_id]
+
+    with open(parent_dir + "/" + "usage_db/usage_db.json", "w") as f:
+        json.dump(usage_db, f, indent=4)
+
 
 
 def json_memory_loader(uid, conversation_id, session):
