@@ -611,8 +611,12 @@ def new_message_post():
     token_cost_message = 4
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
+    last_x_messages = (request.json.get('lastXMessages'))
+    last_x_messages_formatted = {f"-{len(last_x_messages) - i}": msg['content'] for i, msg in enumerate(last_x_messages)}
+
     ask_(
         prompt=request.json.get('message'), 
+        human_prompts_history=last_x_messages_formatted,
         uid=user_info["email"],
         conversation_id=request.json.get('chat'), 
         socket_id=request.json.get('socketId'), 

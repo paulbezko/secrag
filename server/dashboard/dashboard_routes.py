@@ -68,17 +68,7 @@ def ask_(
         ready_filing = None
         ):
 
-    print(socket_id)
-
-    # We do not know what document is the request for if there is no ticker, filing, and conversation ID
-    # if (not ticker or not filing_date or not filing_type):
-    #     res_dict = {"error": "Missing Ticker or Filing Year or Filing Type"}
-    #     return res_dict
-    
-    filing_type = "10-K"
-
     filing_info = create_filing_info_for_new_chat(conversation_id, filing_date)
-  
     
     # Ask the question to the custom RAG
     answer = main_llm_chain(uid, conversation_id, prompt, human_prompts_history, filing_info, socket_id, chunk_size, chunk_overlap, k, table_prepend_k, ready_filing)
