@@ -189,6 +189,7 @@ export default {
       newMessage: '',
       message: '',
       assistantMessageLoading: false,
+      lastXMessagesLength: 0,
       chatLoading: false,
       showConfirm: false,
       confirmAction: '',
@@ -216,6 +217,8 @@ export default {
     if (!this.isSmallScreen) {this.sidebarShown = true;}
     else (this.filingShown = false)
     window.addEventListener('resize', this.handleResize);
+    if (this.subscription === 'basic') {this.lastXMessagesLength = 5}
+    else {this.lastXMessagesLength = 10}
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize);
@@ -317,7 +320,6 @@ export default {
       .then(response => {
         this.currentMessages = response.data.messages;
         this.filingDate = response.data.filing_date
-        
       })
       .catch(error => {
         console.error('Error getting messages:', error);
@@ -395,11 +397,15 @@ export default {
           this.scrollToBottom(); // Scroll to the bottom after the message is added
         });
 
+        
+        const lastXMessages = this.currentMessages.filter(msg => msg.role === 'user').slice(-this.lastXMessagesLength)
+
         try {
           let response = await axios.post(`${config.apiUrl}/api/new-message`, {
             token: localStorage.getItem('_u'),
             chat: this.currentChat,
             message: payloadMessage,
+            lastXMessages: lastXMessages,
             socketId: this.socketId,
             filingDate: this.filingDate
           });
