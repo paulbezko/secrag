@@ -168,47 +168,58 @@ export default {
   },
   data() {
     return {
-      filingContent: '',
-      filingLoading: false,
+      // UI states
       showProfile: false,
-      popularFilings: [],
-      chats: [],
-      hoveredChat: null,
-      availableFilings: {},
-      tickerInfo: {},
-      tickerOptions: [],
-      yearOptions: [],
-      filingOptions: [],
-      selectedTicker: '', // Initialize selected ticker
-      selectedYear: '', // Initialize selected year
-      selectedFiling: '',
-      socketId: '',
-      currentChat: '',
-      currentMessages: [],
-      newChat: true,
-      newMessage: '',
-      message: '',
-      assistantMessageLoading: false,
-      lastXMessagesLength: 0,
-      chatLoading: false,
+      sidebarShown: false,
+      filingShown: false,
       showConfirm: false,
       confirmAction: '',
       confirmLoading: false,
       confirmSuccess: false,
-      sidebarShown: false,
-      filingShown: false,
-      filingDate: '',
-      chatHistoryHeight: '0px',
       isSmallScreen: window.innerWidth <= 800, // Initial check for screen size
-      llmResponseBuffer: '', // Buffer for storing incoming words
-      assistantMessageIndex: null, // Index of the assistant message to update
+
+      // Chat data
+      chats: [],
+      hoveredChat: null,
+      currentChat: '',
+      currentMessages: [],
+      newChat: true,
+      newMessage: '',
+      assistantMessageIndex: null, // Index for assistant message
+      assistantMessageLoading: false,
+      llmResponseBuffer: '', // Buffer for LLM incoming words
+      chatLoading: false,
+      lastXMessagesLength: 0, // Adjusted based on subscription
+      chatScrollPosition: 0, // To store chat scroll position
+      chatHistoryHeight: '0px', // Adjusted dynamically based on screen size
+
+      // Filing data
+      filingContent: '',
+      filingLoading: false,
+      popularFilings: [],
+      availableFilings: {},
+      filingOptions: [],
+      filingDate: '',
+      filingScrollPosition: 0, // To store filing scroll position
+
+      // Ticker selection
+      tickerInfo: {},
+      tickerOptions: [],
+      yearOptions: [],
+      selectedTicker: '', // Initialize selected ticker
+      selectedYear: '', // Initialize selected year
+      selectedFiling: '',
+
+      // Socket
+      socketId: '',
+
+      // Miscellaneous
       error: null,
       chatContainer: ref(null),
       filingContainer: ref(null),
-      chatScrollPosition: 0,  // To store chat scroll position
-      filingScrollPosition: 0 // To store filing scroll position
     };
   },
+  
   mounted() {
     this.initializeSocket();
     this.loadListTickers();
@@ -220,160 +231,129 @@ export default {
     if (this.subscription === 'basic') {this.lastXMessagesLength = 5}
     else {this.lastXMessagesLength = 10}
   },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.handleResize);
-  },
+  beforeUnmount() {window.removeEventListener('resize', this.handleResize);},
+
   methods: {
-    handleResize() {
-      this.checkScreenWidth(); // Check screen width for responsiveness
-      this.updateChatHistoryHeight(); // Update chat history height
-    },
-    
-    selectTicker(option) {
-      this.selectedTicker = option; 
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {
-        params: { token: localStorage.getItem('_u'), ticker: option }
-      })
-      .then(response => {
-        this.tickerInfo = response.data.info
-        this.yearOptions = Object.keys(this.tickerInfo);
-      })
-      .catch(error => {
-        console.error('Error getting ticker info:', error);
-      });
-    },
-    selectYear(option) {this.selectedYear = option; this.filingOptions = this.tickerInfo[this.selectedYear];},
-    selectFiling(option) {this.selectedFiling = option;},
+
+    // Initialize Socket
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {console.log(socket.id); (this.socketId = socket.id)});
-      socket.on("llm_response", (data) => {
-        if (data && data.word) {
-          this.llmResponseBuffer += data.word; // Append new word to buffer
-          this.updateAssistantMessage();
-        }
-      });
+      socket.on("connect", () => {(this.socketId = socket.id)});
+      socket.on("llm_response", (data) => {if (data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
     },
-    toggleProfile() {this.showProfile = !this.showProfile; if (this.isSmallScreen) {this.sidebarShown = false}},
 
+    // Load List Tickers
+    loadListTickers() {
+      axios.get(`${config.apiUrl}/api/get-list-tickers`, {params: { token: localStorage.getItem('_u') }})
+      .then(response => {this.popularFilings = response.data.popularFilings; this.tickerOptions = response.data.tickers;})
+      .catch(error => {console.error('Error getting filing selection data:', error)});
+    },
+
+    // Load Chats
+    loadChats() {
+      axios.get(`${config.apiUrl}/api/get-chats`, {params: { token: localStorage.getItem('_u') }})
+      .then(response => {this.chats = response.data.chats;})
+      .catch(error => {console.error('Error getting chats:', error);});
+    },
+
+    // Update Chat History Height
     updateChatHistoryHeight() {
-      // Calculate available height based on window size and fixed element heights
       let heightAdjustment = 0
-      const headerHeight = 100; // Adjust based on your actual header/footer heights
+      const headerHeight = 100; 
       if (this.isSmallScreen) {heightAdjustment = 6;}
-      const availableHeight = window.innerHeight - headerHeight + heightAdjustment; // Subtracting other elements' heights
+      const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
     },
-    toggleFilingView() {
-      this.filingShown = !this.filingShown;
-      if (this.isSmallScreen && !this.filingShown) {this.$nextTick(() => {this.scrollToBottomInstant()})}
-      if (this.filingShown) {
 
-        // Optional: Introduce a small delay to allow for padding to apply
-        setTimeout(() => {
-          const offset = this.isSmallScreen ? 25 : 0; // Adjust as necessary
-          this.$refs.filingContainer.scrollTop = this.filingScrollPosition + offset;
-        }, 50); // Adjust the delay as needed
-      
+    // Select Ticker
+    selectTicker(option) {
+      this.selectedTicker = option; 
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: option }})
+      .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
+      .catch(error => {console.error('Error getting ticker info:', error)});
+    },
+
+    // Select Year and Filing
+    selectYear(option) {this.selectedYear = option; this.filingOptions = this.tickerInfo[this.selectedYear];},
+    selectFiling(option) {this.selectedFiling = option;},
+
+    // Create chat
+    async createChat(option, filing) {
+
+      if (option === 'selection') {if (!this.selectedTicker || !this.selectedYear) {this.error =  'Please select both a Ticker and a Year of interest.'; return}}
+      else {[this.selectedTicker, this.selectedYear, this.selectedFiling] = filing.split("_")}
+
+      let newChatName = '';
+      if (this.subscription === 'basic') {newChatName = `${this.selectedTicker}-${this.selectedYear}-10K`;} 
+      else {
+        let selectedFiling
+        if (this.selectedFiling.split(' ')[0] === '10-Q') {selectedFiling = this.selectedFiling.split(' ')[0].replace('-', '') + this.selectedFiling.split(' ')[1].split('-')[1]}
+        else {selectedFiling = this.selectedFiling.split(' ')[0]}
+        newChatName = `${this.selectedTicker}-${this.selectedYear}-${selectedFiling.replace('-', '')}`
       }
-    },
-    checkScreenWidth() {
-      this.isSmallScreen = window.innerWidth <= 800;
-    },
-    handleScroll(event) {
-      this.filingScrollPosition = event.target.scrollTop;
-    },
-    loadListTickers() {
-      axios.get(`${config.apiUrl}/api/get-list-tickers`, {
-        params: { token: localStorage.getItem('_u') }
-      })
-      .then(response => {
-        this.popularFilings = response.data.popularFilings;
-        this.tickerOptions = response.data.tickers;
-        // this.availableFilings = response.data.availableFilings;
-      })
-      .catch(error => {
-        console.error('Error getting filing selection data:', error);
-      });
+
+      if (this.chats.includes(newChatName)) {this.error = 'Chat already exists'; return}
+      try {
+        let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
+          token: localStorage.getItem('_u'),
+          chat: newChatName,
+          filingDate: this.selectedFiling.split(' ')[1],
+          ticker: this.selectedTicker
+        });
+
+        if (response.data.error) {
+          if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
+          else (alert(response.data.error))
+          return;
+        }
+
+        this.chats.unshift(newChatName);
+        this.selectChat(newChatName);
+        if (this.isSmallScreen) {this.sidebarShown = false;}
+        this.newChat = false;
+        this.selectedTicker = '';
+        this.selectedYear = '';
+        this.selectedFiling = '';
+      } 
+      catch (error) {console.error('Error creating chat:', error);}
     },
 
-    loadChats() {
-      axios.get(`${config.apiUrl}/api/get-chats`, {
-        params: { token: localStorage.getItem('_u') }
-      })
-      .then(response => {
-        this.chats = response.data.chats;
-      })
-      .catch(error => {
-        console.error('Error getting chats:', error);
-      });
-    },
-
+    // Select Chat
     selectChat(chat) {
       this.newChat = false;
       this.currentChat = chat;
       this.chatLoading = true;
 
-      axios.get(`${config.apiUrl}/api/get-messages`, {
-        params: { token: localStorage.getItem('_u'), 'chat': chat }
-      })
-      .then(response => {
-        this.currentMessages = response.data.messages;
-        this.filingDate = response.data.filing_date
-      })
-      .catch(error => {
-        console.error('Error getting messages:', error);
-      })
-      .finally(() => {
-        this.chatLoading = false; // Ensure chatLoading is false after messages are loaded
-        this.$nextTick(() => {this.scrollToBottomInstant()});
-      });
+      axios.get(`${config.apiUrl}/api/get-messages`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
+      .then(response => {this.currentMessages = response.data.messages; this.filingDate = response.data.filing_date})
+      .catch(error => {console.error('Error getting messages:', error);})
+      .finally(() => {this.chatLoading = false; this.$nextTick(() => {this.scrollToBottom("instant")});});
 
       this.filingLoading = true
-      axios.get(`${config.apiUrl}/api/get-filing`, {
-        params: { token: localStorage.getItem('_u'), 'chat': chat }
-      })
-      .then(response => {
-        this.filingContent = response.data.html;
-        this.filingLoading = false
-      })
-      .catch(error => {
-        console.error('Error getting filing:', error);
-      });
 
+      axios.get(`${config.apiUrl}/api/get-filing`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
+      .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
+      .catch(error => {console.error('Error getting filing:', error);});
       if (this.isSmallScreen) {this.toggleSidebar();}
-      
     },
 
-    scrollToBottom() {
-      const chatContainer = this.$refs.chatContainer;
-      if (chatContainer) {
-        chatContainer.scrollTo({
-          top: chatContainer.scrollHeight,
-          behavior: 'smooth' // This enables smooth scrolling
-        });
-      }
-    },
-
-    scrollToBottomInstant() {
-      const chatContainer = this.$refs.chatContainer;
-      if (chatContainer) {
-        chatContainer.scrollTo({
-          top: chatContainer.scrollHeight,
-          behavior: 'instant' // This enables smooth scrolling
-        });
-      }
-    },
-
-    async replenishTokens() {
-      this.showSpinner = true
-      const response = await axios.post(`${config.apiUrl}/api/subscribe`, {
+    // Delete Chat
+    async deleteChat(chat) {
+      this.confirmLoading = true
+      let response = await axios.post(`${config.apiUrl}/api/delete-chat`, {
         token: localStorage.getItem('_u'),
-        operation: 'replenishTokens',
+        chat: chat
       });
-      window.location.href = response.data.sessionUrl;
-    },
 
+      if (response.data.error) {alert(response.data.error); return;}
+      this.confirmAction = ''
+      this.confirmLoading = false
+      this.confirmSuccess = true
+      this.loadChats()
+      this.newChat = true
+    },
+  
+    // Send Message
     async sendMessage(refName) {
 
       if (this.isSmallScreen && this.filingShown) {this.toggleFilingView();}
@@ -383,21 +363,16 @@ export default {
 
       if (this.newMessage.trim() !== '') {
 
-        this.currentMessages.push({ role: 'user', content: this.newMessage });
+        this.currentMessages.push({role: 'user', content: this.newMessage});
         this.assistantMessageIndex = this.currentMessages.length;
         this.assistantMessageLoading = true;
         this.llmResponseBuffer = '';
-        this.currentMessages[this.assistantMessageIndex] = { role: 'assistant', content: null };
+        this.currentMessages[this.assistantMessageIndex] = {role: 'assistant', content: null};
         let payloadMessage = this.newMessage
-        this.newMessage = ''; // Clear the input message
+        this.newMessage = '';
         this.newChat = false;
         
-        this.$nextTick(() => {
-          this.adjustTextareaHeight('textarea'); // Adjust the height after message is sent
-          this.scrollToBottom(); // Scroll to the bottom after the message is added
-        });
-
-        
+        this.$nextTick(() => {this.adjustTextareaHeight('textarea'); this.scrollToBottom("smooth")});
         const lastXMessages = this.currentMessages.filter(msg => msg.role === 'user').slice(-this.lastXMessagesLength)
 
         try {
@@ -418,107 +393,47 @@ export default {
         } catch (error) {console.error('Error sending message:', error); return;}
       }
     },
-    renderMarkdown(content) {
-      if (!content) {return '';}
-      return marked(content);
-    },
+    
+    // Update Assistant Message
     updateAssistantMessage() {
-      // Update the existing assistant message
       if (this.assistantMessageIndex !== null) {
         if (this.llmResponseBuffer.trim()) {
           this.assistantMessageLoading = false;
           this.currentMessages[this.assistantMessageIndex].content = marked(this.llmResponseBuffer);
-          this.$nextTick(() => {this.scrollToBottomInstant()});
+          this.$nextTick(() => {this.scrollToBottom("instant")});
         }
       }
     },
-    adjustTextareaHeight(refName) {
-      const textarea = this.$refs[refName]; // Access the specific textarea by its ref
-      
-      if (textarea) {
-        textarea.style.height = 'auto'; // Reset the height to auto to get the correct scrollHeight
-        textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px'; // Limit max-height to 160px
-      }
-    },
-    toggleSidebar() {
-      this.sidebarShown = !this.sidebarShown;
-    },
-    toggleNewChat() {
-      this.newChat = true;
-      this.currentMessages = [];
-      if (this.isSmallScreen) {this.sidebarShown = false}
+
+    // Render Markdown
+    renderMarkdown(content) {if (!content) {return '';} return marked(content)},
+
+    // Toggle Filing View
+    toggleFilingView() {
+      this.filingShown = !this.filingShown;
+      if (this.isSmallScreen && !this.filingShown) {this.$nextTick(() => {this.scrollToBottom("instant")})}
+      if (this.filingShown) {setTimeout(() => {const offset = this.isSmallScreen ? 25 : 0; this.$refs.filingContainer.scrollTop = this.filingScrollPosition + offset;}, 50)}
     },
 
-    async createChat(option, filing) {
+    // Various UI Helpers
+    adjustTextareaHeight(refName) {this.$refs[refName].style.height = 'auto'; this.$refs[refName].style.height = Math.min(this.$refs[refName].scrollHeight, 160) + 'px'},
+    checkScreenWidth() {this.isSmallScreen = window.innerWidth <= 800;},
+    handleResize() {this.checkScreenWidth(); this.updateChatHistoryHeight()},
+    handleScroll(event) {this.filingScrollPosition = event.target.scrollTop;},
+    scrollToBottom(type) {this.$refs.chatContainer.scrollTo({top: this.$refs.chatContainer.scrollHeight, behavior: type})},
 
-      if (option === 'selection') {
-        if (!this.selectedTicker || !this.selectedYear) {
-          this.error =  'Please select both a Ticker and a Year of interest.'
-          return;
-        }
-      }
-      else {[this.selectedTicker, this.selectedYear, this.selectedFiling] = filing.split("_")}
+    // Toggle Sidebar, Profile, New Chat, Confirm
+    toggleProfile() {this.showProfile = !this.showProfile; if (this.isSmallScreen) {this.sidebarShown = false}},
+    toggleSidebar() {this.sidebarShown = !this.sidebarShown;},
+    toggleNewChat() {this.newChat = true; this.currentMessages = []; if (this.isSmallScreen) {this.sidebarShown = false}},
+    toggleConfirm(action) {this.confirmAction = action; this.confirmSuccess = false; this.showConfirm = !this.showConfirm},
 
-      let newChatName = '';
-      if (this.subscription === 'basic') {newChatName = `${this.selectedTicker}-${this.selectedYear}-10K`;} 
-      else {
-        let selectedFiling
-        if (this.selectedFiling.split(' ')[0] === '10-Q') {selectedFiling = this.selectedFiling.split(' ')[0].replace('-', '') + this.selectedFiling.split(' ')[1].split('-')[1]}
-        else {selectedFiling = this.selectedFiling.split(' ')[0]}
-        newChatName = `${this.selectedTicker}-${this.selectedYear}-${selectedFiling.replace('-', '')}`}
-
-      if (this.chats.includes(newChatName)) {
-        this.error = 'Chat already exists';
-        return;
-      }
-      try {
-        let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
-          token: localStorage.getItem('_u'),
-          chat: newChatName,
-          filingDate: this.selectedFiling.split(' ')[1],
-          ticker: this.selectedTicker
-        });
-
-        if (response.data.error) {
-          if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
-          else (alert(response.data.error))
-          return;
-        }
-
-        this.chats.unshift(newChatName);
-        this.selectChat(newChatName);
-        if (this.isSmallScreen) {this.sidebarShown = false;} // only if small
-        this.newChat = false;
-        this.selectedTicker = '';
-        this.selectedYear = '';
-        this.selectedFiling = '';
-      } catch (error) {
-        console.error('Error creating chat:', error);
-      }
+    // Replenish Tokens
+    async replenishTokens() {
+      this.showSpinner = true
+      const response = await axios.post(`${config.apiUrl}/api/subscribe`, {token: localStorage.getItem('_u'), operation: 'replenishTokens'});
+      window.location.href = response.data.sessionUrl;
     },
-    async deleteChat(chat) {
-      this.confirmLoading = true
-      let response = await axios.post(`${config.apiUrl}/api/delete-chat`, {
-          token: localStorage.getItem('_u'),
-          chat: chat
-        });
-
-      if (response.data.error) {
-        alert(response.data.error);
-        return;
-      }
-
-      this.confirmAction = ''
-      this.confirmLoading = false
-      this.confirmSuccess = true
-      this.loadChats()
-      this.newChat = true
-    },
-    toggleConfirm(action) {
-      this.confirmAction = action
-      this.confirmSuccess = false
-      this.showConfirm = !this.showConfirm
-    }
   }
 };
 

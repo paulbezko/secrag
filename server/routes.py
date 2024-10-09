@@ -613,7 +613,7 @@ def new_message_post():
 
     last_x_messages = (request.json.get('lastXMessages'))
     last_x_messages_formatted = {f"-{len(last_x_messages) - i}": msg['content'] for i, msg in enumerate(last_x_messages)}
-
+    
     ask_(
         prompt=request.json.get('message'), 
         human_prompts_history=last_x_messages_formatted,

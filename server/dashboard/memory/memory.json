@@ -72,6 +72,30 @@
                 {
                     "role": "assistant",
                     "content": "Test received! How can I assist you today?"
+                },
+                {
+                    "role": "user",
+                    "content": "[{'content': 'test', 'role': 'user'}, {'content': 'test', 'role': 'user'}, {'role': 'user', 'content': 'give me balance sheet figures\\n'}]"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I'm unable to provide specific balance sheet figures from the SEC 10-K filing for AAPL. However, I can help answer questions or provide general information about balance sheets or financial concepts. Let me know how else I can assist you!"
+                },
+                {
+                    "role": "user",
+                    "content": "[{'content': 'test', 'role': 'user'}, {'content': 'test', 'role': 'user'}, {'role': 'user', 'content': 'give me balance sheet figures\\n'}, {'role': 'user', 'content': 'why not?'}]"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I'm unable to provide specific balance sheet figures from the SEC 10-K filing. However, I can help answer questions or provide general information about financial statements or related topics. Let me know how else I can assist you!"
+                },
+                {
+                    "role": "user",
+                    "content": "[{'content': 'test', 'role': 'user'}, {'content': 'test', 'role': 'user'}, {'role': 'user', 'content': 'give me balance sheet figures\\n'}, {'role': 'user', 'content': 'why not?'}, {'role': 'user', 'content': 'what day is it today'}]"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I'm unable to provide balance sheet figures from the SEC 10-K filing. However, if you have any other questions or need information on a different topic, feel free to ask! \n\nAs for today's date, it is October 2023."
                 }
             ]
         },
@@ -700,6 +724,38 @@
                 {
                     "role": "assistant",
                     "content": "The most important aspects for Access Pharmaceuticals in the year leading up to the SEC filing on March 31, 2005, include:\n\n1. **Clinical Development Progress**: The completion of a Phase I clinical study for AP5346 (a polymer platinate) in Europe, which involved approximately 26 patients. The results indicated some partial responses in patients with various types of cancer, suggesting potential efficacy.\n\n2. **Regulatory Approvals**: The company received clearance from the FDA for its Investigational New Drug Application (IND) for AP5346, allowing it to proceed with clinical trials.\n\n3. **Product Launches**: The re-launch of Aphthasol(R) in the U.S. market after resolving manufacturing issues, which was significant for generating product sales.\n\n4. **Financial Position**: The company faced challenges with a working capital deficit and the impending maturity of convertible notes, highlighting the need for additional capital to support ongoing operations and development efforts.\n\n5. **Strategic Partnerships**: The company aimed to form strategic alliances for product development and commercialization, which is crucial for mitigating financial risks and enhancing market reach.\n\nThese points reflect the company's focus on advancing its drug candidates, addressing financial challenges, and seeking partnerships to support its growth and development strategy."
+                },
+                {
+                    "role": "user",
+                    "content": "testing"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It seems like you're testing the system. If you have any specific financial questions or topics you'd like to discuss, such as investment strategies, market trends, or corporate finance, feel free to ask! I'm here to provide valuable insights on those subjects."
+                },
+                {
+                    "role": "user",
+                    "content": "send me the balance sheet"
+                },
+                {
+                    "role": "assistant",
+                    "content": "The balance sheet for Access Pharmaceuticals, Inc. as of December 31, 2004, is not provided in the retrieved context. However, it typically includes assets, liabilities, and shareholders' equity. If you need specific figures or details, please let me know!"
+                },
+                {
+                    "role": "user",
+                    "content": "what about income statement"
+                },
+                {
+                    "role": "assistant",
+                    "content": "The income statement for Access Pharmaceuticals, Inc. for the year ended December 31, 2004, shows a net loss of $10,238,000, which translates to a basic and diluted loss per common share of $0.68. This loss is an increase from the previous year's net loss of $6,935,000, or $0.52 per share. \n\nKey components of the income statement include:\n\n- Licensing revenue: $104,000 (down from $729,000 in 2003)\n- Product sales of Aphthasol(R): $351,000 (down from $532,000 in 2003)\n- Royalty income: $94,000 (up from $34,000 in 2003)\n- Total research spending: $5,417,000 (down from $6,096,000 in 2003)\n- General and administrative expenses: $3,199,000 (up from $2,514,000 in 2003)\n- Interest and miscellaneous income: $226,000 (down from $2,559,000 in 2003)\n- Interest and miscellaneous expense: $1,385,000 (up from $1,281,000 in 2003)\n\nThe increase in losses is attributed to various factors, including decreased revenues and increased expenses."
+                },
+                {
+                    "role": "user",
+                    "content": "can you show it in a markdown table form?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It seems like you're asking for financial statements in a markdown table format. However, I need to clarify which specific financial statements you would like to see. \n\nIf you're interested in a balance sheet or an income statement for a specific company, please provide the name of the company, and I can help you understand how to structure that information in a markdown table. \n\nHere\u2019s a general example of how a balance sheet might look in markdown format:\n\n```markdown\n| Assets                | Amount   |\n|-----------------------|----------|\n| Current Assets        | $XX,XXX  |\n| Non-Current Assets    | $XX,XXX  |\n| **Total Assets**      | **$XX,XXX** |\n\n| Liabilities           | Amount   |\n|-----------------------|----------|\n| Current Liabilities   | $XX,XXX  |\n| Long-Term Liabilities  | $XX,XXX  |\n| **Total Liabilities** | **$XX,XXX** |\n\n| Equity                | Amount   |\n|-----------------------|----------|\n| Common Stock          | $XX,XXX  |\n| Retained Earnings      | $XX,XXX  |\n| **Total Equity**      | **$XX,XXX** |\n```\n\nIf you have a specific company or financial data in mind, please let me know!"
                 }
             ]
         },

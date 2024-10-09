@@ -158,9 +158,9 @@ def general_llm(prompt, human_prompts_history, socket_id):
     general_llm_chain = general_llm_prompt | llm
     for chunk in general_llm_chain.stream({"human_prompts_history":human_prompts_history, "prompt":prompt}):
         buffer += chunk.content
-        # socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
-        sys.stdout.write(chunk.content)
-        sys.stdout.flush()
+        socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
+        # sys.stdout.write(chunk.content)
+        # sys.stdout.flush()
     return {
         "context": "None",
         "answer": buffer

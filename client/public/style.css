@@ -437,11 +437,11 @@ select option {
 
 /* .chat-message-assistant > :first-child {
   margin-top: 0;
-}
+} */
 
 .chat-message-assistant > :last-child {
-  margin-bottom: 0;
-} */
+  margin-bottom: 1rem;
+}
 
 .chat-input {
   width: 100%;
