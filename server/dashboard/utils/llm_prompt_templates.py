@@ -5,86 +5,9 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, Prom
 tenK_descriptions = ["Overview of the document","Overview of the company's business operations, products, services, and market environment.", "Discussion of risks and uncertainties that could materially affect the company's financial condition or results of operations.", 'Any comments from the SEC staff on the company’s previous filingsthat remain unresolved.', 'Information about the physical properties owned or leased by the company.', 'Details of significant ongoing legal proceedings.', 'Relevant for mining companies, disclosures about mine safety and regulatory compliance.', 'Information on the company’s equity, including stock performance and shareholder matters.', 'Financial data summary for the last five fiscal years.', 'Management’s perspective on the financial condition, changes in financial condition, and results of operations.', "Information on the company's exposure to market risk, such as interest rate risk, foreign currency exchange risk, commodity price risk, etc.", 'Complete audited financial statements, including balance sheet, income statement, cash flow statement, and notes to the financial statements.', 'Evaluation of the effectiveness of the design and operation of the company’s disclosure controls and procedures.', 'Evaluation of internal controls over financial reporting.', 'Any other relevant information not covered in other sections.', "Information about the company's directors, executive officers, and governance policies.", 'Details of compensation paid to key executives.', 'Information about stock ownership of major shareholders, directors, and management.', 'Information on transactions between the company and its directors, officers, and significant shareholders.', 'Fees paid to the principal accountant and services rendered.', 'Legal documents and financial schedules that support the financial statements and disclosures.']
 tenQ_descriptions = ["Overview of the document",'Unaudited financial statements including balance sheets, income statements, and cash flow statements.', 'Management’s perspective on the financial condition and results of operations.', "Information on the company's exposure to market risk.", 'Evaluation of the effectiveness of disclosure controls and procedures.', 'Brief description of any significant pending legal proceedings.', 'An update on risk factors that may affect future results.', 'Details of unregistered sales of equity securities.', 'Information regarding any defaults on senior securities.', 'Required for companies with mining operations.', 'Any other information that should be disclosed to investors.', 'List of exhibits required by Item 601 of Regulation S-K.']
 
-determine_rag_necessety_prompt = """
-You are presented with a current question and the latest chat messages from a human. Your task is to assess whether the question requires specific company information found exclusively in a company's SEC filing (e.g., revenue, net income, risks, legal proceedings) or if it can be addressed using general business knowledge or common industry practices not tied to any specific company’s filing.
-
-Output required: true if the question must be answered with specific data from a SEC filing.
-Output required: false if the question can be answered using general business knowledge, industry practices, or does not need specific SEC filing data.
-
-You will receive a $100 tip for providing the correct answer.
-
-Latest chat messages: {human_prompts_history}
-
-Question: {prompt}
-"""
-
-rag_need_prompt = ChatPromptTemplate.from_messages(
-    [
-        # ("system", determine_rag_necessety_prompt),
-        ("human", determine_rag_necessety_prompt),
-    ]
-)
-
-follow_up_system_prompt = """
-You are presented with a current question and the latest chat messages from a human. Your task is to assess whether the current question is a follow-up to one of the latest chat messages.
-
-To determine if the current question is a follow-up, consider the following:
-
-It qualifies as a follow-up if it explicitly asks for further detail about the previous topic, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
-
-Do not classify it as a follow-up if the question addresses a different financial statements, topic or request that doesn’t build upon the previous question.
-
-If the current question qualifies as a follow-up, return follow_up_to_prompt: FOLLOW_UP_TO_PROMPT where FOLLOW_UP_TO_PROMPT is contextually the most relevant history chat message from the human. Also, describe why you think it qualifies as a follow-up.
-If it is not a follow-up, return an empty string follow_up_to_prompt: "".
-
-You will receive a $100 tip for providing the correct answer.
-
-Latest chat messages: {human_prompts_history}
-
-Question: {prompt}
-"""
-
-follow_up_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", follow_up_system_prompt),
-    ]
-)
-
-
-general_llm_system_prompt = """
-You are a highly skilled financial expert with extensive knowledge in corporate finance, investment strategies, financial markets, \
-risk management, accounting, and economic principles. You provide accurate, detailed, and professional advice on financial topics. \
-
-Do not engage in discussions that are unrelated to finance or corporate world. Decline to answer irrelevant questions and redirect the conversation back to financial topics when necessary. \
-You value clarity, precision, and focus in all interactions. Your goal is to offer valuable, actionable insights that help \
-individuals and businesses make informed financial decisions.
-"""
-
-general_llm_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", general_llm_system_prompt),
-        ("human", "Last human messages: \n {human_prompts_history}\nPrompt:\n{prompt}")
-    ]
-)
-
-contextualize_q_system_prompt = """
-Return the keyphrases from \
+contextualize_q_system_prompt = """Return the keyphrases from \
 the given question as a single string that will be used in \
-FAISS similarity search to retrieve chunks from the document. \
-The question might be a follow-up to previous human prompts, so \
-if appropriate use previous human prompts for keyword generation.
-
-Also, your task is to assess whether the current question is a follow-up to one of the previous human prompts.
-
-To determine if the current question is a follow-up, consider the following:
-
-It qualifies as a follow-up if it explicitly asks for further detail about the previous topic, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
-
-Do not classify it as a follow-up if the question addresses a different financial statements, topic or request that doesn’t build upon the previous question.
-
-If the current question qualifies as a follow-up, include keyphrases that help retrieve context from previous prompts to complete the follow-up.
-
-Previous human prompts: {human_prompts_history}
+FAISS similarity search to retrieve chunks from the document. 
 
 Question: {prompt}
 

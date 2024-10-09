@@ -297,6 +297,73 @@
                     "completion_tokens": 0
                 }
             }
+        ],
+        "ABEO-2005-10K": [
+            {
+                "time": "2024-10-07 : 07-48-51",
+                "usage_meta": {
+                    "cost": 4.724999999999999e-05,
+                    "tokens": 300,
+                    "prompt_tokens": 295,
+                    "completion_tokens": 5
+                }
+            },
+            {
+                "time": "2024-10-07 : 07-48-35",
+                "usage_meta": {
+                    "cost": 0.00019619999999999997,
+                    "tokens": 1092,
+                    "prompt_tokens": 1020,
+                    "completion_tokens": 72
+                }
+            },
+            {
+                "time": "2024-10-07 : 07-46-22",
+                "usage_meta": {
+                    "cost": 0.0001938,
+                    "tokens": 1076,
+                    "prompt_tokens": 1004,
+                    "completion_tokens": 72
+                }
+            },
+            {
+                "time": "2024-10-07 : 07-46-10",
+                "usage_meta": {
+                    "cost": 4.094999999999999e-05,
+                    "tokens": 258,
+                    "prompt_tokens": 253,
+                    "completion_tokens": 5
+                }
+            }
+        ],
+        "AAPL-2011-10K": [
+            {
+                "time": "2024-10-07 : 17-59-01",
+                "usage_meta": {
+                    "cost": 0.0002091,
+                    "tokens": 1091,
+                    "prompt_tokens": 990,
+                    "completion_tokens": 101
+                }
+            },
+            {
+                "time": "2024-10-07 : 17-57-06",
+                "usage_meta": {
+                    "cost": 0.00019829999999999997,
+                    "tokens": 1049,
+                    "prompt_tokens": 958,
+                    "completion_tokens": 91
+                }
+            },
+            {
+                "time": "2024-10-07 : 17-56-52",
+                "usage_meta": {
+                    "cost": 0.00020009999999999998,
+                    "tokens": 1031,
+                    "prompt_tokens": 930,
+                    "completion_tokens": 101
+                }
+            }
         ]
     }
 }
