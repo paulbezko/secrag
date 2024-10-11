@@ -2,7 +2,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from captcha.image import ImageCaptcha
 from datetime import datetime, timezone, timedelta
 
-from server.dashboard.dashboard_routes import create_filing_info_for_new_chat
 from .utils import get_user_data, get_user_data_stripe, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp, get_assistant_response, get_filing, get_vectorstore
 from flask import Blueprint, render_template, send_from_directory, request, current_app, jsonify, render_template_string
 
@@ -498,7 +497,6 @@ def get_messages_get():
 
 
 
-from server.dashboard.utils.sec_utils import load_sec
 @routes.route('/new-chat', methods=['POST'])
 def new_chat_post():
     
@@ -596,7 +594,6 @@ def delete_chat_post():
 
 from . import socketio
 from openai import OpenAI
-from server.dashboard.dashboard_routes import ask_
 from flask_socketio import emit
 import time
 client = OpenAI(api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS")
