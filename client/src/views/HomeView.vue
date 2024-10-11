@@ -1,7 +1,7 @@
 <template>
   <div class="flex-column center width-100" style="padding-inline: 2rem;">
     <NavbarComp :authenticated=isAuthenticated :subscribed=isSubscribed />
-    <div class="flex-row width-100 gap-8 center" style="padding-top: 20rem; padding-inline: 4rem;">
+    <div class="flex-row width-100 gap-8 center" style="padding-inline: 0rem; height: calc(100vh - 6rem)">
       <div class="flex-column gap-4 center" style="max-width: 52rem;">
         <div class="heading">{{ heroHeading }}</div>
         <div class="text-1">{{ heroSubheading }}</div>
@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <div id="about" class="flex-column width-100 center gap-4" style="padding-top: 20rem; padding-inline: 4rem;">
+    <div id="about" class="flex-column width-100 center gap-4" style="padding-inline: 0rem;">
       <div class="heading text-center">The SEC Filing Problem</div>
       <div class="flex-row gap-4 center">
         <div class="text-2 text-center" style="max-width: 50rem;">For investors, analysts, and legal professionals, deciphering complex SEC filings can be <b style="color: var(--color-red);">overwhelming</b>.</div>
@@ -34,7 +34,7 @@
         <img src="../assets/home/money_with_wings_3d 1.png" style="width: 10rem; height: 10rem;">
       </div>
     </div>
-    <div class="flex-column width-100 center gap-8" style="max-width: 88rem; padding-top: 20rem; padding-inline: 4rem;">
+    <div class="flex-column width-100 center gap-8" style="max-width: 88rem; padding-top: 20rem; padding-inline: 0rem;">
       <div class="heading text-center">Our Simple, Two-Step Solution</div>
       <div class="flex-row switch-row-to-column gap-4 center width-100">
         <div class="flex-column vertical-line gap-2 width-100">
@@ -59,10 +59,10 @@
             <li><b style="color: var(--color-green);">User-Friendly:</b> Navigate filings and interact with AI effortlessly.</li>
           </ul>
         </div>
-        <img src="../assets/home/money_with_wings_3d 1.png" style="width: 15rem; height: 15rem;">
+        <img src="../assets/home/stopwatch_3d 1.png" style="width: 15rem; height: 15rem;">
       </div>
     </div>
-    <div class="flex-column center gap-4" style="padding-top: 20rem; padding-inline: 4rem;">
+    <div class="flex-column center gap-4" style="padding-top: 20rem; padding-inline: 0rem;">
       <div class="text-2 text-center">~ We provide access to filings for any public company. No matter which one you're looking for, we have it. ~</div>
       <div class="flex-row width-100 switch-row-to-column gap-2">
         <div class="flex-row width-100 space-between">
@@ -80,7 +80,7 @@
         </div>
       </div>
     </div>
-    <div class="flex-column center gap-4" style="max-width: 70rem; padding-top: 20rem; padding-inline: 4rem;">
+    <div class="flex-column center gap-4" style="max-width: 70rem; padding-top: 20rem; padding-inline: 0rem;">
       <div class="heading text-center">Start Your Journey to Smarter Filings</div>
       <div class="text-1 text-center">Get more from SEC filings with the plan that fits your workflow.</div>
       <div class="flex-column gap-2 width-100">
@@ -167,7 +167,7 @@
         </div>
       </div>
     </div>
-    <div id="faq" class="flex-column gap-4" style="max-width: 112rem; padding-top: 20rem; padding-inline: 4rem;">
+    <div id="faq" class="flex-column gap-4" style="max-width: 112rem; padding-top: 20rem; padding-inline: 0rem;">
       <div class="heading text-center">Frequently Asked Questions</div>
       <div class="width-100 vertical-line flex-column">
         <div v-for="(faq, index) in faqItems" :key="index">
@@ -181,7 +181,7 @@
         </div>
       </div>
     </div>
-    <div id="contact" class="flex-column gap-4 text-left width-100" style="max-width: 112rem; padding-top: 20rem; padding-inline: 4rem;">
+    <div id="contact" class="flex-column gap-4 text-left width-100" style="max-width: 112rem; padding-top: 20rem; padding-inline: 0rem;">
       <div class="flex-column gap-2">
         <div class="heading">Contact Us</div>
         <div class="text-1">Got a question or a remark? <a href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C" class="text-link text-bold">Send us a message!</a></div>
