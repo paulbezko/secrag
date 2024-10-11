@@ -463,7 +463,7 @@ def get_filing_selection_data_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/filing_db/filing_db.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('server/memory/filings_db/filings_available.json', 'r') as f: filing_selection_data = json.load(f)
     popular_filings = filing_selection_data['popular_filings']
     if user_info['subscription'] == 'basic': popular_filings = [filing for filing in popular_filings if '10Q' not in filing]
 
@@ -477,7 +477,7 @@ def get_chats_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
+    with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
     chats = list(reversed(memory[user_info['email']].keys()))
 
     return {'chats': chats}
@@ -490,7 +490,7 @@ def get_messages_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
+    with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
     messages = memory[user_info['email']][request.args.get('chat')]['messages']
     filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
     return {'messages': messages, 'filing_date': filing_date}
@@ -506,9 +506,9 @@ def new_chat_post():
     token_cost_chat = 20
     if int(user_info['subscription_tokens_left']) < token_cost_chat: return {'error': 'Insufficient Tokens'}
 
-    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
+    with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
     memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
-    with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
+    with open('server/memory/chat_memory.json', 'w') as f: json.dump(memory, f, indent=2)
     
     filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
     get_vectorstore(filing, new_chat=True)
@@ -528,7 +528,7 @@ def get_list_tickers():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/filing_db/filing_db.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('server/memory/filings_db/filings_available.json', 'r') as f: filing_selection_data = json.load(f)
 
     return {'tickers': list(filing_selection_data['available_filings'].keys()), 'popularFilings': filing_selection_data['popular_filings'][:3]}
 
@@ -540,7 +540,7 @@ def get_info_by_ticker():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/filing_db/filing_db.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('server/memory/filings_db/filings_available.json', 'r') as f: filing_selection_data = json.load(f)
 
     return {'info': filing_selection_data['available_filings'][request.args.get('ticker')]}
 
@@ -555,7 +555,7 @@ def get_filing_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
+    with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
 
     ticker, year, form_raw = request.args.get('chat').split('-')
     filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
@@ -584,9 +584,9 @@ def delete_chat_post():
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('server/dashboard/memory/memory.json', 'r') as f: memory = json.load(f)
+    with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
     del memory[user_info['email']][request.json.get('chat')]
-    with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
+    with open('server/memory/chat_memory.json', 'w') as f: json.dump(memory, f, indent=2)
 
     return {'success': True}
 
