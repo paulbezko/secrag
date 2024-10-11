@@ -3,7 +3,7 @@ from captcha.image import ImageCaptcha
 from datetime import datetime, timezone, timedelta
 
 from server.dashboard.dashboard_routes import create_filing_info_for_new_chat
-from .utils import get_user_data, get_user_data_stripe, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp
+from .utils import get_user_data, get_user_data_stripe, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp, get_assistant_response, get_filing, get_vectorstore
 from flask import Blueprint, render_template, send_from_directory, request, current_app, jsonify, render_template_string
 
 
@@ -499,7 +499,6 @@ def get_messages_get():
 
 
 from server.dashboard.utils.sec_utils import load_sec
-from server.dashboard.utils.vectorstore_utils import vectorstore_manager
 @routes.route('/new-chat', methods=['POST'])
 def new_chat_post():
     
@@ -513,8 +512,8 @@ def new_chat_post():
     memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
     with open('server/dashboard/memory/memory.json', 'w') as f: json.dump(memory, f, indent=2)
     
-    filing = create_filing_info_for_new_chat(conversation_id=request.json.get('chat'),filing_date=request.json.get('filingDate'))
-    vectorstore_manager(filing, new_chat=True)
+    filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
+    get_vectorstore(filing, new_chat=True)
 
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
 
@@ -611,16 +610,15 @@ def new_message_post():
     token_cost_message = 4
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
-    last_x_messages = (request.json.get('lastXMessages'))
-    last_x_messages_formatted = {f"-{len(last_x_messages) - i}": msg['content'] for i, msg in enumerate(last_x_messages)}
-    
-    ask_(
-        prompt=request.json.get('message'), 
-        human_prompts_history=last_x_messages_formatted,
-        uid=user_info["email"],
-        conversation_id=request.json.get('chat'), 
-        socket_id=request.json.get('socketId'), 
-        filing_date=request.json.get('filingDate')
+    message_history = (request.json.get('lastXMessages'))
+
+    get_assistant_response(
+        user_prompt = request.json.get('message'),
+        message_history = message_history,
+        user_email = user_info["email"],
+        filing_id = request.json.get('chat'),
+        socket_id = request.json.get('socketId'),
+        filing_date = request.json.get('filingDate')
     )
     
     execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
