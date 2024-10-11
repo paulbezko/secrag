@@ -66,7 +66,7 @@ def vectorstore_manager(
         raise Exception("Unsupported splitter_mode - {}. Currently supported modes - {}".format(splitter_mode, supported_text_splitters))
     
 
-    vectorstore_dir = parent_dir + "/memory/vectorstore/grand_vectorstore"
+    vectorstore_dir = parent_dir + "/memory/vectorstore"
     embeddings = OpenAIEmbeddings()
 
     # Check if vectorstore exists
@@ -87,6 +87,7 @@ def vectorstore_manager(
             # Case when embedding already exists       
             else:
                 print(f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+
     # Create vectorstore if it doesn't exist
     else:
         # Create new embedding and vectorstore, and save the vectorstore 

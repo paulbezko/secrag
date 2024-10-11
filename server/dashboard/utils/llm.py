@@ -34,7 +34,6 @@ llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='')
 class ContextualOutput(BaseModel):
     """Key words and Chapter descriptions"""
     keywords: str
-    chapter_descriptions: list
     balance_sheet: bool
     income_statement: bool
     cash_flow_statement: bool
@@ -92,8 +91,6 @@ def main_llm_chain(uid, session, prompt, human_prompts_history, filing_info : Fi
         Dictionary containing the input, output, context, and usage metadata
     """
 
-    
-
     # Disabled public agent and combinator
     public_db_agent_output = None
     combined_output = None
@@ -140,6 +137,7 @@ def main_llm_chain(uid, session, prompt, human_prompts_history, filing_info : Fi
         }        
 
 def determine_rag_need(prompt, human_prompts_history):
+
 
 
     # Integrated Pydantic
@@ -298,7 +296,7 @@ def process_need_for_financials(vectorstore, need_for_financials, metadata_model
         "chunk_size": metadata_model["chunk_size"],
         "chunk_overlap": metadata_model["chunk_overlap"],
         "table_prepend_k": metadata_model["table_prepend_k"],
-        "chapter_description": ""
+        "chunk_description": "",
     }
 
     supported_financials = ["balance_sheet", "cash_flow_statement", "income_statement", "statement_of_changes_in_equity", "statement_of_comprehensive_income"]

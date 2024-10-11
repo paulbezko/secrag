@@ -50,20 +50,6 @@ class CustomCompanyFiling():
         self.cash_flow_statement = cash_flow_statement,
     
     def as_documents(self, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3):
-        """
-        Converts the filing object into a list of Document objects for embedding.
-
-        This function takes the filing object and its associated financials, and uses the `filing_splitter` function to split the filing into chunks.
-        It then composes a list of `Document` objects, where each object contains the text content of a chunk and its associated metadata.
-
-        Args:
-            chunk_size (int, optional): The maximum size of each chunk. Defaults to 10000.
-            chunk_overlap (int, optional): The number of rows to overlap between chunks. Defaults to 3.
-            table_prepend_k (int, optional): The number of rows to prepend to each table chunk. Defaults to 3.
-
-        Returns:
-            list: A list of `Document` objects, where each object contains the text content of a chunk and its associated metadata.
-        """
         return filing_to_embeddings_input(self, self.get_financials(), chunk_size, chunk_overlap, table_prepend_k)
    
     def get_financials(self):
