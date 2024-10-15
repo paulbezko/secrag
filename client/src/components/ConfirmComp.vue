@@ -6,11 +6,14 @@
         <div class="card-component flex-column center gap-2 card-size-confirm" ref="ConfirmCard">
           <div class="text-1 text-bold text-center">{{ actions[action].heading }}</div>
           <div class="text-3 text-center">{{ actions[action].text }}</div>
-          <div v-if="action === 'resetPasswordBefore'" class="flex-row gap-1 width-100">
-            <input class="input" placeholder="Email" v-model="email"/>
-            <div @click="submit($event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="action === 'resetPasswordBefore'" class="flex-column gap-1 width-100">
+            <div class="flex-row gap-1 width-100">
+              <input class="input" placeholder="Email" v-model="email"/>
+              <div @click="submit($event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+            </div>
+            <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
-          <div class="flex-column gap-1 center width-100" v-if="action === 'changeEmail' || action === 'changePassword' || action === 'deleteAccount'">
+          <div v-if="action === 'changeEmail' || action === 'changePassword' || action === 'deleteAccount'" class="flex-column gap-1 center width-100">
             <input v-if="action === 'changeEmail' || action === 'changePassword' || action === 'deleteAccount'" class="input" type="password" placeholder="Current Password" v-model="password"/>
             <input v-if="action === 'changePassword'" class="input" type="password" placeholder="New Password" v-model="passwordNew"/>
             <div v-if="action === 'changePassword'" class="flex-column gap-1 width-100">
@@ -18,14 +21,14 @@
                 <input class="input" type="password" placeholder="Confirm New Password" v-model="passwordNewConfirm"/>
                 <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
               </div>
-              <div v-if="error" class="text-error bold text-center">{{ error }}</div>
+              <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
             </div>
             <div v-if="action === 'changeEmail'" class="flex-column gap-1 width-100">
               <div class="flex-row gap-1 width-100">
                 <input class="input" type="text" placeholder="New Email" v-model="emailNew"/>
                 <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
               </div>
-              <div v-if="error" class="text-error bold text-center">{{ error }}</div>
+              <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
             </div>
           </div>
           <div v-if="action === 'signOut' || action === 'deleteAccount'" class="button button-secondary" @click="submit($event)">Confirm</div>
