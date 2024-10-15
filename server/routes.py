@@ -289,8 +289,10 @@ def webhook_post():
             elif response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: 
                 tokens = 2400
                 product = 'premium'
-            
-            execute_query("UPDATE users SET subscription = %s, subscription_tokens_left = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s", (product, int(user['subscription_tokens_left']) + tokens, response['id'], response['customer']))
+                
+            if user['subscription_tokens_left'] != None:
+                tokens += int(user['subscription_tokens_left'])
+            execute_query("UPDATE users SET subscription = %s, subscription_tokens_left = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s", (product, tokens, response['id'], response['customer']))
 
         elif response['type'] == 'customer.subscription.deleted':
             execute_query("UPDATE users SET subscription = 'none', subscription_tokens_left = 0, stripe_subscription_id = NULL WHERE stripe_user_id = %s", (response['customer'],))
@@ -478,8 +480,10 @@ def get_chats_get():
     except: return {'error': 'Error decoding token'}
 
     with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
-    chats = list(reversed(memory[user_info['email']].keys()))
-
+    if user_info['email'] in memory:
+        chats = list(reversed(memory[user_info['email']].keys()))
+    else:
+        chats = []
     return {'chats': chats}
 
 
@@ -507,6 +511,7 @@ def new_chat_post():
     if int(user_info['subscription_tokens_left']) < token_cost_chat: return {'error': 'Insufficient Tokens'}
 
     with open('server/memory/chat_memory.json', 'r') as f: memory = json.load(f)
+    if user_info['email'] not in memory: memory[user_info['email']] = {}
     memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
     with open('server/memory/chat_memory.json', 'w') as f: json.dump(memory, f, indent=2)
     
