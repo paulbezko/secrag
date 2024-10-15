@@ -136,6 +136,7 @@ def login_post():
         'name': user['name'],
         'auth_type': user['auth_type'],
         'subscription': user['subscription'],
+        'subscription_tokens_left': user['subscription_tokens_left'],
         'stripe_subscription_id': user['stripe_subscription_id'],
         'stripe_user_id': user['stripe_user_id'],
     }
