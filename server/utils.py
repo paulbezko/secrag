@@ -337,7 +337,7 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
         prompt_keywords_and_filing_tables = llm.with_structured_output(KewordsFilingTables).invoke(system_prompt)
 
         # Getting vectorsore to get context chunks from
-        vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, k=1, table_prepend_k=table_prepend_k)
+        vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, table_prepend_k=table_prepend_k)
 
         # Initializing metadata model
         chunk_metadata_model = {
