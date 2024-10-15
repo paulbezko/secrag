@@ -1,4 +1,6 @@
+from langchain_openai import ChatOpenAI
 from psycopg2.extras import RealDictCursor
+from flask_socketio import SocketIO
 from flask_cors import CORS
 from supabase import create_client
 from dotenv import load_dotenv
@@ -11,8 +13,8 @@ import os
 load_dotenv('../.env', override=True)
 flask_key_secret = os.getenv('flask_key_secret')
 
-from flask_socketio import SocketIO, emit
 socketio = SocketIO(cors_allowed_origins="*")
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS')
 
 def create_app(mode):
 
@@ -21,7 +23,6 @@ def create_app(mode):
 
     # Allowing CORS
     CORS(app)
-
 
     if mode == 'prod':
         app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
@@ -38,7 +39,6 @@ def create_app(mode):
     elif mode == 'dev':
         app.config['REDIRECT_URL'] = 'http://localhost:8080'
         
-
     # Initializing database
     connection = psycopg2.connect(
         host        = os.getenv('DB_HOST'),

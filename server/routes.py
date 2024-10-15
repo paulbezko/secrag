@@ -274,8 +274,6 @@ def webhook_post():
         if event['type'] == 'checkout.session.completed': 
 
             user = get_user_data_stripe(response['customer'])
-
-
             execute_query("UPDATE users SET subscription_tokens_left = %s WHERE stripe_user_id = %s", (int(user['subscription_tokens_left']) + 1200, response['customer']))
 
         elif event['type'] == 'customer.subscription.created' or event['type'] == 'customer.subscription.updated':
@@ -428,7 +426,7 @@ def get_policy_get():
 
     policy = request.args.get('policy')
 
-    with open(f"policies/{policy}.md", encoding="utf-8", mode="r") as f:
+    with open(f"server/policies/{policy}.md", encoding="utf-8", mode="r") as f:
         content = f.read()
 
     variables = {
@@ -550,9 +548,7 @@ def get_info_by_ticker():
     return {'info': filing_selection_data['available_filings'][request.args.get('ticker')]}
 
 
-
 from edgar import *
-set_identity("paul.bezko@hotmail.com")
 
 @routes.route('/get-filing', methods=['GET'])
 def get_filing_get():

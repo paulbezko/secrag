@@ -149,23 +149,76 @@ def check_timestamp(timestamp):
     else: return True
 
 
-
-
-
 # Dashboard util section
 from langchain_community.vectorstores import FAISS
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from pydantic import BaseModel
-from . import socketio
-from typing import Literal
-from edgar.core import set_identity
-from edgar.entities import Company
-from edgar.financials import Financials
 from langchain_core.documents import Document
-import pandas as pd
+from langchain_openai import OpenAIEmbeddings
+from edgar.financials import Financials
 from edgar.htmltools import TableBlock
+from edgar.entities import Company
+from edgar.core import set_identity
+from pydantic import BaseModel
+from typing import Literal, List
+from . import socketio, llm
+import pandas as pd
+import threading
 import json
 
+system_prompt_reformulate = """
+    You are presented with a current request and the latest chat messages from a human. Your task is to assess whether the current request is a follow-up to one of the latest chat messages.
+
+    To determine if the current request is a follow-up, consider the following:
+
+    - It qualifies as a follow-up if it implicitly or explicitly asks for further detail about the previous topic, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
+    - If the current request relates to previous messages and pertains specifically to SEC filings or financial statements, it may be relevant to the filing ID: {filing_id}. Reformulate it to include relevant context only if necessary.
+    - **If the current request is about general financial concepts (e.g., explaining what a balance sheet is or the significance of a 10-Q), do not include historical context in the reformulation.**
+    - Do not classify it as a follow-up if the request addresses a different financial statement, topic, or request that doesn’t build upon the previous requests.
+
+    If the current request qualifies as a follow-up, reformulate it to clearly state what information is being requested, ensuring that no irrelevant historical context is included if the question is general.
+    If the current request does not qualify as a follow-up, return it as is. Return nothing else but the request.
+
+    Latest chat messages: {message_history}
+    Request: {user_prompt}
+    """
+system_prompt_rag_needed = """
+    You are an expert in financial documents, particularly SEC filings such as 10-K and 10-Q reports. \
+    The user is referencing the filing ID: {filing_id}. \
+    Based on the following message, determine if the user is asking for information related to financial documents \
+    specifically associated with this filing ID. \
+    This includes details like balance sheets, income statements, cash flow statements, and any other relevant financial data typically found in SEC filings.
+    
+    Message: {reformulated_prompt}
+    """
+system_prompt_keywords_filings_tables = """
+    You are a helpful assistant. Your task is to analyze the user's prompt and derive any useful keywords that can be used to answer their question.
+    If the user is asking about specific financial statements like a balance sheet, income statement, etc., return those financial statements. If the user asks for multiple financial statements, return all that are relevant.
+
+    Only return a filing_table_selection if the user is asking for or implying financial data related to a specific financial report, like a balance sheet or income statement. If no financial statement is implied, leave filing_table_selection empty.
+
+    The output should be structured as:
+        keywords: str
+        filing_table_selection: Optional[List[Literal["balance_sheet", "income_statement", "cash_flow_statement", "statement_of_changes_in_equity", "statement_of_comprehensive_income"]]] = None
+
+    User prompt:
+    {reformulated_prompt}
+    """
+system_prompt_rag = """
+    You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
+    Your role is to provide clear, concise, and detailed answers to any financial questions the user may have. \
+    Your goal is to provide relevant financial data related to the user's prompt. \
+    The context provided is from the SEC filing for {filing.ticker} (ticker: {filing.ticker}, filing date: {filing.filing_date}). \
+    The context is as follows: {list_context_chunks}
+
+    User prompt: {reformulated_prompt}
+    """
+system_prompt_not_rag = """
+    You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
+    Your role is to provide clear, concise, and detailed answers to any financial questions the user may have. \
+    However, if the user asks a question unrelated to finance, your goal is to politely steer the conversation back to financial topics, gently reminding the user that you specialize in finance. \
+    You may give a brief, polite response to the unrelated question, but then guide the user back to finance-related matters.
+
+    User prompt: {reformulated_prompt}
+    """
 
 # Creating a class for filing information
 class FilingObject():
@@ -175,7 +228,7 @@ class FilingObject():
         self.filing_type = filing_type
         self.filing_year = filing_year
 
-
+# Creating a class for enhanced filing information
 class SECFilingObject():
     def __init__(self, filing, markdown, file_number, filing_html, cik, ticker, filing_date, filing_year, company_name, filing_type, balance_sheet = None, income_statement = None, cash_flow_statement = None, statement_of_comprehensive_income = None, statement_of_changes_in_equity = None):
         self.filing = filing 
@@ -242,13 +295,11 @@ class SECFilingObject():
             ))
         return list_documents
 
-
-# Creating a class for rag needed pydantic boolean
+# Pydantic model for rag need
 class RagNeeded(BaseModel):
     relevant: bool
 
 # Pydantic model for the Contextual Question LLM
-from typing import List, Optional, Literal
 class KewordsFilingTables(BaseModel):
     keywords: str
     filing_table_selection: List[Literal[
@@ -259,11 +310,9 @@ class KewordsFilingTables(BaseModel):
         "statement_of_comprehensive_income"
     ]] = []
 
-
 # Getting assistant response
 def get_assistant_response(user_prompt, message_history, user_email, filing_id, socket_id, filing_date):
 
-    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS')
     chunk_size = 10000
     k = 3
     chunk_overlap = 3
@@ -273,54 +322,18 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
     filing = get_filing(filing_id, filing_date)
 
     # Reformatting user message history and most recent message into a single prompt
-    system_prompt = f"""
-    You are presented with a current request and the latest chat messages from a human. Your task is to assess whether the current request is a follow-up to one of the latest chat messages.
-
-    To determine if the current request is a follow-up, consider the following:
-
-    - It qualifies as a follow-up if it implicitly or explicitly asks for further detail about the previous topic, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
-    - If the current request relates to previous messages and pertains specifically to SEC filings or financial statements, it may be relevant to the filing ID: {filing_id}. Reformulate it to include relevant context only if necessary.
-    - **If the current request is about general financial concepts (e.g., explaining what a balance sheet is or the significance of a 10-Q), do not include historical context in the reformulation.**
-    - Do not classify it as a follow-up if the request addresses a different financial statement, topic, or request that doesn’t build upon the previous requests.
-
-    If the current request qualifies as a follow-up, reformulate it to clearly state what information is being requested, ensuring that no irrelevant historical context is included if the question is general.
-    If the current request does not qualify as a follow-up, return it as is. Return nothing else but the request.
-
-    Latest chat messages: {message_history}
-    Request: {user_prompt}
-    """
+    system_prompt = system_prompt_reformulate.format(filing_id=filing_id, user_prompt=user_prompt, message_history=message_history, user_email=user_email)
     reformulated_prompt = llm.invoke(system_prompt).content
-    print(reformulated_prompt)
 
     # Determining if RAG is needed for the answer
-    system_prompt = f"""
-    You are an expert in financial documents, particularly SEC filings such as 10-K and 10-Q reports. \
-    The user is referencing the filing ID: {filing_id}. \
-    Based on the following message, determine if the user is asking for information related to financial documents \
-    specifically associated with this filing ID. \
-    This includes details like balance sheets, income statements, cash flow statements, and any other relevant financial data typically found in SEC filings.
-    
-    Message: {reformulated_prompt}
-    """
+    system_prompt = system_prompt_rag_needed.format(filing_id=filing_id, reformulated_prompt=reformulated_prompt)
     bool_rag_needed = llm.with_structured_output(RagNeeded).invoke(system_prompt).relevant
 
     # Handle a case where the reformulated prompt is relevant to the filing
     if bool_rag_needed:
         
         # Get keywords and filing table selection
-        system_prompt = f"""
-            You are a helpful assistant. Your task is to analyze the user's prompt and derive any useful keywords that can be used to answer their question.
-            If the user is asking about specific financial statements like a balance sheet, income statement, etc., return those financial statements. If the user asks for multiple financial statements, return all that are relevant.
-
-            Only return a filing_table_selection if the user is asking for or implying financial data related to a specific financial report, like a balance sheet or income statement. If no financial statement is implied, leave filing_table_selection empty.
-
-            The output should be structured as:
-                keywords: str
-                filing_table_selection: Optional[List[Literal["balance_sheet", "income_statement", "cash_flow_statement", "statement_of_changes_in_equity", "statement_of_comprehensive_income"]]] = None
-
-            User prompt:
-            {reformulated_prompt}
-            """
+        system_prompt = system_prompt_keywords_filings_tables.format(reformulated_prompt=reformulated_prompt)
         prompt_keywords_and_filing_tables = llm.with_structured_output(KewordsFilingTables).invoke(system_prompt)
 
         # Getting vectorsore to get context chunks from
@@ -374,15 +387,7 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
             if chunk[0].page_content not in list_context_chunks:
                 list_context_chunks += chunk.page_content + "\n"
             
-        system_prompt = f"""
-        You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
-        Your role is to provide clear, concise, and detailed answers to any financial questions the user may have. \
-        Your goal is to provide relevant financial data related to the user's prompt. \
-        The context provided is from the SEC filing for {filing.ticker} (ticker: {filing.ticker}, filing date: {filing.filing_date}). \
-        The context is as follows: {list_context_chunks}
-
-        User prompt: {reformulated_prompt}
-        """
+        system_prompt = system_prompt_rag.format(filing=filing, reformulated_prompt=reformulated_prompt, list_context_chunks=list_context_chunks)
 
         buffer = ""
         for chunk in llm.stream(system_prompt):
@@ -392,15 +397,7 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
 
     # Handle a case where the reformulated prompt is unrelated to the filing itself
     else:
-
-        system_prompt = f"""
-        You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
-        Your role is to provide clear, concise, and detailed answers to any financial questions the user may have. \
-        However, if the user asks a question unrelated to finance, your goal is to politely steer the conversation back to financial topics, gently reminding the user that you specialize in finance. \
-        You may give a brief, polite response to the unrelated question, but then guide the user back to finance-related matters.
-
-        User prompt: {reformulated_prompt}
-        """
+        system_prompt = system_prompt_not_rag.format(reformulated_prompt=reformulated_prompt)
         buffer = ""
 
         for chunk in llm.stream(system_prompt):
@@ -412,18 +409,15 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
     chat_memory[user_email][filing_id]["messages"] += [{"role": "user", "content": user_prompt}, {"role": "assistant", "content": buffer}]
     with open("server/memory/chat_memory.json", "w+") as f: json.dump(chat_memory, f, indent=4)  
 
-
+# Getting vectorstore
 def get_vectorstore(
         filing : FilingObject, 
         new_chat : bool,
 
         # Optional args
-        
         chunk_size = 10000, 
         chunk_overlap = 3, 
-        k = 1, 
         table_prepend_k = 3, 
-        splitter_mode = "edgartools"
     ):
     """
     Manages vectorstore for a given filing and configuration.
@@ -486,10 +480,7 @@ def get_vectorstore(
 
     return vectorstore
 
-
-
-
-import threading
+# Creating a class for rate limiting
 class RateLimiter:
     def __init__(self, rate_limit):
         self.rate_limit = rate_limit  # Maximum number of calls per second
@@ -520,7 +511,7 @@ class RateLimiter:
     def release(self):
         self.semaphore.release()
 
-
+# Util try except oneliner
 def try_except(func, default=None, expected_exc=(Exception,)):
     """
     Tries to execute a given function, and if it fails with one of the specified
@@ -535,11 +526,17 @@ def try_except(func, default=None, expected_exc=(Exception,)):
     try: return func()
     except expected_exc: return default
 
+# Getting filing object
+def get_filing(filing_id, filing_date) -> FilingObject:
 
+    ticker, filing_year, filing_type = filing_id.split("-")
+    if filing_type == "10K": filing_type = "10-K"
+    elif "10Q" in filing_type: filing_type = "10-Q"
+    else: raise Exception(f"Unsupported filing type {filing_type}")
+    filing = FilingObject(ticker=ticker, filing_date=filing_date, filing_type=filing_type, filing_year=filing_year)
+    return filing 
 
-
-
-
+# Getting SEC filing object
 def get_sec_filing_object(filing_info : FilingObject):
     """
     Load a custom CompanyFiling object from a ticker symbol and year
@@ -596,17 +593,7 @@ def get_sec_filing_object(filing_info : FilingObject):
     finally:
         rate_limiter.release()   
 
-
-def get_filing(filing_id, filing_date) -> FilingObject:
-
-    ticker, filing_year, filing_type = filing_id.split("-")
-    if filing_type == "10K": filing_type = "10-K"
-    elif "10Q" in filing_type: filing_type = "10-Q"
-    else: raise Exception(f"Unsupported filing type {filing_type}")
-    filing = FilingObject(ticker=ticker, filing_date=filing_date, filing_type=filing_type, filing_year=filing_year)
-    return filing 
-
-
+# Custom character text splitter for SEC filings
 def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3, verbose = False):
     """
     Split a filing object into chunks based on its structure and financial statements.
@@ -629,12 +616,9 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
     data = [] # Stores EDGARTOOL chunks and their text lengths
     final_chunks = [] # Stores final chunks  
 
-    # Convert filing to EDGARTOOLS filing object
-    filing_object = filing.filing.obj()
-    # Convert EDGARTOOLS object to EDGARTOOLS chunks
-    chunked_document = filing_object.chunked_document
-    # Retrieve EDGARTOOLS filing object's structure
-    structure = filing_object.structure
+    filing_object = filing.filing.obj() # Convert filing to EDGARTOOLS filing object
+    chunked_document = filing_object.chunked_document # Convert EDGARTOOLS object to EDGARTOOLS chunks
+    structure = filing_object.structure # Retrieve EDGARTOOLS filing object's structure
 
     # Generate intro and outro chunks (outro chunks are not used)
     intro_chunks = [] # Intro chunks list
@@ -681,7 +665,6 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
                 intro_chunk_buffer = ""   
                 intro_complete = True
 
-    
     # Initialize metadata model
     chunk_metadata_model = {
         "ticker": filing.ticker, 
