@@ -1,3 +1,4 @@
+
 from psycopg2.extras import RealDictCursor
 from flask_cors import CORS
 from supabase import create_client
@@ -8,11 +9,11 @@ import psycopg2
 import stripe
 import os
 
-load_dotenv('../.env', override=True)
+load_dotenv('.env', override=True)
 flask_key_secret = os.getenv('flask_key_secret')
 
 from flask_socketio import SocketIO, emit
-socketio = SocketIO(cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*", message_queue='redis://')
 
 def create_app(mode):
 
