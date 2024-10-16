@@ -1,6 +1,5 @@
 <template>
   <div>
-    <SpinnerComp v-if="showSpinner"></SpinnerComp>
     <div v-if="showComponent">
       <div v-if="showConfirm"><ConfirmComp :action="action" :oneStepDelete="limitSettings" @close="handleCloseConfirm" @success="handleSuccess" /></div>
       <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess" /></div>
@@ -10,7 +9,7 @@
           <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-bold">Preferred Name</div>
           <div class="flex-row gap-1 width-100">
             <input class="input" type="text" placeholder="Name" v-model="name"/>
-            <div @click="changeName" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+            <div @click="changeName" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
           </div>
         </div>
         <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
@@ -75,7 +74,7 @@
 import axios from 'axios';
 import ConfirmComp from './ConfirmComp.vue';
 import SuccessComp from './SuccessComp.vue';
-import SpinnerComp from './SpinnerComp.vue';
+import SpinnerCompButton from './SpinnerCompButton.vue';
 import { config } from '@/config';
 
 export default {
@@ -83,7 +82,7 @@ export default {
   components: {
     ConfirmComp,
     SuccessComp,
-    SpinnerComp
+    SpinnerCompButton
   },
   data() {
     return {

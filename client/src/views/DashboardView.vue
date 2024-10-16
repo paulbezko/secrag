@@ -25,7 +25,7 @@
 
     <!-- Sidebar Section -->
     <transition name="slide">
-      <div class="sidebar flex-column gap-1 shadow-wide z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
+      <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
         <div class="flex-column space-between height-100">
           <div class="flex-column gap-1">
             <div class="flex-row gap-2" style="padding-inline: 1rem;">
@@ -71,7 +71,10 @@
         </select>
       </div>
       <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
-      <div class="button button-primary" @click="createChat('selection', '')">Create Chat</div>
+      <div class="button button-primary flex-row gap-1 width-100" @click="createChat('selection', '')">
+        <div v-if="!newChatLoading">Create chat</div>
+        <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
+      </div>
       <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
       <div class="text-3">Or choose one of the Recent Filings</div>
       <div class="flex-row gap-1">
@@ -89,8 +92,8 @@
 
     <!-- Chat Section -->
     <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
-      <div class="flex-column width-100 gap-1 center" style="max-width: 75rem;">
-        <div v-if="!filingShown || !isSmallScreen" class="shadow-wide chat-container text-inter height-100" ref="chatContainer">
+      <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
+        <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" ref="chatContainer">
           <SpinnerCompInside v-if="chatLoading"></SpinnerCompInside>
           <div v-else>
             <div v-for="(message, index) in currentMessages" :key="index" :class="{'text-chat': message.role === 'assistant', 'text-chat': message.role === 'user'}">
@@ -111,12 +114,13 @@
           </div>
         </div>
         <!-- Filing Container Small -->
-        <div class="filing-container shadow-wide flex-column center" ref="filingContainer" @scroll="handleScroll" v-if="filingShown && isSmallScreen" >
+        <div class="filing-container flex-column center" ref="filingContainer" @scroll="handleScroll" v-if="filingShown && isSmallScreen" >
           <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
           <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
         </div>
         <div class="flex-row width-100 gap-1" :style="isSmallScreen ? 'padding-inline: 1rem' : ''" style="max-width: 75rem; align-items: end;">
           <textarea 
+            placeholder="Enter your message here"
             class="chat-input" 
             rows="1" 
             v-model="newMessage" 
@@ -125,7 +129,8 @@
             @input="adjustTextareaHeight('textarea')" 
             style="resize: none;" 
             ref="textarea"
-            ></textarea>
+            >
+          </textarea>
           <!-- Input Buttons Large -->
           <div class="button-icon" v-if="!isSmallScreen" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
@@ -133,7 +138,7 @@
           <div class="button-icon show-on-small" v-if="newMessage == '' && isSmallScreen" @click="toggleFilingView">
             <div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div>
           </div>
-          <div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="sendMessage('textareaSmall')">
+          <div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="sendMessage('textarea')">
             <div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div>
           </div>
         </div>
@@ -153,6 +158,7 @@
 <script>
 import ProfileComp from '../components/ProfileComp.vue';
 import SpinnerCompInside from '../components/SpinnerCompInside.vue';
+import SpinnerCompButton from '../components/SpinnerCompButton.vue';
 import { config } from '@/config';
 import { marked } from 'marked';
 import { socket } from "@/socket";
@@ -161,7 +167,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 
 export default {
-  components: {ProfileComp, SpinnerCompInside},
+  components: {ProfileComp, SpinnerCompInside, SpinnerCompButton},
   computed: {
     profileComp() {return this.showProfile ? 'ProfileComp' : null},
     ...mapState(['subscription', 'subscriptionTokensLeft']),
@@ -189,6 +195,7 @@ export default {
       assistantMessageLoading: false,
       llmResponseBuffer: '', // Buffer for LLM incoming words
       chatLoading: false,
+      newChatLoading: false,
       lastXMessagesLength: 0, // Adjusted based on subscription
       chatScrollPosition: 0, // To store chat scroll position
       chatHistoryHeight: '0px', // Adjusted dynamically based on screen size
@@ -268,13 +275,15 @@ export default {
     // Select Ticker
     selectTicker(option) {
       this.selectedTicker = option; 
+      this.selectedYear = '';
+      this.selectedFiling = '';
       axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: option }})
       .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
       .catch(error => {console.error('Error getting ticker info:', error)});
     },
 
     // Select Year and Filing
-    selectYear(option) {this.selectedYear = option; this.filingOptions = this.tickerInfo[this.selectedYear];},
+    selectYear(option) {this.selectedYear = option; this.selectedFiling = ''; this.filingOptions = this.tickerInfo[this.selectedYear];},
     selectFiling(option) {this.selectedFiling = option;},
 
     // Create chat
@@ -294,6 +303,9 @@ export default {
 
       if (this.chats.includes(newChatName)) {this.error = 'Chat already exists'; return}
       try {
+
+        this.newChatLoading = true;
+
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
           chat: newChatName,
@@ -303,7 +315,7 @@ export default {
 
         if (response.data.error) {
           if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
-          else (alert(response.data.error))
+          else {alert(response.data.error); this.newChatLoading = false}
           return;
         }
 
@@ -314,6 +326,7 @@ export default {
         this.selectedTicker = '';
         this.selectedYear = '';
         this.selectedFiling = '';
+        this.newChatLoading = false;
       } 
       catch (error) {console.error('Error creating chat:', error);}
     },
@@ -354,11 +367,11 @@ export default {
     },
   
     // Send Message
-    async sendMessage(refName) {
+    async sendMessage() {
 
       if (this.isSmallScreen && this.filingShown) {this.toggleFilingView();}
 
-      const textarea = this.$refs[refName]
+      const textarea = this.$refs['textarea']
       textarea.style.height = '40px'
 
       if (this.newMessage.trim() !== '') {
@@ -469,7 +482,7 @@ export default {
 
 .loading-dot {
   animation: dot ease-in-out 1.5s infinite;
-  background-color: grey;
+  background-color: rgb(0, 0, 0);
   display: inline-block;
   height: .5rem; /* Adjust the size to better fit the text */
   width: .5rem;

@@ -1,7 +1,0 @@
-client/node_modules
-
-server_js/node_modules
-server_js/.env
-
-server_py/.venv
-server_py/.env
