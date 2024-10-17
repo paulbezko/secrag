@@ -8,7 +8,7 @@
           <div v-if="action === 'resetPasswordBefore'" class="flex-column gap-1 width-100">
             <div class="flex-row gap-1 width-100">
               <input class="input" placeholder="Email" v-model="email"/>
-              <div @click="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+              <div @click.stop="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
             </div>
             <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
@@ -18,14 +18,14 @@
             <div v-if="action === 'changePassword'" class="flex-column gap-1 width-100">
               <div class="flex-row gap-1 width-100">
                 <input class="input" type="password" placeholder="Confirm New Password" v-model="passwordNewConfirm"/>
-                <div @click="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+                <div @click.stop="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
               </div>
               <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
             </div>
             <div v-if="action === 'changeEmail'" class="flex-column gap-1 width-100">
               <div class="flex-row gap-1 width-100">
                 <input class="input" type="text" placeholder="New Email" v-model="emailNew"/>
-                <div @click="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+                <div @click.stop="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
               </div>
               <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
             </div>
@@ -135,7 +135,7 @@ export default {
           if (this.passwordNew != this.passwordNewConfirm) {this.error = "Passwords do not match"; return}
           if (passwordStrength(this.passwordNew).id < 2) {this.error = "Password too weak"; return}
 
-          const response = await axios.post(`${config.apiUrl}/api/edit-user`, {action: 'changePassword', token: localStorage.getItem('_u'), password: this.password, passwordNew: this.passwordNew})      
+          const response = await axios.post(`${config.apiUrl}/api/edit-user`, {action: 'changePassword', token: localStorage.getItem('_u'), password: this.password, passwordNew: this.passwordNew})
           if (response.data.error) {this.error = response.data.error; return}
           this.$emit('success');
           
@@ -178,8 +178,7 @@ export default {
         }
       }
       catch (error) {console.log(error)}
-      finally {this.showSpinner = false;}
-      event.stopPropagation()
+      finally {this.showSpinner = false; event.stopPropagation()}
     }
   },
 
