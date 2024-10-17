@@ -1,12 +1,15 @@
 from langchain_openai import ChatOpenAI
+from logging.handlers import TimedRotatingFileHandler
 from psycopg2.extras import RealDictCursor
 from flask_socketio import SocketIO
 from flask_cors import CORS
+from datetime import datetime
 from supabase import create_client
 from dotenv import load_dotenv
 from flask import Flask, send_from_directory, render_template
 
 import psycopg2
+import logging
 import stripe
 import os
 
@@ -16,9 +19,19 @@ flask_key_secret = os.getenv('flask_key_secret')
 socketio = SocketIO(cors_allowed_origins="*")
 llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS')
 
+log_filename = os.path.join("database/logs", f"{datetime.now().strftime('%d-%m-%Y')}.log")
+handler = TimedRotatingFileHandler(log_filename, when='midnight', interval=1, backupCount=90)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
 def create_app(mode):
 
-    from .routes import routes
+    from .general.routes import routes as general_routes
+    from .authentication.routes import routes as auth_routes
+    from .dashboard.routes import routes as dashboard_routes
+    from .subscription.routes import routes as subscription_routes
+
     app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist')
 
     # Allowing CORS
@@ -64,11 +77,16 @@ def create_app(mode):
     app.config['STRIPE_PRODUCT_PREMIUM_YEARLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_YEARLY')
     app.config['STRIPE_PRODUCT_REPLENISH'] = os.getenv('STRIPE_PRODUCT_REPLENISH')
 
+    app.config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
+
     stripe.api_key = os.environ.get('STRIPE_KEY_TEST')
     supabase = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
     # Registering routes
-    app.register_blueprint(routes, url_prefix='/api/')
+    app.register_blueprint(general_routes, name='general', url_prefix='/api/')
+    app.register_blueprint(auth_routes, name='auth', url_prefix='/api/')
+    app.register_blueprint(subscription_routes, name='subscription', url_prefix='/api/')
+    app.register_blueprint(dashboard_routes, name='dashboard', url_prefix='/api/')
     socketio.init_app(app)
 
     return app
