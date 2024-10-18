@@ -171,7 +171,7 @@ def get_policy_get():
 
     policy = request.args.get('policy')
 
-    with open(f"server/policies/{policy}.md", encoding="utf-8", mode="r") as f:
+    with open(f"database/policies/{policy}.md", encoding="utf-8", mode="r") as f:
         content = f.read()
 
     variables = {

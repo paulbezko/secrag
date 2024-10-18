@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
+  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
     <component :is="profileComp"></component>
@@ -27,16 +27,22 @@
     <transition name="slide">
       <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
         <div class="flex-column space-between height-100">
-          <div class="flex-column gap-1">
-            <div class="flex-row gap-2" style="padding-inline: 1rem;">
-              <div @click="toggleNewChat" class="text-link text-2"><div class="icon-link fa-solid fa-file-pen"></div></div>
-              <div @click="toggleProfile" class="text-link text-2"><div class="icon-link fa-solid fa-user"></div></div>
+          <div class="flex-column gap-05">
+            <div class="flex-column gap-05">
+              <div @click="toggleProfile" class="text-link text-4 flex-row gap-05 sidebar-element" style="align-items: center;">
+                <div class="icon-link fa-solid fa-user" style="min-width: 1.6rem;"></div>
+                Profile
+              </div>
+              <div @click="toggleNewChat" class="text-link text-4 flex-row gap-05  sidebar-element" style="align-items: center;">
+                <div class="icon-link fa-solid fa-file-pen" style="min-width: 1.6rem;"></div>
+                New Chat
+              </div>
             </div>
+            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
             <div class="flex-column gap-1">
-              <div class="text-bold" :class="isSmallScreen ? 'text-2' : 'text-3'" style="padding-inline: 1rem;">Chat History</div>
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
-                <li class="text-4 chat-history-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
-                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can text-link"></div></div>
+                <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
+                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active"></div></div>
                 </li>
               </ul>
             </div>
@@ -57,18 +63,27 @@
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectYear($event.target.value)" v-model="selectedYear" :disabled="selectedTicker === ''">
+        <select class="input" @change="selectYear($event.target.value)" v-model="selectedYear" :class="{ 'input-disabled': selectedTicker === '' }" :disabled="selectedTicker === ''">
           <option value="" disabled hidden selected>Year</option>
           <option v-for="option in yearOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
+        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '' }" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
           <option value="" disabled hidden selected>Filing</option>
           <option v-for="option in filingOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
+        
+      </div>
+      <div 
+        class="button button-primary flex-row gap-1 width-100" 
+        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))}" 
+        @click="createChat()"
+        :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))">
+        <div v-if="!newChatLoading">Create chat</div>
+        <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
       </div>
       <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
       <div class="text-3">Or choose one of the Recent Filings</div>
@@ -80,18 +95,15 @@
           </option>
         </select>
       </div>
-      <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
       <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
       <div 
         class="button button-primary flex-row gap-1 width-100" 
-        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic')) && !selectedNewFiling }" 
+        :class="{ 'button-disabled': !selectedNewFiling }"
         @click="createChat()"
-        :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic')) && !selectedNewFiling">
-        
+        :disabled="!selectedNewFiling">
         <div v-if="!newChatLoading">Create chat</div>
         <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
       </div>
-
     </div>
 
     <!-- Chat Section -->
@@ -155,7 +167,7 @@
     </div>
 
     <!-- Disclaimer Section -->
-    <div class="text-4 text-center" style="box-sizing: border-box;" v-if="!newChat">SECRag can make mistakes. Check important info.</div>
+    <div class="text-4 text-center" style="box-sizing: border-box;" v-if="!newChat">SECRAG can make mistakes. Check important info.</div>
   </div>
 </template>
 
@@ -179,6 +191,7 @@ export default {
   data() {
     return {
       // UI states
+      windowLoaded: false,
       showProfile: false,
       sidebarShown: false,
       filingShown: false,
@@ -239,6 +252,7 @@ export default {
     this.initializeSocket();
     this.loadFilingSelectionData();
     this.loadChats();
+    this.windowLoaded = true;
     this.updateChatHistoryHeight();
     if (!this.isSmallScreen) {this.sidebarShown = true;}
     else (this.filingShown = false)
@@ -274,7 +288,7 @@ export default {
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 100; 
+      const headerHeight = 110; 
       if (this.isSmallScreen) {heightAdjustment = 6;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
