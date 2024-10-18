@@ -258,9 +258,9 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
             socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
 
     # Saving to memory
-    with open("server/memory/chat_memory.json", "r+") as file: chat_memory = json.load(file)
+    with open("database/memory/chats.json", "r+") as file: chat_memory = json.load(file)
     chat_memory[user_email][filing_id]["messages"] += [{"role": "user", "content": user_prompt}, {"role": "assistant", "content": buffer}]
-    with open("server/memory/chat_memory.json", "w+") as f: json.dump(chat_memory, f, indent=4)  
+    with open("database/memory/chats.json", "w+") as f: json.dump(chat_memory, f, indent=4)  
 
 # Getting vectorstore
 def get_vectorstore(
@@ -299,7 +299,7 @@ def get_vectorstore(
         "table_prepend_k": table_prepend_k
     }
 
-    vectorstore_dir = "server/memory/vectorstore"
+    vectorstore_dir = "database/memory/vectorstore"
     embeddings = OpenAIEmbeddings()
 
     # Check if vectorstore exists
