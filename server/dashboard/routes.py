@@ -9,18 +9,6 @@ import json
 # Routes initialization
 routes = Blueprint('routes', __name__)
 
-@routes.route('/get-filing-selection-data', methods=['GET'])
-def get_filing_selection_data_get():
-
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
-
-    with open('database/memory/filings_available.json', 'r') as f: filing_selection_data = json.load(f)
-    popular_filings = filing_selection_data['popular_filings']
-    if user_info['subscription'] == 'basic': popular_filings = [filing for filing in popular_filings if '10Q' not in filing]
-
-    return {'popularFilings': popular_filings[:3], 'availableFilings': filing_selection_data['available_filings']}
-
 
 @routes.route('/get-chats', methods=['GET'])
 def get_chats_get():
@@ -74,15 +62,17 @@ def new_chat_post():
     return {'token': token}
 
 
-@routes.route('/get-list-tickers', methods=['GET'])
+@routes.route('/get-filing-selection-data', methods=['GET'])
 def get_list_tickers():
 
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('database/memory/filings_available.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
+    with open('database/memory/filings_new.json', 'r') as f: filings_new = json.load(f)
+    if user_info['subscription'] == 'basic': filings_new = [filing for filing in filings_new if '10-Q' not in filing]
 
-    return {'tickers': list(filing_selection_data['available_filings'].keys()), 'popularFilings': filing_selection_data['popular_filings'][:3]}
+    return {'tickers': list(filings_available.keys()), 'newFilings': filings_new}
 
 
 @routes.route('/get-info-by-ticker', methods=['GET'])
@@ -91,9 +81,9 @@ def get_info_by_ticker():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open('database/memory/filings_available.json', 'r') as f: filing_selection_data = json.load(f)
+    with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
 
-    return {'info': filing_selection_data['available_filings'][request.args.get('ticker')]}
+    return {'info': filings_available[request.args.get('ticker')]}
 
 
 @routes.route('/get-filing', methods=['GET'])

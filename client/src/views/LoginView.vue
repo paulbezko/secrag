@@ -55,8 +55,14 @@ export default {
     showError: false,
     showSpinner: false
   }},
+  mounted() {
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        this.loginPassword();
+      }
+    });
+  },
   methods: {
-
     async loginPassword() {
       this.showSpinner = true
       this.error = false

@@ -382,6 +382,8 @@ def try_except(func, default=None, expected_exc=(Exception,)):
 # Getting filing object
 def get_filing(filing_id, filing_date) -> FilingObject:
 
+    print(filing_id)
+
     ticker, filing_year, filing_type = filing_id.split("-")
     if filing_type == "10K": filing_type = "10-K"
     elif "10Q" in filing_type: filing_type = "10-Q"
