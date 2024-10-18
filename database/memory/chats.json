@@ -1,0 +1,174 @@
+{
+  "planetchars@gmail.com": {
+    "AAPL-2010-10K": {
+      "filing_date": "2010-10-27",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAPL-2010-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system! If you have any questions related to finance, SEC filings, or corporate reports, feel free to ask. I'm here to help with any financial queries you may have!"
+        }
+      ]
+    },
+    "AAPL-2018-10K": {
+      "filing_date": "2018-11-05",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAPL-2018-10K is embedded and ready for discussion. How can I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system! If you have any questions related to finance, SEC filings, or corporate reports, feel free to ask. I'm here to help with any financial queries you may have!"
+        },
+        {
+          "role": "user",
+          "content": "give me balance sheet"
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the balance sheet for Apple Inc. (AAPL) as of the filing date November 5, 2018, compared to the previous year, 2017:\n\n### Statement of Financial Position\n\n#### Assets\n- **Total Assets**: \n  - 2018: $365,725,000,000 \n  - 2017: $375,319,000,000\n\n- **Current Assets**: \n  - Cash and Cash Equivalents: \n    - 2018: $25,913,000,000 \n    - 2017: $20,289,000,000\n  - Available for Sale Securities: \n    - 2018: $40,388,000,000 \n    - 2017: $53,892,000,000\n  - Accounts Receivable, Net: \n    - 2018: $23,186,000,000 \n    - 2017: $17,874,000,000\n  - Inventory, Net: \n    - 2018: $3,956,000,000 \n    - 2017: $4,855,000,000\n  - Nontrade Receivables: \n    - 2018: $25,809,000,000 \n    - 2017: $17,799,000,000\n  - Other Current Assets: \n    - 2018: $12,087,000,000 \n    - 2017: $13,936,000,000\n  - **Total Current Assets**: \n    - 2018: $131,339,000,000 \n    - 2017: $128,645,000,000\n\n- **Noncurrent Assets**: \n  - Available for Sale Securities: \n    - 2018: $170,799,000,000 \n    - 2017: $194,714,000,000\n  - Property, Plant, and Equipment, Net: \n    - 2018: $41,304,000,000 \n    - 2017: $33,783,000,000\n  - Other Noncurrent Assets: \n    - 2018: $22,283,000,000 \n    - 2017: $18,177,000,000\n  - **Total Noncurrent Assets**: \n    - 2018: $234,386,000,000 \n    - 2017: $246,674,000,000\n\n#### Liabilities and Stockholders' Equity\n- **Total Liabilities**: \n  - 2018: $258,578,000,000 \n  - 2017: $241,272,000,000\n\n- **Current Liabilities**: \n  - Accounts Payable: \n    - 2018: $55,888,000,000 \n    - 2017: $44,242,000,000\n  - Other Current Liabilities: \n    - 2018: $32,687,000,000 \n    - 2017: $30,551,000,000\n  - Deferred Revenue: \n    - 2018: $7,543,000,000 \n    - 2017: $7,548,000,000\n  - Commercial Paper: \n    - 2018: $11,964,000,000 \n    - 2017: $11,977,000,000\n  - Long Term Debt, Current: \n    - 2018: $8,784,000,000 \n    - 2017: $6,496,000,000\n  - **Total Current Liabilities**: \n    - 2018: $116,866,000,000 \n    - 2017: $100,814,000,000\n\n- **Noncurrent Liabilities**: \n  - Deferred Revenue: \n    - 2018: $2,797,000,000 \n    - 2017: $2,836,000,000\n  - Long Term Debt: \n    - 2018: $93,735,000,000 \n    - 2017: $97,207,000,000\n  - Other Noncurrent Liabilities: \n    - 2018: $45,180,000,000 \n    - 2017: $40,415,000,000\n  - **Total Noncurrent Liabilities**: \n    - 2018: $141,712,000,000 \n    - 2017: $140,458,000,000\n\n#### Stockholders' Equity\n- **Total Stockholders' Equity**: \n  - 2018: $107,147,000,000 \n  - 2017: $134,047,000,000\n\n### Summary\n- **Total Liabilities and Stockholders' Equity**: \n  - 2018: $365,725,000,000 \n  - 2017: $375,319,000,000\n\nThis balance sheet provides a snapshot of Apple's financial position as of November 5, 2018, highlighting the company's assets, liabilities, and equity."
+        },
+        {
+          "role": "user",
+          "content": "in a table format"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure! Please provide the specific financial data or information you would like to see in a table format related to the SEC filing for AAPL (ticker: AAPL, filing date: 2018-11-05). This could include items like revenue, net income, earnings per share, or any other specific metrics you are interested in."
+        },
+        {
+          "role": "user",
+          "content": "show it in a table format"
+        },
+        {
+          "role": "assistant",
+          "content": "To provide a clear and concise table format based on the SEC filing for Apple Inc. (AAPL) dated November 5, 2018, I would need specific data or sections from the filing that you would like to see in a table. Common sections might include financial statements, executive compensation, or key metrics.\n\nPlease specify the type of information you are interested in, and I can create a table for you!"
+        },
+        {
+          "role": "user",
+          "content": "test"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like you're testing the system! If you have any questions related to finance, SEC filings, or corporate reports, feel free to ask. I'm here to help with any financial queries you may have!"
+        },
+        {
+          "role": "user",
+          "content": "give me balance sheet in a table form"
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the balance sheet for Apple Inc. (AAPL) as of the filing date November 5, 2018, presented in a table format:\n\n| **Label**                                              | **2018**         | **2017**         |\n|-------------------------------------------------------|------------------|------------------|\n| **Statement Of Financial Position**                   |                  |                  |\n| **Assets**                                            |                  |                  |\n| Assets Current                                        |                  |                  |\n| Cash And Cash Equivalents At Carrying Value           | 25,913,000,000   | 20,289,000,000   |\n| Available For Sale Securities Current                 | 40,388,000,000   | 53,892,000,000   |\n| Accounts Receivable Net Current                       | 23,186,000,000   | 17,874,000,000   |\n| Inventory Net                                         | 3,956,000,000    | 4,855,000,000    |\n| Nontrade Receivables Current                          | 25,809,000,000   | 17,799,000,000   |\n| Other Assets Current                                  | 12,087,000,000   | 13,936,000,000   |\n| **Assets Current**                                   | **131,339,000,000** | **128,645,000,000** |\n| Assets Noncurrent                                     |                  |                  |\n| Available For Sale Securities Noncurrent              | 170,799,000,000  | 194,714,000,000  |\n| Property Plant And Equipment Net                      | 41,304,000,000   | 33,783,000,000   |\n| Other Assets Noncurrent                               | 22,283,000,000   | 18,177,000,000   |\n| **Assets Noncurrent**                                | **234,386,000,000** | **246,674,000,000** |\n| **Assets**                                           | **365,725,000,000** | **375,319,000,000** |\n| **Liabilities And Stockholders Equity**               |                  |                  |\n| **Liabilities Current**                               |                  |                  |\n| Accounts Payable Current                              | 55,888,000,000   | 44,242,000,000   |\n| Other Liabilities Current                             | 32,687,000,000   | 30,551,000,000   |\n| Deferred Revenue Current                              | 7,543,000,000    | 7,548,000,000    |\n| Commercial Paper                                      | 11,964,000,000   | 11,977,000,000   |\n| Long Term Debt Current                                | 8,784,000,000    | 6,496,000,000    |\n| **Liabilities Current**                              | **116,866,000,000** | **100,814,000,000** |\n| **Liabilities Noncurrent**                            |                  |                  |\n| Deferred Revenue Noncurrent                           | 2,797,000,000    | 2,836,000,000    |\n| Long Term Debt Noncurrent                             | 93,735,000,000   | 97,207,000,000   |\n| Other Liabilities Noncurrent                          | 45,180,000,000   | 40,415,000,000   |\n| **Liabilities Noncurrent**                           | **141,712,000,000** | **140,458,000,000** |\n| **Liabilities**                                      | **258,578,000,000** | **241,272,000,000** |\n| **Commitments And Contingencies**                    |                  |                  |\n| **Stockholders Equity**                               |                  |                  |\n| Common Stocks Including Additional Paid In Capital    | 40,201,000,000   | 35,867,000,000   |\n| Retained Earnings Accumulated Deficit                 | 70,400,000,000   | 98,330,000,000   |\n| Accumulated Other Comprehensive Income Loss Net Of Tax| -3,454,000,000   | -150,000,000     |\n| **Stockholders Equity**                              | **107,147,000,000** | **134,047,000,000** |\n| **Liabilities And Stockholders Equity**              | **365,725,000,000** | **375,319,000,000** |\n\nThis table summarizes the financial position of Apple Inc. as of November 5, 2018, including both assets and liabilities along with stockholders' equity."
+        },
+        {
+          "role": "user",
+          "content": "show as a json now"
+        },
+        {
+          "role": "assistant",
+          "content": "To present the information from the SEC filing for AAPL (Apple Inc.) dated November 5, 2018, in JSON format, I would need to structure the relevant data accordingly. However, since I don't have the specific details from the filing, I can provide a generic template based on typical SEC filing data. You can fill in the specific details as needed.\n\nHere\u2019s an example of how the JSON structure might look:\n\n```json\n{\n  \"company\": {\n    \"name\": \"Apple Inc.\",\n    \"ticker\": \"AAPL\",\n    \"filing_date\": \"2018-11-05\",\n    \"type\": \"10-K\",\n    \"period_ending\": \"2018-09-29\"\n  },\n  \"financials\": {\n    \"revenue\": {\n      \"total\": 265595000000,\n      \"year_over_year_growth\": 16\n    },\n    \"net_income\": {\n      \"total\": 59531000000,\n      \"year_over_year_growth\": 10\n    },\n    \"assets\": {\n      \"total\": 365725000000\n    },\n    \"liabilities\": {\n      \"total\": 258549000000\n    },\n    \"equity\": {\n      \"total\": 107176000000\n    }\n  },\n  \"management_discussion\": {\n    \"overview\": \"The company experienced significant growth in revenue driven by strong sales of iPhones and services.\",\n    \"risks\": [\n      \"Market competition\",\n      \"Supply chain disruptions\",\n      \"Regulatory challenges\"\n    ]\n  },\n  \"shareholder_information\": {\n    \"dividend\": {\n      \"amount_per_share\": 0.73,\n      \"dividend_yield\": 1.5\n    },\n    \"stock_performance\": {\n      \"52_week_high\": 233.47,\n      \"52_week_low\": 142.00\n    }\n  }\n}\n```\n\nThis JSON structure includes sections for company information, financials, management discussion, and shareholder information. You can modify the values and add more details based on the actual content of the SEC filing. If you have specific data from the filing that you would like to include, please provide that, and I can help format it into JSON."
+        },
+        {
+          "role": "user",
+          "content": "whats the weather"
+        },
+        {
+          "role": "assistant",
+          "content": "I appreciate your interest, but I specialize in financial topics. If you have any questions about SEC filings, financial statements, or corporate reports, feel free to ask!"
+        },
+        {
+          "role": "user",
+          "content": "aer"
+        },
+        {
+          "role": "assistant",
+          "content": "It seems like your message might have been cut off or is unclear. If you have a financial question or need assistance with SEC filings, financial statements, or corporate reports, feel free to ask! I'm here to help with any finance-related inquiries you may have."
+        }
+      ]
+    },
+    "AAP-2007-10K": {
+      "filing_date": "2007-02-28",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAP-2007-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAL-2012-10K": {
+      "filing_date": null,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainij! AAL-2012-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAPL-2006-10K": {
+      "filing_date": "2006-12-29",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainijs! AAPL-2006-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AASP-2011-10K": {
+      "filing_date": "2011-03-24",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainijs! AASP-2011-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAQL-2018-10K": {
+      "filing_date": "2018-06-29",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainijs! AAQL-2018-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAL-2009-10K": {
+      "filing_date": "2009-02-19",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainijs! AAL-2009-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAPL-2002-10K": {
+      "filing_date": "2002-12-19",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainijs! AAPL-2002-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    },
+    "AAT-2016-10K": {
+      "filing_date": "2016-02-19",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello Paul Bezkorovainijs! AAT-2016-10K is embedded and ready for discussion. How can I help you today?"
+        }
+      ]
+    }
+  }
+}

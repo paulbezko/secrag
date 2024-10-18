@@ -1,0 +1,206 @@
+2024-10-17 22:51:20,858 - DEBUG - Email of type "signUp" sent successfully to ass@gmail.com
+2024-10-17 22:51:20,860 - DEBUG - Signup email sent to ass@gmail.com
+2024-10-17 23:08:56,953 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:08:56,954 - ERROR - Error [Send Email]: 'TELEGRAM_BOT_TOKEN'
+2024-10-17 23:08:56,956 - ERROR - Exception on /api/edit-user [POST]
+Traceback (most recent call last):
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 69, in send_email_from_template
+    log('debug', f'Email of type "{template}" sent successfully to {email}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 18, in log
+    log_telebot("Debug: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_TOKEN']}" + "/sendMessage", chat_id='-4506773539', text=message)
+                                                 ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'TELEGRAM_BOT_TOKEN'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 78, in edit_user_post
+    send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 72, in send_email_from_template
+    log('error', f'Error [Send Email]: {error}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 23, in log
+    log_telebot("Error: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_TOKEN']}" + "/sendMessage", chat_id='-4506773539', text=message)
+                                                 ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'TELEGRAM_BOT_TOKEN'
+2024-10-17 23:09:28,150 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:09:28,152 - ERROR - Error [Send Email]: Session.request() got an unexpected keyword argument 'chat_id'
+2024-10-17 23:09:28,154 - ERROR - Exception on /api/edit-user [POST]
+Traceback (most recent call last):
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 69, in send_email_from_template
+    log('debug', f'Email of type "{template}" sent successfully to {email}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 18, in log
+    log_telebot("Debug: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}" + "/sendMessage", chat_id='-4506773539', text=message)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Session.request() got an unexpected keyword argument 'chat_id'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 78, in edit_user_post
+    send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 72, in send_email_from_template
+    log('error', f'Error [Send Email]: {error}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 23, in log
+    log_telebot("Error: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}" + "/sendMessage", chat_id='-4506773539', text=message)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Session.request() got an unexpected keyword argument 'chat_id'
+2024-10-17 23:09:32,346 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:09:32,348 - ERROR - Error [Send Email]: Session.request() got an unexpected keyword argument 'chat_id'
+2024-10-17 23:09:32,349 - ERROR - Exception on /api/edit-user [POST]
+Traceback (most recent call last):
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 69, in send_email_from_template
+    log('debug', f'Email of type "{template}" sent successfully to {email}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 18, in log
+    log_telebot("Debug: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}" + "/sendMessage", chat_id='-4506773539', text=message)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Session.request() got an unexpected keyword argument 'chat_id'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 78, in edit_user_post
+    send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 72, in send_email_from_template
+    log('error', f'Error [Send Email]: {error}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 23, in log
+    log_telebot("Error: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}" + "/sendMessage", chat_id='-4506773539', text=message)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Session.request() got an unexpected keyword argument 'chat_id'
+2024-10-17 23:10:26,339 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:10:26,341 - ERROR - Error [Send Email]: Session.request() got an unexpected keyword argument 'chat_id'
+2024-10-17 23:10:26,342 - ERROR - Exception on /api/edit-user [POST]
+Traceback (most recent call last):
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 69, in send_email_from_template
+    log('debug', f'Email of type "{template}" sent successfully to {email}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 18, in log
+    log_telebot("Debug: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.get(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}" + "/sendMessage", chat_id='-4506773539', text=message)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Session.request() got an unexpected keyword argument 'chat_id'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 78, in edit_user_post
+    send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 72, in send_email_from_template
+    log('error', f'Error [Send Email]: {error}')
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 23, in log
+    log_telebot("Error: " + message)
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\utils.py", line 29, in log_telebot
+    requests.get(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}" + "/sendMessage", chat_id='-4506773539', text=message)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Session.request() got an unexpected keyword argument 'chat_id'
+2024-10-17 23:11:06,594 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:12:05,339 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:14:35,988 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:16:19,639 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:16:46,857 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:18:40,967 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:19:42,753 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:20:26,307 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:20:51,287 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com
+2024-10-17 23:22:07,450 - DEBUG - Email of type "changeEmail" sent successfully to paul.bezko@hotmail.com

@@ -1,0 +1,68 @@
+2024-10-18 08:25:05,647 - INFO - Starting filing scraper
+2024-10-18 08:25:08,393 - CRITICAL - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:25:08,393 - CRITICAL - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:25:08,393 - CRITICAL - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:26:28,035 - INFO - Starting filing scraper
+2024-10-18 08:26:30,676 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:26:30,676 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:26:30,676 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:43:36,492 - INFO - Starting filing scraper
+2024-10-18 08:43:36,879 - DEBUG - Updated ticker json
+
+Added tickers: 
+{}
+
+Removed tickers: 
+{}
+2024-10-18 08:43:39,126 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:43:39,152 - INFO - Finished filing scraper
+2024-10-18 08:44:14,739 - INFO - Starting filing scraper
+2024-10-18 08:44:15,134 - DEBUG - Updated ticker json
+
+Added tickers: 
+{}
+
+Removed tickers: 
+{}
+2024-10-18 08:44:17,242 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:44:17,273 - INFO - Finished filing scraper
+2024-10-18 08:45:29,836 - INFO - Starting filing scraper
+2024-10-18 08:45:30,298 - DEBUG - Updated ticker json
+
+Added tickers: 
+{}
+
+Removed tickers: 
+{}
+2024-10-18 08:45:32,505 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:45:32,536 - INFO - Finished filing scraper
+2024-10-18 08:49:51,462 - INFO - Starting filing scraper
+2024-10-18 08:49:51,868 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-18 08:49:54,046 - DEBUG - New filings: 0
+2024-10-18 08:49:54,074 - INFO - Finished filing scraper

@@ -1,13 +1,13 @@
 <template>
   <div class="overlay">
     <div class="spinner">
-      <div class="fa-solid fa-arrows-rotate text-1"></div>
+      <div class="fa-solid fa-arrows-rotate text-2"></div>
     </div>
   </div>
 </template>
 
 <script>
-export default {name: 'SpinnerCompInside', mounted() {}};
+export default {name: 'SpinnerCompButton', mounted() {}};
 </script>
 
 <style scoped>
