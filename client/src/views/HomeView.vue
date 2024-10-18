@@ -77,7 +77,7 @@
           <img src="../assets/home/logos/image 16.png" class="fade-in delay-1" style="object-fit: contain;">
         </div>
       </div>
-      <div class="flex-row width-100 show-on-small">
+      <div class="flex-column width-100 show-on-small">
         <div class="flex-row width-100 space-between">
           <img src="../assets/home/logos/image 6.png" class="fade-in delay-1" style="object-fit: contain;">
           <img src="../assets/home/logos/image 7.png" class="fade-in delay-2" style="object-fit: contain;">

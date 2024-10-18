@@ -36,7 +36,7 @@
               <div class="text-bold" :class="isSmallScreen ? 'text-2' : 'text-3'" style="padding-inline: 1rem;">Chat History</div>
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li class="text-4 chat-history-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
-                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="currentChat === chat || hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can text-link"></div></div>
+                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can text-link"></div></div>
                 </li>
               </ul>
             </div>
@@ -70,24 +70,28 @@
           </option>
         </select>
       </div>
-      <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
-      <div class="button button-primary flex-row gap-1 width-100" @click="createChat('selection', '')">
-        <div v-if="!newChatLoading">Create chat</div>
-        <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
-      </div>
       <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
       <div class="text-3">Or choose one of the Recent Filings</div>
       <div class="flex-row gap-1">
-        <div class="flex-row gap-2 width-100" v-for="(filing, index) in (popularFilings)" :key="index">
-          <div class="card card-clickable flex-column center" @click="createChat('card', filing)">
-            <div class="text-2">{{ filing.split("_")[0] }}</div>
-            <div class="flex-row gap-05">
-              <div class="text-4">{{ filing.split("_")[2] }}</div>
-              <div class="text-4">{{ filing.split("_")[1] }}</div>
-            </div>
-          </div>
-        </div>
+        <select class="input" style="width: 24rem" @change="selectNewFiling($event.target.value)" v-model="selectedNewFiling">
+          <option value="" disabled hidden selected>Select a Filing</option>
+          <option v-for="option in newFilings" :key="option" class="text-inter text-4" :value="option">
+            {{ option }}
+          </option>
+        </select>
       </div>
+      <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+      <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
+      <div 
+        class="button button-primary flex-row gap-1 width-100" 
+        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic')) && !selectedNewFiling }" 
+        @click="createChat()"
+        :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic')) && !selectedNewFiling">
+        
+        <div v-if="!newChatLoading">Create chat</div>
+        <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
+      </div>
+
     </div>
 
     <!-- Chat Section -->
@@ -183,6 +187,7 @@ export default {
       confirmLoading: false,
       confirmSuccess: false,
       isSmallScreen: window.innerWidth <= 800, // Initial check for screen size
+      createButtonDisabled: true,
 
       // Chat data
       chats: [],
@@ -203,7 +208,7 @@ export default {
       // Filing data
       filingContent: '',
       filingLoading: false,
-      popularFilings: [],
+      newFilings: [],
       availableFilings: {},
       filingOptions: [],
       filingDate: '',
@@ -215,7 +220,10 @@ export default {
       yearOptions: [],
       selectedTicker: '', // Initialize selected ticker
       selectedYear: '', // Initialize selected year
+      selectedDate: '',
       selectedFiling: '',
+      selectedFilingType: '',
+      selectedNewFiling: '',
 
       // Socket
       socketId: '',
@@ -229,7 +237,7 @@ export default {
   
   mounted() {
     this.initializeSocket();
-    this.loadListTickers();
+    this.loadFilingSelectionData();
     this.loadChats();
     this.updateChatHistoryHeight();
     if (!this.isSmallScreen) {this.sidebarShown = true;}
@@ -250,9 +258,9 @@ export default {
     },
 
     // Load List Tickers
-    loadListTickers() {
-      axios.get(`${config.apiUrl}/api/get-list-tickers`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.popularFilings = response.data.popularFilings; this.tickerOptions = response.data.tickers;})
+    loadFilingSelectionData() {
+      axios.get(`${config.apiUrl}/api/get-filing-selection-data`, {params: { token: localStorage.getItem('_u') }})
+      .then(response => {this.newFilings = response.data.newFilings; this.tickerOptions = response.data.tickers;})
       .catch(error => {console.error('Error getting filing selection data:', error)});
     },
 
@@ -277,6 +285,7 @@ export default {
       this.selectedTicker = option; 
       this.selectedYear = '';
       this.selectedFiling = '';
+      this.selectedNewFiling = '';
       axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: option }})
       .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
       .catch(error => {console.error('Error getting ticker info:', error)});
@@ -285,12 +294,18 @@ export default {
     // Select Year and Filing
     selectYear(option) {this.selectedYear = option; this.selectedFiling = ''; this.filingOptions = this.tickerInfo[this.selectedYear];},
     selectFiling(option) {this.selectedFiling = option;},
+    selectNewFiling(option) {this.selectedNewFiling = option; this.selectedTicker = ''; this.selectedYear = ''; this.selectedFiling = '';},
 
     // Create chat
-    async createChat(option, filing) {
+    async createChat() {
 
-      if (option === 'selection') {if (!this.selectedTicker || !this.selectedYear) {this.error =  'Please select both a Ticker and a Year of interest.'; return}}
-      else {[this.selectedTicker, this.selectedYear, this.selectedFiling] = filing.split("_")}
+      if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
+
+      if (this.selectedNewFiling) {
+        [this.selectedTicker, this.selectedFilingType, this.selectedDate] = this.selectedNewFiling.split(" ");
+        this.selectedYear = this.selectedDate.split('-')[0]
+        this.selectedFiling = `${this.selectedFilingType} ${this.selectedDate}`
+      }
 
       let newChatName = '';
       if (this.subscription === 'basic') {newChatName = `${this.selectedTicker}-${this.selectedYear}-10K`;} 
@@ -429,7 +444,7 @@ export default {
     },
 
     // Various UI Helpers
-    adjustTextareaHeight(refName) {this.$refs[refName].style.height = 'auto'; this.$refs[refName].style.height = Math.min(this.$refs[refName].scrollHeight, 160) + 'px'},
+    adjustTextareaHeight(refName) {this.$refs[refName].style.height = 'auto'; this.$refs[refName].style.height = (Math.min(this.$refs[refName].scrollHeight, 160) + 2) + 'px';},
     checkScreenWidth() {this.isSmallScreen = window.innerWidth <= 800;},
     handleResize() {this.checkScreenWidth(); this.updateChatHistoryHeight()},
     handleScroll(event) {this.filingScrollPosition = event.target.scrollTop;},
