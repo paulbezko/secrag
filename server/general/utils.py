@@ -31,7 +31,10 @@ def log(level, message):
 
 
 def log_telebot(message):
-    requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}/sendMessage", data={'chat_id': '-4506773539', 'text': message})
+    chat_id = '-4506773539'
+    for i in range(0, len(message), 4000):
+        chunk = message[i:i + 4000]
+        requests.post(f"https://api.telegram.org/bot{current_app.config['TELEGRAM_BOT_KEY']}/sendMessage", data={'chat_id': chat_id, 'text': chunk})
 
 
 def encode_token(payload):

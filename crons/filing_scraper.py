@@ -1,17 +1,22 @@
-import os
-import json
-from datetime import datetime, timezone
-import pytz
-import requests
 from dateutil.relativedelta import relativedelta
-import traceback
-from edgar import get_filings
 from edgar.core import set_identity
+from datetime import datetime, timezone
+from logger import log, configure_logger
+from edgar import get_filings
+
+import traceback
+import requests
+import logging
+import json
+import pytz
+import os
 
 # Get the current directory of the script
-current_dir = os.path.dirname(os.path.abspath(__file__))
+log_filename = os.path.join("crons/logs", f"filing_scraper.log")
+configure_logger(log_filename)
 
-data_directory = "server/memory/filing_db"
+current_dir = os.path.dirname(os.path.abspath(__file__))
+data_directory = "database/memory"
 
 def scrape_filings(mode="month", mode_amount=1):
     available_modes = ["month", "ytd", "year", "day"]
@@ -62,38 +67,37 @@ def scrape_filings(mode="month", mode_amount=1):
             json.dump(filings_available, f, indent=4)
 
         with open(data_directory +"/filings_available.json", "r") as f:
-            filings_new = json.load(f)        
+            filings_new = json.load(f)
+
         new_filings = []
         for filing in filings:
             filings_available_str = f"{filing.form} {str(filing.filing_date)}"
             if "-" not in cik_ticker_dict[filing.cik]:
                 try:
-                    if cik_ticker_dict[filing.cik] not in filings_available["available_filings"]:
-                        filings_available["available_filings"][cik_ticker_dict[filing.cik]] = {}
-                    if str(filing.filing_date.year) not in filings_available["available_filings"][cik_ticker_dict[filing.cik]]:
+                    if cik_ticker_dict[filing.cik] not in filings_available:
+                        filings_available[cik_ticker_dict[filing.cik]] = {}
+                    if str(filing.filing_date.year) not in filings_available[cik_ticker_dict[filing.cik]]:
                         new_dict_entry = {str(filing.filing_date.year) : []}
-                        filings_available["available_filings"][cik_ticker_dict[filing.cik]].update(new_dict_entry)
-                    if filings_available_str not in filings_available["available_filings"][cik_ticker_dict[filing.cik]][str(filing.filing_date.year)]:
-                        filings_available["available_filings"][cik_ticker_dict[filing.cik]][str(filing.filing_date.year)].append(filings_available_str)
+                        filings_available[cik_ticker_dict[filing.cik]].update(new_dict_entry)
+                    if filings_available_str not in filings_available[cik_ticker_dict[filing.cik]][str(filing.filing_date.year)]:
+                        filings_available[cik_ticker_dict[filing.cik]][str(filing.filing_date.year)].append(filings_available_str)
                         new_filings.append(f"{cik_ticker_dict[filing.cik]} {filings_available_str}")
                 except Exception as e:
-                    print(cik_ticker_dict[filing.cik], filing.filing_date.year)
+                    log("error", f"{str(e)}\n\nTraceback: {traceback.format_exc()}")
                     raise e
         
         if added_tickers:
-            filings_available["available_filings"] = sort_dict_keys(filings_available["available_filings"])
+            filings_available = sort_dict_keys(filings_available)
 
         with open(data_directory +"/filings_available.json", "w") as f:
             json.dump(filings_available,f,indent=4)
         
         if new_filings:
             with open(data_directory +"/filings_new.json", "w") as f:
-                current_time = datetime.now(tz=timezone.utc).strftime('%Y-%m-%d')
-                filings_new["data"] = new_filings
-                filings_new["last_modified"] = current_time
+                filings_new = new_filings
                 json.dump(filings_new, f, indent=4)
         
-        print(f"Finished scraping!\n New filings: \n{new_filings}")
+        log("debug", f"New filings: {len(new_filings)}")
         
 
     
@@ -115,18 +119,17 @@ def update_ticker_json():
             with open(data_directory+'/company_tickers.json', 'w') as json_file:
                 json_data = json.loads(response.text)
                 json.dump(json_data, json_file, indent=4)
-            print(f"Updated ticker json\n\nAdded tickers: \n{added_tickers}\n\nRemoved tickers: \n{removed_tickers}")
+
+            log("debug", f"Added tickers: {len(added_tickers)} | Removed tickers: {len(removed_tickers)}")
             return new_cik_ticker_list, added_tickers
+        
         else:
-            current_time = datetime.now(tz=timezone.utc)
             error_str = f"Error: Request failed\nStatus code: {response.status_code} \n\n Text: {response.text}"
-            with open(current_dir+'/'+f"filing_scraper_logs/fail_log_{current_time.strftime('%Y-%m-%d_%H-%M-%S')}.txt", "w") as f:
-                f.write(error_str)
+            log("error", error_str)
             raise Exception(error_str)
+        
     except Exception as e:  
-        current_time = datetime.now(tz=timezone.utc)
-        with open(current_dir+ f"/filing_scraper_logs/fail_log_{current_time.strftime('%Y-%m-%d_%H-%M-%S')}.txt", "w") as f:
-            f.write(f"Error: {str(e)}\n\nTraceback: {traceback.format_exc()}")  
+        log("error", f"{str(e)}\n\nTraceback: {traceback.format_exc()}")
         raise e  
 
 def compare_cik_ticker_lists(old_list : list, new_list : list):
@@ -170,4 +173,6 @@ def sort_dict_keys(input_dict):
     return {key: input_dict[key] for key in sorted(input_dict)}
 
 if __name__ == "__main__":
+    log("info", "Starting filing scraper")
     scrape_filings(mode="month", mode_amount=2)
+    log("info", "Finished filing scraper")
