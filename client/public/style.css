@@ -14,12 +14,12 @@ html::-webkit-scrollbar {display: none;}
 body {
   margin: 0;
   overflow-y: scroll;
+  color: var(--color-black);
 }
 
 * {
   text-decoration: none;
   box-sizing: border-box;
-  color: var(--color-black);
 }
 
 ul {
@@ -28,6 +28,7 @@ ul {
 }
 
 :root {
+  --color-yellow-dark: #7c5d00;
   --color-yellow: #FFC107;
   --color-yellow-light: #FFD350;
   --color-yellow-highlight: #fff7df;
@@ -37,6 +38,8 @@ ul {
 
   --color-blue-dark: #001E3D;
   --color-blue: #002E5D;
+  --color-blue-light: #004386;
+  --color-blue-highlight: #e5eef7;
 
   --color-white: #FFFFFF;
   --color-grey-light: #F4F6F9;
@@ -122,18 +125,19 @@ hr {
 
 .text-link *,
 .text-link {
+  color: var(--color-black);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .text-link:hover *,
 .text-link:hover {
-  color: var(--color-yellow);
+  color: var(--color-blue-light);
 }
 
 .text-link.encouraged:hover *,
 .text-link.encouraged:hover {
-  color: var(--color-yellow);
+  color: var(--color-blue-light);
 }
 
 .text-link.discouraged:hover,
@@ -246,7 +250,7 @@ code {
   transition: all 0.2s ease;
 }
 
-.button-disabled {cursor: default; background-color: var(--color-grey) !important;}
+.button-disabled {cursor: default; color: var(--color-grey-semidark) !important; background-color: var(--color-grey) !important;}
 
 .button-primary {background-color: var(--color-yellow); color: var(--color-black)}
 .button-primary:hover {background-color: var(--color-yellow-light); color: var(--color-black)}
@@ -269,11 +273,11 @@ code {
 }
 
 .button-icon:hover {
-  /* color: var(--color-yellow);
-  border: 1px solid var(--color-yellow);
+  color: var(--color-yellow-dark);
+  /* border: 1px solid var(--color-yellow);
   box-shadow: inset 0px 0px 0px 2px var(--color-yellow); */
   background-color: var(--color-yellow-highlight);
-  border: 1px solid var(--color-yellow);
+  border: 1px solid var(--color-yellow-dark);
 }
 
 .icon-link {
@@ -281,7 +285,11 @@ code {
 }
 
 .icon-link:hover {
-  color: var(--color-yellow);
+  color: var(--color-blue-light);
+}
+
+.icon-link-active:hover {
+  color: var(--color-blue-dark);
 }
 
 .input {
@@ -311,9 +319,13 @@ input[type="password"]
 .input:active {
   outline: none;
   font-size: var(--text-3);
-  border: 1px solid var(--color-yellow);
-  /* box-shadow: inset 0px 0px 0px 2px var(--color-yellow); */
-  background-color: var(--color-yellow-highlight)
+  border: 1px solid var(--color-blue);
+  background-color: var(--color-blue-highlight)
+}
+
+.input-disabled:hover {
+  border: 1px solid var(--color-grey) !important;
+  background-color: var(--color-white);
 }
 
 input:-webkit-autofill,
@@ -333,9 +345,22 @@ input:-webkit-autofill:active {
   font-family: 'Inter', sans-serif !important;
   background-color: var(--color-yellow-highlight);
   -webkit-text-fill-color: var(--color-grey-dark);
-  /* box-shadow: inset 0px 0px 0px 2px var(--color-yellow);  */
-  border: 1px solid var(--color-yellow);
+  /* border: 1px solid var(--color-yellow); */
   font-size: var(--text-3);
+}
+
+textarea {
+  background-color: var(--color-white);
+  transition: all 0.2s ease;
+}
+
+textarea:focus,
+textarea:hover,
+textarea:active {
+  outline: none;
+
+  border: 1px solid var(--color-blue);
+  background-color: var(--color-blue-highlight)
 }
 
 select {
@@ -511,11 +536,10 @@ select option {
   top: 0;
   width: 100%;
   height: 100%;
-  padding: 2rem 1rem;
-  padding-right: 0.5rem;
+  padding: 0.5rem;
   background-color: var(--color-white);
   border-right: 1px solid var(--color-grey);
-  transition: transform  0.3s ease; /* Smooth transition */
+  transition: transform  0.3s ease;
   overflow-x: hidden;
 }
 
@@ -525,27 +549,26 @@ select option {
   flex-grow: 1;
 }
 
-.chat-history-element {
+.sidebar-element {
   background-color: var(--color-grey-light);
   border-radius: .5rem;
   padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
 }
 
-.chat-history-element:hover,
-.chat-history-element.active {
-  background-color: var(--color-yellow-highlight);
+.sidebar-element:hover,
+.sidebar-element.active {
+  background-color: var(--color-blue-highlight);
   border-radius: .5rem;
   cursor: pointer;
 }
 
-.chat-history-element .fa-trash-can {
+.sidebar-element .fa-trash-can {
   opacity: 0.6; /* Default visibility */
   transition: opacity 0.2s;
 }
 
-.chat-history-element:hover .fa-trash-can,
-.chat-history-element.active .fa-trash-can {
+.sidebar-element:hover .fa-trash-can,
+.sidebar-element.active .fa-trash-can {
   opacity: 1; /* Fully visible on hover or active */
 }
 
