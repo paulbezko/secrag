@@ -1,7 +1,5 @@
 <template>
-  
   <div class="flex-column flex-1 width-100 center" style="padding-inline: 4rem;">
-    <SpinnerComp v-if="showSpinner"></SpinnerComp>
     <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess"/></div>
     <div v-if="showSuccess" class="backdrop z-30" @click="handleCloseConfirm"></div>
     <div v-if="stage === 'signUpBefore'" class="flex-column width-100 flex-1 space-between gap-2">
@@ -14,7 +12,7 @@
           <div class="flex-column center gap-2 width-100" style="max-width: 40rem;">
             <div class="flex-row gap-1 width-100">
               <input class="input" v-model="email" type="email" placeholder="Email">
-              <div @click="signupPassword('signUpBefore', $event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+              <div @click="signupPassword('signUpBefore', $event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner"  class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
             </div>
             <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
@@ -35,7 +33,7 @@
           <input class="input" v-model="password" type="password" placeholder="Password">
           <div class="flex-row gap-1 width-100">
             <input class="input" v-model="passwordConfirm" type="password" placeholder="Confirm Password">
-            <div @click="signupPassword('signUpAfter', $event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+            <div @click="signupPassword('signUpAfter', $event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
           </div>
           <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
         </div>
@@ -48,7 +46,7 @@
 import webdata from '../webdata.json'
 import axios from 'axios';
 import SuccessComp from '../components/SuccessComp.vue';
-import SpinnerComp from '../components/SpinnerComp.vue';
+import SpinnerCompButton from '../components/SpinnerCompButton.vue';
 import {createClient} from '@supabase/supabase-js'
 import { passwordStrength } from 'check-password-strength'
 import { config } from '@/config';
@@ -56,7 +54,7 @@ import { config } from '@/config';
 export default {
   components: {
     SuccessComp,
-    SpinnerComp
+    SpinnerCompButton
   },
   data() {return {
     projectName: webdata.projectName,

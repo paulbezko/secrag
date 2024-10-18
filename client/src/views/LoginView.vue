@@ -2,7 +2,6 @@
   <div class="flex-column width-100 flex-1 space-between gap-2">
     <div></div>
     <div class="flex-column width-100 center" style="padding-inline: 4rem;">
-      <SpinnerComp v-if="showSpinner"></SpinnerComp>
       <div v-if="showConfirm"><ConfirmComp :action="action" @close="handleCloseConfirm" @success="handleSuccess" /></div>
       <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess" /></div>
       <div v-if="showConfirm || showSuccess || showError" class="backdrop z-30" @click="handleCloseConfirm"></div>
@@ -15,7 +14,7 @@
             <input class="input" v-model="email" type="email" placeholder="Email">
             <div class="flex-row gap-1">
               <input class="input" v-model="password" type="password" placeholder="Password">
-              <div @click="loginPassword()" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+              <div @click="loginPassword()" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
             </div>
             <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
@@ -36,14 +35,14 @@ import axios from 'axios';
 import {createClient} from '@supabase/supabase-js'
 import ConfirmComp from '../components/ConfirmComp.vue';
 import SuccessComp from '../components/SuccessComp.vue';
-import SpinnerComp from '../components/SpinnerComp.vue';
+import SpinnerCompButton from '../components/SpinnerCompButton.vue';
 import {config} from '@/config';
 
 export default {
   components: {
     ConfirmComp,
     SuccessComp,
-    SpinnerComp
+    SpinnerCompButton
   },
   data() {return {
     projectName: webdata.projectName,

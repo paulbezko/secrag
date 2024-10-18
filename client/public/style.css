@@ -480,7 +480,7 @@ select option {
 
 .filing-html {
   width: 100%;
-  overflow-x: auto
+  overflow: scroll
 }
 
 .filing-html::-webkit-scrollbar {

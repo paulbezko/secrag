@@ -1,6 +1,5 @@
 <template>
   <div>
-    <SpinnerComp v-if="showSpinner"></SpinnerComp>
     <div v-if="showComponent">
       <div class="z-40 width-100 flex-row center absolute card-component-center" style="padding-inline: 4rem;">
         <div class="card-component flex-column center gap-2 card-size-confirm" ref="ConfirmCard">
@@ -9,7 +8,7 @@
           <div v-if="action === 'resetPasswordBefore'" class="flex-column gap-1 width-100">
             <div class="flex-row gap-1 width-100">
               <input class="input" placeholder="Email" v-model="email"/>
-              <div @click="submit($event)" class="button-icon"><div class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
+              <div @click.stop="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
             </div>
             <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
@@ -19,14 +18,14 @@
             <div v-if="action === 'changePassword'" class="flex-column gap-1 width-100">
               <div class="flex-row gap-1 width-100">
                 <input class="input" type="password" placeholder="Confirm New Password" v-model="passwordNewConfirm"/>
-                <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
+                <div @click.stop="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
               </div>
               <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
             </div>
             <div v-if="action === 'changeEmail'" class="flex-column gap-1 width-100">
               <div class="flex-row gap-1 width-100">
                 <input class="input" type="text" placeholder="New Email" v-model="emailNew"/>
-                <button @click="submit($event)" class="fa-solid fa-arrow-right text-2 button-icon"></button>
+                <div @click.stop="submit($event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
               </div>
               <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
             </div>
@@ -40,13 +39,13 @@
 
 <script>
 import { passwordStrength } from 'check-password-strength'
-import SpinnerComp from './SpinnerComp.vue';
+import SpinnerCompButton from './SpinnerCompButton.vue';
 import { config } from '@/config';
 import axios from 'axios';
 
 export default {
   name: 'ConfirmComp',
-  components: {SpinnerComp},
+  components: {SpinnerCompButton},
   props: {
     oneStepDelete: {type: Boolean, required: true},
     action: {type: String, required: true}
@@ -136,7 +135,7 @@ export default {
           if (this.passwordNew != this.passwordNewConfirm) {this.error = "Passwords do not match"; return}
           if (passwordStrength(this.passwordNew).id < 2) {this.error = "Password too weak"; return}
 
-          const response = await axios.post(`${config.apiUrl}/api/edit-user`, {action: 'changePassword', token: localStorage.getItem('_u'), password: this.password, passwordNew: this.passwordNew})      
+          const response = await axios.post(`${config.apiUrl}/api/edit-user`, {action: 'changePassword', token: localStorage.getItem('_u'), password: this.password, passwordNew: this.passwordNew})
           if (response.data.error) {this.error = response.data.error; return}
           this.$emit('success');
           
@@ -179,8 +178,7 @@ export default {
         }
       }
       catch (error) {console.log(error)}
-      finally {this.showSpinner = false;}
-      event.stopPropagation()
+      finally {this.showSpinner = false; event.stopPropagation()}
     }
   },
 
