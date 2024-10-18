@@ -41,6 +41,6 @@ cython_debug/
 
 *.faiss
 *.pkl
-client/dist/
+
 database/memory/chats.json
 database/filings/*
