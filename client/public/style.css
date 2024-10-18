@@ -5,7 +5,7 @@ html {
 
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-  
+  overscroll-behavior: contain;
 }
 
 
@@ -123,7 +123,7 @@ hr {
 .text-link *,
 .text-link {
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .text-link:hover *,
@@ -133,7 +133,7 @@ hr {
 
 .text-link.encouraged:hover *,
 .text-link.encouraged:hover {
-  color: var(--color-green);
+  color: var(--color-yellow);
 }
 
 .text-link.discouraged:hover,
@@ -240,11 +240,13 @@ code {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: var(--text-button);
-  border-radius: 40rem;
+  border-radius: 1rem;
   padding-inline: 4rem;
   padding-block: 1rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
+
+.button-disabled {cursor: default; background-color: var(--color-grey) !important;}
 
 .button-primary {background-color: var(--color-yellow); color: var(--color-black)}
 .button-primary:hover {background-color: var(--color-yellow-light); color: var(--color-black)}
@@ -258,23 +260,24 @@ code {
   align-items: center;
   justify-content: center;
   font-size: var(--text-2);
-  border-radius: 100%;
+  border-radius: 1rem;
   border: 1px solid var(--color-grey);
   background-color: var(--color-white);
   min-width: 4.2rem !important;
   height: 4.2rem !important;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .button-icon:hover {
-  /* color: var(--color-yellow); */
+  /* color: var(--color-yellow);
   border: 1px solid var(--color-yellow);
-  box-shadow: inset 0px 0px 0px 2px var(--color-yellow);
-  background-color: var(--color-yellow-highlight)
+  box-shadow: inset 0px 0px 0px 2px var(--color-yellow); */
+  background-color: var(--color-yellow-highlight);
+  border: 1px solid var(--color-yellow);
 }
 
 .icon-link {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .icon-link:hover {
@@ -291,11 +294,11 @@ code {
   padding-block: 1rem;
   padding-inline: 2rem;
   border: 1px solid var(--color-grey);
-  border-radius: 4rem;
+  border-radius: 1rem;
   max-width: 50rem;
   box-sizing: border-box;
   font-size: var(--text-3);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 input[type="text"],
@@ -309,7 +312,7 @@ input[type="password"]
   outline: none;
   font-size: var(--text-3);
   border: 1px solid var(--color-yellow);
-  box-shadow: inset 0px 0px 0px 2px var(--color-yellow);
+  /* box-shadow: inset 0px 0px 0px 2px var(--color-yellow); */
   background-color: var(--color-yellow-highlight)
 }
 
@@ -330,7 +333,7 @@ input:-webkit-autofill:active {
   font-family: 'Inter', sans-serif !important;
   background-color: var(--color-yellow-highlight);
   -webkit-text-fill-color: var(--color-grey-dark);
-  box-shadow: inset 0px 0px 0px 2px var(--color-yellow); 
+  /* box-shadow: inset 0px 0px 0px 2px var(--color-yellow);  */
   border: 1px solid var(--color-yellow);
   font-size: var(--text-3);
 }
@@ -422,7 +425,7 @@ select option {
 
 .chat-message-user {
   padding: 1rem 2rem;
-  border-radius: 2rem;
+  border-radius: 1rem;
   border: 1px solid var(--color-grey);
   max-width: 75%;
 }
@@ -451,7 +454,7 @@ select option {
   line-height: 1.5;    /* Adjust line height for better spacing */
   font-family: 'Inter', sans-serif;
   font-weight: 300;
-  border-radius: 2rem;
+  border-radius: 1rem;
   padding: 1rem 2rem;
   border: 1px solid var(--color-grey);
   overflow-y: auto;  /* Keep scrolling enabled */
@@ -523,14 +526,16 @@ select option {
 }
 
 .chat-history-element {
+  background-color: var(--color-grey-light);
+  border-radius: .5rem;
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
 }
 
 .chat-history-element:hover,
 .chat-history-element.active {
-  background-color: var(--color-grey-light);
-  border-radius: 1rem;
+  background-color: var(--color-yellow-highlight);
+  border-radius: .5rem;
   cursor: pointer;
 }
 
@@ -570,11 +575,11 @@ select option {
     background-color: var(--color-white);
     border: 1px solid var(--color-grey);
     padding: 2rem;
-    border-radius: 2rem;
+    border-radius: 1rem;
   }
   .filing-container {
     border: 1px solid var(--color-grey);
-    border-radius: 2rem;
+    border-radius: 1rem;
   }
   .chat-message-user {
     background-color: var(--color-grey-light);
