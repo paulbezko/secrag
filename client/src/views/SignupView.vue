@@ -71,7 +71,12 @@ export default {
   mounted() {
     const tokenUrl = new URLSearchParams(window.location.search).get('token') // Getting the token from the url
     const tokenLocalStorage = localStorage.getItem('_u')
-
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        if (this.stage === 'signUpBefore') {this.signupPassword('signUpBefore', event)}
+        if (this.stage === 'signUpAfter') {this.signupPassword('signUpAfter', event)}
+      }
+    });
     if (tokenUrl) {
       try {
         axios.get(`${config.apiUrl}/api/signup?token=${tokenUrl}`)

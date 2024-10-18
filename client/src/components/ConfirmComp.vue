@@ -87,7 +87,11 @@ export default {
   mounted() {
     this.showSpinner = true; // Show spinner while loading CAPTCHA
     window.addEventListener('click', this.handleClickOutside);
-
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        this.submit(event);
+      }
+    });
     if (this.oneStepDelete && this.action === 'deleteAccount') {
       axios.get(`${config.apiUrl}/api/get-captcha`, {params: {token: localStorage.getItem('_u')}})
         .then(response => {

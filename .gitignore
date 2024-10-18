@@ -42,5 +42,5 @@ cython_debug/
 *.faiss
 *.pkl
 client/dist/
-dashboard/memory/*.json
-dashboard/memory/vectorstore/*/
+database/memory/chats.json
+database/filings/*

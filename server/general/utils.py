@@ -1,3 +1,4 @@
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timezone
@@ -48,33 +49,116 @@ def decode_token(token):
 
 
 def send_email_from_template(email, template, payload):
+
+    head = f"""
+        <head>
+            <style>
+                .container {{
+                    font-family: Arial, sans-serif;
+                    color: #333;
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                    max-width: 600px;
+                    margin: auto;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                }}
+                .button {{
+                    background-color: #FFC107;
+                    color: #2D2D2D;
+                    max-width: fit-content;
+                    cursor: pointer;
+                    font-family: 'Inter', sans-serif;
+                    font-weight: 700;
+                    font-size: var(--text-button);
+                    border-radius: 40rem;
+                    padding-inline: 4rem;
+                    padding-block: 1rem;
+                    transition: all 0.3s ease;
+                }}
+
+                .button:hover {{
+                    background-color: #FFD350
+                }}
+            </style>
+        </head>
+    """
     
-    if template == 'signUp':
-        subject = 'Welcome to SkelTal!'
-        body = f"Click the link below to verify your email address: {current_app.config['REDIRECT_URL']}/signup?token={payload}"
+    # Define HTML templates for each email type
+    templates = {
+        'signUp': {
+            'subject': 'Welcome to SkelTal!',
+            'html_body': f"""
+                <html>
+                    {head}
+                    <body>
+                        <div class="container">
+                            <h2>Welcome to SkelTal!</h2>
+                            <p>Click the button below to verify your email address:</p>
+                            <a class="button" href="{current_app.config['REDIRECT_URL']}/signup?token={payload}">Verify Email</a>
+                            <p>If you did not sign up for this account, please ignore this email.</p>
+                        </div>
+                    </body>
+                </html>
+            """
+        },
+        'resetPassword': {
+            'subject': 'Reset Password',
+            'html_body': f"""
+                <html>
+                    {head}
+                    <body>
+                        <div class="container">
+                            <h2>Reset Your Password</h2>
+                            <p>Click the button below to reset your password:</p>
+                            <a class="button" href="{current_app.config['REDIRECT_URL']}/reset-password?token={payload}">Reset Password</a>
+                            <p>If you did not request a password reset, please ignore this email.</p>
+                        </div>
+                    </body>
+                </html>
+            """
+        },
+        'changeEmail': {
+            'subject': 'Change Email Confirmation',
+            'html_body': f"""
+                <html>
+                    {head}
+                    <body>
+                        <div class="container">
+                            <h2>Confirm Your Email Change</h2>
+                            <p>Click the button below to confirm your new email address:</p>
+                            <a class="button" href="{current_app.config['REDIRECT_URL']}/change-email?token={payload}">Confirm Email</a>
+                            <p>If you did not request an email change, please ignore this email.</p>
+                        </div>
+                    </body>
+                </html>
+            """
+        }
+    }
+    
+    # Check if the template exists
+    if template not in templates:
+        return log('error', f'Error [Send Email]: Invalid email type "{template}"')
 
-    elif template == 'resetPassword':
-        subject = 'Reset Password'
-        body = f"Click the link below to reset your password: {current_app.config['REDIRECT_URL']}/reset-password?token={payload}"
-
-    elif template == 'changeEmail':
-        subject = 'Change Email'
-        body = f"Click the link below to confirm your email: {current_app.config['REDIRECT_URL']}/change-email?token={payload}"
-
-    elif template == 'contact':
-        subject = 'New contact request submitted.'
-        body = payload
-
-    else: return print('Error [Send Email]: Invalid email type')
+    # Extract subject and body
+    subject = templates[template]['subject']
+    html_body = templates[template]['html_body']
 
     try:
-        email_message = MIMEText(body)
+        # Create a multipart email
+        email_message = MIMEMultipart('alternative')
         email_message['Subject'] = subject
         email_message['From'] = current_app.config['MAIL_SENDER_USER']
         email_message['To'] = email
+        
+        # Attach the HTML version
+        email_message.attach(MIMEText(html_body, 'html'))
+
+        # Send the email
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
             smtp_server.login(current_app.config['MAIL_SENDER_USER'], current_app.config['MAIL_SENDER_PASS'])
             smtp_server.send_message(email_message)
+
         log('debug', f'Email of type "{template}" sent successfully to {email}')
 
     except Exception as error:
@@ -92,13 +176,13 @@ def get_user_data(email, retries=3):
                 return cursor.fetchone()
         
         except (OperationalError, InterfaceError) as conn_error:
-            log('error', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
+            log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
             attempt += 1
             reconnect_to_db()
             time.sleep(1)
         
         except Exception as error:
-            log('warning', f'Error [Get User Data]: {error}')
+            log('error', f'Error [Get User Data]: {error}')
             break
     
     log('critical', 'Failed to retrieve user data after multiple attempts.')
