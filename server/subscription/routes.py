@@ -102,5 +102,5 @@ def webhook_post():
             log('debug', f'User canceled subscription: {response["customer"]}')
             execute_query("UPDATE users SET subscription = 'none', subscription_tokens_left = 0, stripe_subscription_id = NULL WHERE stripe_user_id = %s", (response['customer'],))
 
-    except KeyError: pass
+    except Exception as error: log('error', f'Error in webhook: {error}')
     return {}
