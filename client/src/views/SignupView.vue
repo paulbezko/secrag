@@ -83,7 +83,7 @@ export default {
           .then(response => {
 
             if (response.data.critical) {this.$router.push('/'); return} // Logout the user if token is not correct
-            if (response.data.error === 'linkExpired') {alert('Link expired'); this.$router.push('/'); return}
+            if (response.data.error === 'linkExpired') {console.log('Link expired'); this.$router.push('/'); return}
             
             localStorage.setItem('_u', response.data.token);
             this.stage = 'signUpAfter'

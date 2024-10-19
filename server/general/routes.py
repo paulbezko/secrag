@@ -32,7 +32,7 @@ def get_user_data_get():
         'name': user['name'],
         'auth_type': user['auth_type'],
         'subscription': user['subscription'],
-        'subscription_tokens_left': user['subscription_tokens_left'], #########################################################
+        'subscription_tokens_left': user['subscription_tokens_left'],
         'stripe_subscription_id': user['stripe_subscription_id'],
         'stripe_user_id': user['stripe_user_id'],
     }
@@ -56,7 +56,8 @@ def edit_user_post():
     user = get_user_data(user_info['email'])
 
     if request.json.get('action') == 'changeName':
-        execute_query("UPDATE users SET name = %s WHERE email = %s", (request.json.get('name'), user_info['email']))
+        query = f"UPDATE users_{current_app.config['MODE']} SET name = %s WHERE email = %s"
+        execute_query(query, (request.json.get('name'), user_info['email']))
 
         if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], name = request.json.get('name'))
         user_info['name'] = request.json.get('name')
@@ -76,7 +77,9 @@ def edit_user_post():
 
         token = encode_token(email_payload)
         send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
-        execute_query("UPDATE users SET link_token = %s WHERE email = %s", (token, user_info['email']))
+
+        query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
+        execute_query(query, (token, user_info['email']))
         return {'message': 'Confirmation email sent'}
     
     elif request.json.get('action') == 'changePassword':
@@ -84,7 +87,9 @@ def edit_user_post():
         if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
 
         password_encrypted = generate_password_hash(request.json.get('passwordNew'))
-        execute_query("UPDATE users SET password = %s WHERE email = %s", (password_encrypted, user_info['email']))
+
+        query = f"UPDATE users_{current_app.config['MODE']} SET password = %s WHERE email = %s"
+        execute_query(query, (password_encrypted, user_info['email']))
         return {'message': 'Password change successful'}
     
     elif request.json.get('action') == 'deleteAccount':
@@ -97,7 +102,8 @@ def edit_user_post():
 
         if user['stripe_user_id']: stripe.Customer.delete(user['stripe_user_id'])
 
-        execute_query("DELETE FROM users WHERE email = %s", (user_info['email'],))
+        query = f"DELETE FROM users_{current_app.config['MODE']} WHERE email = %s"
+        execute_query(query, (user_info['email'],))
         return {}
 
 
@@ -113,7 +119,8 @@ def change_email_get():
     if not check_timestamp(email_payload['expiry']): return {'error': 'linkExpired'}
     if user['link_token'] != request.args.get('token'): return {'error': 'linkExpired'}
 
-    execute_query("UPDATE users SET email = %s, link_token = %s WHERE email = %s", (email_payload['emailNew'], None, email_payload['email']))
+    query = f"UPDATE users_{current_app.config['MODE']} SET email = %s, link_token = %s WHERE email = %s"
+    execute_query(query, (email_payload['emailNew'], None, email_payload['email']))
     if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], email = email_payload['emailNew'])
 
     email_payload['email'] = email_payload['emailNew']
