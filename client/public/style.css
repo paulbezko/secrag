@@ -247,7 +247,7 @@ code {
   border-radius: 1rem;
   padding-inline: 4rem;
   padding-block: 1rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .button-disabled {cursor: default; color: var(--color-grey-semidark) !important; background-color: var(--color-grey) !important;}
@@ -370,8 +370,10 @@ select {
   width: 100%;
 }
 
-select option {
-  background: var(--color-white)
+.selected-option {
+  background: var(--color-yellow-highlight);
+  border: 1px solid var(--color-yellow-dark);
+  color: var(--color-yellow-dark);
 }
 
 .faq-question {
@@ -453,24 +455,13 @@ select option {
   border-radius: 1rem;
   border: 1px solid var(--color-grey);
   max-width: 75%;
+  margin-block: 1rem;
 }
 
-.chat-message-assistant {
-  padding-top: 1rem;
-  max-width: 75%;
-}
-
-.chat-message-assistant > * {
-  margin: 0;
-}
-
-/* .chat-message-assistant > :first-child {
-  margin-top: 0;
-} */
-
-.chat-message-assistant > :last-child {
-  margin-bottom: 1rem;
-}
+.chat-message-assistant {max-width: 75%;}
+/* .chat-message-assistant > * {margin: 0;} */
+.chat-message-assistant > :first-child {margin-top: 0;}
+.chat-message-assistant > :last-child {margin-bottom: 0;}
 
 .chat-input {
   width: 100%;
@@ -553,11 +544,20 @@ select option {
   background-color: var(--color-grey-light);
   border-radius: .5rem;
   padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
 }
 
 .sidebar-element:hover,
 .sidebar-element.active {
   background-color: var(--color-blue-highlight);
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.sidebar-element.menu:hover,
+.sidebar-element.menu.active {
+  color: var(--color-yellow-dark);
+  background-color: var(--color-yellow-highlight);
   border-radius: .5rem;
   cursor: pointer;
 }
@@ -631,10 +631,10 @@ select option {
 }
 
 .bot-image {
-  height: 4rem; 
+  /* filter: drop-shadow(0px 0px 5px var(--color-grey)); */
+  height: 3.5rem; 
   aspect-ratio: 1;
 }
-
 
 /* For Chrome, Safari, and Edge */
 .no-scrollbar::-webkit-scrollbar {

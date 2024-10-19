@@ -28,13 +28,14 @@
       <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
         <div class="flex-column space-between height-100">
           <div class="flex-column gap-05">
-            <div class="flex-column gap-05">
-              <div @click="toggleProfile" class="text-link text-4 flex-row gap-05 sidebar-element" style="align-items: center;">
-                <div class="icon-link fa-solid fa-user" style="min-width: 1.6rem;"></div>
+            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+            <div class="flex-column gap-05" :class="isSmallScreen ? 'text-3' : 'text-4'">
+              <div @click="toggleProfile" class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
+                <div class="fa-solid fa-user" style="min-width: 1.6rem;"></div>
                 Profile
               </div>
-              <div @click="toggleNewChat" class="text-link text-4 flex-row gap-05  sidebar-element" style="align-items: center;">
-                <div class="icon-link fa-solid fa-file-pen" style="min-width: 1.6rem;"></div>
+              <div @click="toggleNewChat" class="flex-row gap-05 sidebar-element menu" style="align-items: center;" :class="{ active: newChat }">
+                <div class="fa-solid fa-file-pen" style="min-width: 1.6rem;"></div>
                 New Chat
               </div>
             </div>
@@ -52,58 +53,57 @@
     </transition>
 
     <!-- New Chat Section -->
-    <div class="flex-column center gap-2" style="padding: 2rem" v-if="newChat">
+    <SpinnerCompInside v-if="newChatLoading"></SpinnerCompInside>
+    <div v-if="!newChatLoading && newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
       <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
       <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-row switch-row-to-column gap-1 width-100">
-        <select class="input" @change="selectTicker($event.target.value)" v-model="selectedTicker">
-          <option value="" disabled hidden selected>Ticker</option>
+        <select class="input" @change="selectTicker($event.target.value)" v-model="selectedTicker" :class="{ 'selected-option': selectedTicker !== '' }">
+          <option value="" disabled hidden selected class="placeholder-option">Ticker</option>
           <option v-for="option in tickerOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectYear($event.target.value)" v-model="selectedYear" :class="{ 'input-disabled': selectedTicker === '' }" :disabled="selectedTicker === ''">
+        <select class="input" @change="selectYear($event.target.value)" v-model="selectedYear" :class="{ 'input-disabled': selectedTicker === '' , 'selected-option': selectedYear !== '' }" :disabled="selectedTicker === ''">
           <option value="" disabled hidden selected>Year</option>
           <option v-for="option in yearOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '' }" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
+        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
           <option value="" disabled hidden selected>Filing</option>
           <option v-for="option in filingOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
-        
       </div>
-      <div 
+      <div
         class="button button-primary flex-row gap-1 width-100" 
         :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))}" 
         @click="createChat()"
         :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))">
-        <div v-if="!newChatLoading">Create chat</div>
-        <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
+        Create Chat
       </div>
+      <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
       <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
       <div class="text-3">Or choose one of the Recent Filings</div>
       <div class="flex-row gap-1">
-        <select class="input" style="width: 24rem" @change="selectNewFiling($event.target.value)" v-model="selectedNewFiling">
+        <select class="input" style="width: 24rem" @change="selectNewFiling($event.target.value)" v-model="selectedNewFiling" :class="{ 'selected-option': selectedNewFiling !== '' }">
           <option value="" disabled hidden selected>Select a Filing</option>
           <option v-for="option in newFilings" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
       </div>
-      <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
       <div 
         class="button button-primary flex-row gap-1 width-100" 
         :class="{ 'button-disabled': !selectedNewFiling }"
         @click="createChat()"
         :disabled="!selectedNewFiling">
-        <div v-if="!newChatLoading">Create chat</div>
-        <SpinnerCompButton v-if="newChatLoading"></SpinnerCompButton>
+        Create Chat
       </div>
+      <div v-if="error && selectedNewFiling !== ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
     </div>
 
     <!-- Chat Section -->
@@ -114,8 +114,21 @@
           <div v-else>
             <div v-for="(message, index) in currentMessages" :key="index" :class="{'text-chat': message.role === 'assistant', 'text-chat': message.role === 'user'}">
               <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1">
-                <!-- <div class="fa-solid fa-gamepad text-1"></div> -->
-                <img src="../assets/fintel.png" class="bot-image">
+                <!-- v-if needed to only show emoji in the last message -->
+                <img
+                  v-if="index === currentMessages.length - 1" 
+                  :src="newMessage !== '' 
+                    ? require('@/assets/dashboard/face_with_monocle_3d.png')
+                    : (assistantMessageIndex === index 
+                      ? require('@/assets/dashboard/thinking_face_3d.png')
+                      : require('@/assets/dashboard/slightly_smiling_face_3d.png'))"
+                  class="bot-image"
+                >
+                <img
+                v-if="index !== currentMessages.length - 1" 
+                :src="require('@/assets/dashboard/relieved_face_3d.png')" 
+                class="bot-image"
+                >
                 <div class="loading-dots" v-if="assistantMessageLoading && index === assistantMessageIndex">
                   <span class="loading-dot"></span>
                   <span class="loading-dot"></span>
@@ -148,15 +161,16 @@
             >
           </textarea>
           <!-- Input Buttons Large -->
-          <div class="button-icon" v-if="!isSmallScreen" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="stopButtonShown"><div class="button-icon" v-if="!isSmallScreen" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div></div>
+          <div v-else><div class="button-icon" v-if="!isSmallScreen" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div></div>
+          
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
           <!-- Input Buttons Small -->
           <div class="button-icon show-on-small" v-if="newMessage == '' && isSmallScreen" @click="toggleFilingView">
             <div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div>
           </div>
-          <div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="sendMessage('textarea')">
-            <div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div>
-          </div>
+          <div v-if="stopButtonShown"><div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div></div>
+          <div v-else><div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div></div>
         </div>
       </div>
       <!-- Filing Container Large -->
@@ -175,6 +189,7 @@
 import ProfileComp from '../components/ProfileComp.vue';
 import SpinnerCompInside from '../components/SpinnerCompInside.vue';
 import SpinnerCompButton from '../components/SpinnerCompButton.vue';
+import SpinnerComp from '@/components/SpinnerComp.vue';
 import { config } from '@/config';
 import { marked } from 'marked';
 import { socket } from "@/socket";
@@ -183,7 +198,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 
 export default {
-  components: {ProfileComp, SpinnerCompInside, SpinnerCompButton},
+  components: {ProfileComp, SpinnerCompInside, SpinnerCompButton, SpinnerComp},
   computed: {
     profileComp() {return this.showProfile ? 'ProfileComp' : null},
     ...mapState(['subscription', 'subscriptionTokensLeft']),
@@ -217,6 +232,8 @@ export default {
       lastXMessagesLength: 0, // Adjusted based on subscription
       chatScrollPosition: 0, // To store chat scroll position
       chatHistoryHeight: '0px', // Adjusted dynamically based on screen size
+      stopButtonShown: false,
+      responseStopped: false,
 
       // Filing data
       filingContent: '',
@@ -268,7 +285,8 @@ export default {
     initializeSocket() {
       socket.connect();
       socket.on("connect", () => {(this.socketId = socket.id)});
-      socket.on("llm_response", (data) => {if (data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
+      socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
+      socket.on("llm_response_complete", () => {if (!this.responseStopped) {this.stopButtonShown = false, this.saveAssitantResponse()}});
     },
 
     // Load List Tickers
@@ -296,6 +314,7 @@ export default {
 
     // Select Ticker
     selectTicker(option) {
+      this.error = null; 
       this.selectedTicker = option; 
       this.selectedYear = '';
       this.selectedFiling = '';
@@ -306,45 +325,46 @@ export default {
     },
 
     // Select Year and Filing
-    selectYear(option) {this.selectedYear = option; this.selectedFiling = ''; this.filingOptions = this.tickerInfo[this.selectedYear];},
-    selectFiling(option) {this.selectedFiling = option;},
-    selectNewFiling(option) {this.selectedNewFiling = option; this.selectedTicker = ''; this.selectedYear = ''; this.selectedFiling = '';},
+    selectYear(option) {this.error = null; this.selectedYear = option; this.selectedFiling = ''; this.filingOptions = this.tickerInfo[this.selectedYear];},
+    selectFiling(option) {this.error = null; this.selectedFiling = option;},
+    selectNewFiling(option) {this.error = null; this.selectedNewFiling = option; this.selectedTicker = ''; this.selectedYear = ''; this.selectedFiling = '';},
 
     // Create chat
     async createChat() {
 
       if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
 
+      let selectedTicker, selectedYear, selectedDate, selectedFilingType
+
       if (this.selectedNewFiling) {
-        [this.selectedTicker, this.selectedFilingType, this.selectedDate] = this.selectedNewFiling.split(" ");
-        this.selectedYear = this.selectedDate.split('-')[0]
-        this.selectedFiling = `${this.selectedFilingType} ${this.selectedDate}`
+        [selectedTicker, selectedFilingType, selectedDate] = this.selectedNewFiling.split(" ");
+        selectedFilingType = selectedFilingType.replace('-', '')
+        selectedYear = selectedDate.split('-')[0]
       }
 
-      let newChatName = '';
-      if (this.subscription === 'basic') {newChatName = `${this.selectedTicker}-${this.selectedYear}-10K`;} 
       else {
-        let selectedFiling
-        if (this.selectedFiling.split(' ')[0] === '10-Q') {selectedFiling = this.selectedFiling.split(' ')[0].replace('-', '') + this.selectedFiling.split(' ')[1].split('-')[1]}
-        else {selectedFiling = this.selectedFiling.split(' ')[0]}
-        newChatName = `${this.selectedTicker}-${this.selectedYear}-${selectedFiling.replace('-', '')}`
+        selectedTicker = this.selectedTicker
+        selectedYear = this.selectedYear
+        selectedFilingType = this.selectedFiling.split(' ')[0].replace('-', '')
+        selectedDate = this.selectedFiling.split(' ')[1]
       }
 
+      let newChatName = `${selectedTicker}-${selectedYear}-${selectedFilingType}`
       if (this.chats.includes(newChatName)) {this.error = 'Chat already exists'; return}
+
       try {
 
         this.newChatLoading = true;
-
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
           chat: newChatName,
-          filingDate: this.selectedFiling.split(' ')[1],
-          ticker: this.selectedTicker
+          filingDate: selectedDate,
+          ticker: selectedTicker
         });
 
         if (response.data.error) {
           if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
-          else {alert(response.data.error); this.newChatLoading = false}
+          else {console.log(response.data.error); this.newChatLoading = false}
           return;
         }
 
@@ -387,7 +407,7 @@ export default {
         chat: chat
       });
 
-      if (response.data.error) {alert(response.data.error); return;}
+      if (response.data.error) {console.log(response.data.error); return;}
       this.confirmAction = ''
       this.confirmLoading = false
       this.confirmSuccess = true
@@ -404,7 +424,9 @@ export default {
       textarea.style.height = '40px'
 
       if (this.newMessage.trim() !== '') {
-
+        
+        this.responseStopped = false
+        this.stopButtonShown = true
         this.currentMessages.push({role: 'user', content: this.newMessage});
         this.assistantMessageIndex = this.currentMessages.length;
         this.assistantMessageLoading = true;
@@ -418,7 +440,7 @@ export default {
         const lastXMessages = this.currentMessages.filter(msg => msg.role === 'user').slice(-this.lastXMessagesLength)
 
         try {
-          let response = await axios.post(`${config.apiUrl}/api/new-message`, {
+          let response = await axios.post(`${config.apiUrl}/api/new-message-user`, {
             token: localStorage.getItem('_u'),
             chat: this.currentChat,
             message: payloadMessage,
@@ -429,7 +451,7 @@ export default {
 
           if (response.data.error) {
             if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
-            else (alert(response.data.error))
+            else (console.log(response.data.error))
             return;
           }
         } catch (error) {console.error('Error sending message:', error); return;}
@@ -445,6 +467,18 @@ export default {
           this.$nextTick(() => {this.scrollToBottom("instant")});
         }
       }
+    },
+
+    stopResponse() {this.stopButtonShown = false; this.responseStopped = true; this.saveAssitantResponse();},
+    async saveAssitantResponse() {          
+      try {
+          let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
+            token: localStorage.getItem('_u'),
+            chat: this.currentChat,
+            message: this.llmResponseBuffer,
+          });
+          if (response.data.error) {console.log(response.data.error); return;}
+        } catch (error) {console.error('Error sending message:', error); return;}
     },
 
     // Render Markdown
@@ -467,7 +501,7 @@ export default {
     // Toggle Sidebar, Profile, New Chat, Confirm
     toggleProfile() {this.showProfile = !this.showProfile; if (this.isSmallScreen) {this.sidebarShown = false}},
     toggleSidebar() {this.sidebarShown = !this.sidebarShown;},
-    toggleNewChat() {this.newChat = true; this.currentMessages = []; if (this.isSmallScreen) {this.sidebarShown = false}},
+    toggleNewChat() {this.currentChat='', this.newChat = true; this.currentMessages = []; if (this.isSmallScreen) {this.sidebarShown = false}},
     toggleConfirm(action) {this.confirmAction = action; this.confirmSuccess = false; this.showConfirm = !this.showConfirm},
 
     // Replenish Tokens
@@ -503,19 +537,20 @@ export default {
 
 
 .loading-dots {
-  display: inline-flex; /* Inline flex to align with text */
-  align-items: center;  /* Vertically center the dots */
-  justify-content: flex-start; /* Align dots next to the message */
-  gap: .5rem;  /* Adjust the gap between the dots */
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem; /* Slightly increased gap for better scaling */
 }
 
 .loading-dot {
   animation: dot ease-in-out 1.5s infinite;
-  background-color: rgb(0, 0, 0);
+  background-color: var(--color-yellow-dark);
   display: inline-block;
-  height: .5rem; /* Adjust the size to better fit the text */
-  width: .5rem;
+  height: 0.5rem; /* Increase the size slightly to avoid pixelation */
+  width: 0.5rem;
   border-radius: 50%;
+  will-change: transform; /* Optimize for transformations */
 }
 
 .loading-dot:nth-of-type(2) {
@@ -527,10 +562,9 @@ export default {
 }
 
 @keyframes dot {
-  0% { background-color: var(--color-grey); transform: scale(1); }
-  50% { background-color: var(--color-grey-dark); transform: scale(1.25); }
-  100% { background-color: var(--color-grey); transform: scale(1); }
+  0% { background-color: var(--color-yellow-dark);}
+  50% { background-color: var(--color-yellow);}
+  100% { background-color: var(--color-yellow-dark);}
 }
-
 </style>
 

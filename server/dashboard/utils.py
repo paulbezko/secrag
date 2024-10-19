@@ -246,8 +246,7 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
         for chunk in llm.stream(system_prompt):
             buffer += chunk.content
             socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
-
-
+        
     # Handle a case where the reformulated prompt is unrelated to the filing itself
     else:
         system_prompt = system_prompt_not_rag.format(reformulated_prompt=reformulated_prompt)
@@ -257,10 +256,9 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
             buffer += chunk.content
             socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
 
-    # Saving to memory
-    with open("database/memory/chats.json", "r+") as file: chat_memory = json.load(file)
-    chat_memory[user_email][filing_id]["messages"] += [{"role": "user", "content": user_prompt}, {"role": "assistant", "content": buffer}]
-    with open("database/memory/chats.json", "w+") as f: json.dump(chat_memory, f, indent=4)  
+    # Finishing the response
+    socketio.emit('llm_response_complete', to=socket_id)
+
 
 # Getting vectorstore
 def get_vectorstore(
@@ -299,7 +297,7 @@ def get_vectorstore(
         "table_prepend_k": table_prepend_k
     }
 
-    vectorstore_dir = "database/memory/vectorstore"
+    vectorstore_dir = "database/vectorstore"
     embeddings = OpenAIEmbeddings()
 
     # Check if vectorstore exists
@@ -317,10 +315,10 @@ def get_vectorstore(
                 chunks = sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
                 vectorstore.add_documents(chunks)
                 vectorstore.save_local(vectorstore_dir)
-                print(f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+                log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
             # Case when embedding already exists       
             else:
-                print(f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+                log('debug', f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
 
     # Create vectorstore if it doesn't exist
     else:
@@ -381,8 +379,6 @@ def try_except(func, default=None, expected_exc=(Exception,)):
 
 # Getting filing object
 def get_filing(filing_id, filing_date) -> FilingObject:
-
-    print(filing_id)
 
     ticker, filing_year, filing_type = filing_id.split("-")
     if filing_type == "10K": filing_type = "10-K"

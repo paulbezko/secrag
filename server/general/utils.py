@@ -172,7 +172,8 @@ def get_user_data(email, retries=3):
         try:
             connection = current_app.config['DB_CONNECTION']
             with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+                query = f"SELECT * FROM users_{current_app.config['MODE']} WHERE email = %s"
+                cursor.execute(query, (email,))
                 return cursor.fetchone()
         
         except (OperationalError, InterfaceError) as conn_error:
