@@ -13,10 +13,11 @@ import logging
 import stripe
 import os
 
-load_dotenv('../.env', override=True)
+load_dotenv('.env', override=True)
 flask_key_secret = os.getenv('flask_key_secret')
 
-socketio = SocketIO(cors_allowed_origins="*")
+from flask_socketio import SocketIO, emit
+socketio = SocketIO(cors_allowed_origins="*", message_queue='redis://')
 llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS')
 
 log_filename = os.path.join("database/logs", f"{datetime.now().strftime('%d-%m-%Y')}.log")
@@ -31,6 +32,7 @@ def create_app(mode):
     from .authentication.routes import routes as auth_routes
     from .dashboard.routes import routes as dashboard_routes
     from .subscription.routes import routes as subscription_routes
+    from .github.routes import routes as github_routes
 
     app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist')
 
@@ -90,6 +92,7 @@ def create_app(mode):
     app.register_blueprint(auth_routes, name='auth', url_prefix='/api/')
     app.register_blueprint(subscription_routes, name='subscription', url_prefix='/api/')
     app.register_blueprint(dashboard_routes, name='dashboard', url_prefix='/api/')
+    app.register_blueprint(github_routes, name='github', url_prefix='/gh/')
     socketio.init_app(app)
 
     return app

@@ -1,0 +1,217 @@
+{
+    "planetchars@gmail.com": {
+        "AAPL-2010-10K": {
+            "filing_date": "2010-10-27",
+            "messages": [
+                {
+                    "role": "assistant",
+                    "content": "Hello Paul Bezkorovainij! AAPL-2010-10K is embedded and ready for discussion. How can I help you today?"
+                }
+            ]
+        },
+        "AAPL-2018-10K": {
+            "filing_date": "2018-11-05",
+            "messages": [
+                {
+                    "role": "assistant",
+                    "content": "Hello Paul Bezkorovainij! AAPL-2018-10K is embedded and ready for discussion. How can I help you today?"
+                },
+                {
+                    "role": "user",
+                    "content": "test"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It seems like you're testing the system! If you have any questions related to finance, SEC filings, or corporate reports, feel free to ask. I'm here to help with any financial queries you may have!"
+                },
+                {
+                    "role": "user",
+                    "content": "give me balance sheet"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here is the balance sheet for Apple Inc. (AAPL) as of the filing date November 5, 2018, compared to the previous year, 2017:\n\n### Statement of Financial Position\n\n#### Assets\n- **Total Assets**: \n  - 2018: $365,725,000,000 \n  - 2017: $375,319,000,000\n\n- **Current Assets**: \n  - Cash and Cash Equivalents: \n    - 2018: $25,913,000,000 \n    - 2017: $20,289,000,000\n  - Available for Sale Securities: \n    - 2018: $40,388,000,000 \n    - 2017: $53,892,000,000\n  - Accounts Receivable, Net: \n    - 2018: $23,186,000,000 \n    - 2017: $17,874,000,000\n  - Inventory, Net: \n    - 2018: $3,956,000,000 \n    - 2017: $4,855,000,000\n  - Nontrade Receivables: \n    - 2018: $25,809,000,000 \n    - 2017: $17,799,000,000\n  - Other Current Assets: \n    - 2018: $12,087,000,000 \n    - 2017: $13,936,000,000\n  - **Total Current Assets**: \n    - 2018: $131,339,000,000 \n    - 2017: $128,645,000,000\n\n- **Noncurrent Assets**: \n  - Available for Sale Securities: \n    - 2018: $170,799,000,000 \n    - 2017: $194,714,000,000\n  - Property, Plant, and Equipment, Net: \n    - 2018: $41,304,000,000 \n    - 2017: $33,783,000,000\n  - Other Noncurrent Assets: \n    - 2018: $22,283,000,000 \n    - 2017: $18,177,000,000\n  - **Total Noncurrent Assets**: \n    - 2018: $234,386,000,000 \n    - 2017: $246,674,000,000\n\n#### Liabilities and Stockholders' Equity\n- **Total Liabilities**: \n  - 2018: $258,578,000,000 \n  - 2017: $241,272,000,000\n\n- **Current Liabilities**: \n  - Accounts Payable: \n    - 2018: $55,888,000,000 \n    - 2017: $44,242,000,000\n  - Other Current Liabilities: \n    - 2018: $32,687,000,000 \n    - 2017: $30,551,000,000\n  - Deferred Revenue: \n    - 2018: $7,543,000,000 \n    - 2017: $7,548,000,000\n  - Commercial Paper: \n    - 2018: $11,964,000,000 \n    - 2017: $11,977,000,000\n  - Long Term Debt, Current: \n    - 2018: $8,784,000,000 \n    - 2017: $6,496,000,000\n  - **Total Current Liabilities**: \n    - 2018: $116,866,000,000 \n    - 2017: $100,814,000,000\n\n- **Noncurrent Liabilities**: \n  - Deferred Revenue: \n    - 2018: $2,797,000,000 \n    - 2017: $2,836,000,000\n  - Long Term Debt: \n    - 2018: $93,735,000,000 \n    - 2017: $97,207,000,000\n  - Other Noncurrent Liabilities: \n    - 2018: $45,180,000,000 \n    - 2017: $40,415,000,000\n  - **Total Noncurrent Liabilities**: \n    - 2018: $141,712,000,000 \n    - 2017: $140,458,000,000\n\n#### Stockholders' Equity\n- **Total Stockholders' Equity**: \n  - 2018: $107,147,000,000 \n  - 2017: $134,047,000,000\n\n### Summary\n- **Total Liabilities and Stockholders' Equity**: \n  - 2018: $365,725,000,000 \n  - 2017: $375,319,000,000\n\nThis balance sheet provides a snapshot of Apple's financial position as of November 5, 2018, highlighting the company's assets, liabilities, and equity."
+                },
+                {
+                    "role": "user",
+                    "content": "in a table format"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Sure! Please provide the specific financial data or information you would like to see in a table format related to the SEC filing for AAPL (ticker: AAPL, filing date: 2018-11-05). This could include items like revenue, net income, earnings per share, or any other specific metrics you are interested in."
+                },
+                {
+                    "role": "user",
+                    "content": "show it in a table format"
+                },
+                {
+                    "role": "assistant",
+                    "content": "To provide a clear and concise table format based on the SEC filing for Apple Inc. (AAPL) dated November 5, 2018, I would need specific data or sections from the filing that you would like to see in a table. Common sections might include financial statements, executive compensation, or key metrics.\n\nPlease specify the type of information you are interested in, and I can create a table for you!"
+                },
+                {
+                    "role": "user",
+                    "content": "test"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It seems like you're testing the system! If you have any questions related to finance, SEC filings, or corporate reports, feel free to ask. I'm here to help with any financial queries you may have!"
+                },
+                {
+                    "role": "user",
+                    "content": "give me balance sheet in a table form"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here is the balance sheet for Apple Inc. (AAPL) as of the filing date November 5, 2018, presented in a table format:\n\n| **Label**                                              | **2018**         | **2017**         |\n|-------------------------------------------------------|------------------|------------------|\n| **Statement Of Financial Position**                   |                  |                  |\n| **Assets**                                            |                  |                  |\n| Assets Current                                        |                  |                  |\n| Cash And Cash Equivalents At Carrying Value           | 25,913,000,000   | 20,289,000,000   |\n| Available For Sale Securities Current                 | 40,388,000,000   | 53,892,000,000   |\n| Accounts Receivable Net Current                       | 23,186,000,000   | 17,874,000,000   |\n| Inventory Net                                         | 3,956,000,000    | 4,855,000,000    |\n| Nontrade Receivables Current                          | 25,809,000,000   | 17,799,000,000   |\n| Other Assets Current                                  | 12,087,000,000   | 13,936,000,000   |\n| **Assets Current**                                   | **131,339,000,000** | **128,645,000,000** |\n| Assets Noncurrent                                     |                  |                  |\n| Available For Sale Securities Noncurrent              | 170,799,000,000  | 194,714,000,000  |\n| Property Plant And Equipment Net                      | 41,304,000,000   | 33,783,000,000   |\n| Other Assets Noncurrent                               | 22,283,000,000   | 18,177,000,000   |\n| **Assets Noncurrent**                                | **234,386,000,000** | **246,674,000,000** |\n| **Assets**                                           | **365,725,000,000** | **375,319,000,000** |\n| **Liabilities And Stockholders Equity**               |                  |                  |\n| **Liabilities Current**                               |                  |                  |\n| Accounts Payable Current                              | 55,888,000,000   | 44,242,000,000   |\n| Other Liabilities Current                             | 32,687,000,000   | 30,551,000,000   |\n| Deferred Revenue Current                              | 7,543,000,000    | 7,548,000,000    |\n| Commercial Paper                                      | 11,964,000,000   | 11,977,000,000   |\n| Long Term Debt Current                                | 8,784,000,000    | 6,496,000,000    |\n| **Liabilities Current**                              | **116,866,000,000** | **100,814,000,000** |\n| **Liabilities Noncurrent**                            |                  |                  |\n| Deferred Revenue Noncurrent                           | 2,797,000,000    | 2,836,000,000    |\n| Long Term Debt Noncurrent                             | 93,735,000,000   | 97,207,000,000   |\n| Other Liabilities Noncurrent                          | 45,180,000,000   | 40,415,000,000   |\n| **Liabilities Noncurrent**                           | **141,712,000,000** | **140,458,000,000** |\n| **Liabilities**                                      | **258,578,000,000** | **241,272,000,000** |\n| **Commitments And Contingencies**                    |                  |                  |\n| **Stockholders Equity**                               |                  |                  |\n| Common Stocks Including Additional Paid In Capital    | 40,201,000,000   | 35,867,000,000   |\n| Retained Earnings Accumulated Deficit                 | 70,400,000,000   | 98,330,000,000   |\n| Accumulated Other Comprehensive Income Loss Net Of Tax| -3,454,000,000   | -150,000,000     |\n| **Stockholders Equity**                              | **107,147,000,000** | **134,047,000,000** |\n| **Liabilities And Stockholders Equity**              | **365,725,000,000** | **375,319,000,000** |\n\nThis table summarizes the financial position of Apple Inc. as of November 5, 2018, including both assets and liabilities along with stockholders' equity."
+                },
+                {
+                    "role": "user",
+                    "content": "show as a json now"
+                },
+                {
+                    "role": "assistant",
+                    "content": "To present the information from the SEC filing for AAPL (Apple Inc.) dated November 5, 2018, in JSON format, I would need to structure the relevant data accordingly. However, since I don't have the specific details from the filing, I can provide a generic template based on typical SEC filing data. You can fill in the specific details as needed.\n\nHere\u2019s an example of how the JSON structure might look:\n\n```json\n{\n  \"company\": {\n    \"name\": \"Apple Inc.\",\n    \"ticker\": \"AAPL\",\n    \"filing_date\": \"2018-11-05\",\n    \"type\": \"10-K\",\n    \"period_ending\": \"2018-09-29\"\n  },\n  \"financials\": {\n    \"revenue\": {\n      \"total\": 265595000000,\n      \"year_over_year_growth\": 16\n    },\n    \"net_income\": {\n      \"total\": 59531000000,\n      \"year_over_year_growth\": 10\n    },\n    \"assets\": {\n      \"total\": 365725000000\n    },\n    \"liabilities\": {\n      \"total\": 258549000000\n    },\n    \"equity\": {\n      \"total\": 107176000000\n    }\n  },\n  \"management_discussion\": {\n    \"overview\": \"The company experienced significant growth in revenue driven by strong sales of iPhones and services.\",\n    \"risks\": [\n      \"Market competition\",\n      \"Supply chain disruptions\",\n      \"Regulatory challenges\"\n    ]\n  },\n  \"shareholder_information\": {\n    \"dividend\": {\n      \"amount_per_share\": 0.73,\n      \"dividend_yield\": 1.5\n    },\n    \"stock_performance\": {\n      \"52_week_high\": 233.47,\n      \"52_week_low\": 142.00\n    }\n  }\n}\n```\n\nThis JSON structure includes sections for company information, financials, management discussion, and shareholder information. You can modify the values and add more details based on the actual content of the SEC filing. If you have specific data from the filing that you would like to include, please provide that, and I can help format it into JSON."
+                },
+                {
+                    "role": "user",
+                    "content": "whats the weather"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I appreciate your interest, but I specialize in financial topics. If you have any questions about SEC filings, financial statements, or corporate reports, feel free to ask!"
+                }
+            ]
+        }
+    },
+    "marksdocenko@outlook.com": {
+        "AAPL-2023-10K": {
+            "filing_date": null,
+            "messages": [
+                {
+                    "role": "assistant",
+                    "content": "Hello Marks Docenko! AAPL-2023-10K is embedded and ready for discussion. How can I help you today?"
+                },
+                {
+                    "role": "user",
+                    "content": "What is the company's balance sheet?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "The balance sheet for Apple Inc. (AAPL) as of 2023 and 2022 is summarized below:\n\n### Apple Inc. Balance Sheet\n\n#### ASSETS\n- **Current Assets:**\n  - Cash and Cash Equivalents: \n    - 2023: $29,965,000,000 \n    - 2022: $23,646,000,000\n  - Marketable Securities: \n    - 2023: $31,590,000,000 \n    - 2022: $24,658,000,000\n  - Accounts Receivable, Net: \n    - 2023: $29,508,000,000 \n    - 2022: $28,184,000,000\n  - Vendor Non-Trade Receivables: \n    - 2023: $31,477,000,000 \n    - 2022: $32,748,000,000\n  - Inventories: \n    - 2023: $6,331,000,000 \n    - 2022: $4,946,000,000\n  - Other Current Assets: \n    - 2023: $14,695,000,000 \n    - 2022: $21,223,000,000\n  - **Total Current Assets:** \n    - 2023: $143,566,000,000 \n    - 2022: $135,405,000,000\n\n- **Non-Current Assets:**\n  - Marketable Securities: \n    - 2023: $100,544,000,000 \n    - 2022: $120,805,000,000\n  - Property, Plant and Equipment, Net: \n    - 2023: $43,715,000,000 \n    - 2022: $42,117,000,000\n  - Other Non-Current Assets: \n    - 2023: $64,758,000,000 \n    - 2022: $54,428,000,000\n  - **Total Non-Current Assets:** \n    - 2023: $209,017,000,000 \n    - 2022: $217,350,000,000\n\n- **Total Assets:** \n  - 2023: $352,583,000,000 \n  - 2022: $352,755,000,000\n\n#### LIABILITIES AND SHAREHOLDERS\u2019 EQUITY\n- **Current Liabilities:**\n  - Accounts Payable: \n    - 2023: $62,611,000,000 \n    - 2022: $64,115,000,000\n  - Other Current Liabilities: \n    - 2023: $58,829,000,000 \n    - 2022: $60,845,000,000\n  - Deferred Revenue: \n    - 2023: $8,061,000,000 \n    - 2022: $7,912,000,000\n  - Commercial Paper: \n    - 2023: $5,985,000,000 \n    - 2022: $9,982,000,000\n  - Term Debt: \n    - 2023: $9,822,000,000 \n    - 2022: $11,128,000,000\n  - **Total Current Liabilities:** \n    - 2023: $145,308,000,000 \n    - 2022: $153,982,000,000\n\n- **Non-Current Liabilities:**\n  - Term Debt: \n    - 2023: $95,281,000,000 \n    - 2022: $98,959,000,000\n  - Other Non-Current Liabilities: \n    - 2023: $49,848,000,000 \n    - 2022: $49,142,000,000\n  - **Total Non-Current Liabilities:** \n    - 2023: $145,129,000,000 \n    - 2022: $148,101,000,000\n\n- **Total Liabilities:** \n  - 2023: $290,437,000,000 \n  - 2022: $302,083,000,000\n\n- **Shareholders\u2019 Equity:**\n  - Common Stock and Additional Paid-In Capital: \n    - 2023: $73,812,000,000 \n    - 2022: $64,849,000,000\n  - Accumulated Deficit: \n    - 2023: -$214,000,000 \n    - 2022: -$3,068,000,000\n  - Accumulated Other Comprehensive Loss: \n    - 2023: -$11,452,000,000 \n    - 2022: -$11,109,000,000\n  - **Total Shareholders\u2019 Equity:** \n    - 2023: $62,146,000,000 \n    - 2022: $50,672,000,000\n\n- **Total Liabilities and Shareholders\u2019 Equity:** \n  - 2023: $352,583,000,000 \n  - 2022: $352,755,000,000\n\nThis balance sheet provides a snapshot of Apple Inc.'s financial position, detailing its assets, liabilities, and shareholders' equity for the years 2023 and 2022."
+                },
+                {
+                    "role": "user",
+                    "content": "what is the document about?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "The document you are referring to is likely an SEC filing for Apple Inc. (AAPL). SEC filings typically include a variety of reports that provide detailed information about a company's financial performance, operations, and governance. Common types of SEC filings include:\n\n1. **10-K**: An annual report that provides a comprehensive overview of the company's financial performance, including audited financial statements, management's discussion and analysis, and information about the company's operations and risks.\n\n2. **10-Q**: A quarterly report that provides unaudited financial statements and updates on the company's financial condition and operations since the last 10-K filing.\n\n3. **8-K**: A current report used to announce major events that shareholders should know about, such as acquisitions, changes in management, or other significant developments.\n\n4. **Proxy Statements (DEF 14A)**: Documents that provide information to shareholders about matters to be voted on at the annual meeting, including executive compensation and board member elections.\n\n5. **S-1**: A registration statement for new securities being offered to the public, detailing the company's business, financials, and risks.\n\nThe specific content of the document would depend on its type and purpose, but generally, it aims to provide transparency and keep investors informed about the company's financial health and strategic direction. If you have a specific filing type in mind or need details about a particular aspect, please let me know!"
+                },
+                {
+                    "role": "user",
+                    "content": "what is the document about"
+                },
+                {
+                    "role": "assistant",
+                    "content": "The document you are referring to is likely an SEC filing for Apple Inc. (ticker: AAPL). SEC filings are official documents submitted to the U.S. Securities and Exchange Commission by publicly traded companies. These documents provide important information about a company's financial performance, operations, and governance.\n\nCommon types of SEC filings include:\n\n1. **10-K**: An annual report that provides a comprehensive overview of the company's financial performance, including audited financial statements, management discussion, and risk factors.\n\n2. **10-Q**: A quarterly report that includes unaudited financial statements and provides an update on the company's financial condition and results of operations.\n\n3. **8-K**: A current report that companies must file to announce major events that shareholders should know about, such as acquisitions, changes in management, or other significant developments.\n\n4. **Proxy Statements (DEF 14A)**: Documents that provide information to shareholders about matters to be voted on at the annual meeting, including executive compensation and board member elections.\n\n5. **S-1**: A registration statement for new securities being offered to the public.\n\nIf you have a specific filing in mind, I can provide more detailed information about its contents and significance."
+                },
+                {
+                    "role": "user",
+                    "content": "hello"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Hello! How can I assist you with your financial queries today? Whether you have questions about SEC filings, financial statements, or corporate reports, I'm here to help!"
+                },
+                {
+                    "role": "user",
+                    "content": "give me the balance sheet"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here is the balance sheet for Apple Inc. (AAPL) as of the fiscal years 2023 and 2022:\n\n### Apple Inc. Balance Sheet\n\n| **Label**                                                                                                   | **2023**         | **2022**         |\n|-------------------------------------------------------------------------------------------------------------|------------------|------------------|\n| **ASSETS**                                                                                                 |                  |                  |\n| **Current Assets:**                                                                                        |                  |                  |\n| Cash and cash equivalents                                                                                   | $29,965,000,000  | $23,646,000,000  |\n| Marketable securities                                                                                       | $31,590,000,000  | $24,658,000,000  |\n| Accounts receivable, net                                                                                    | $29,508,000,000  | $28,184,000,000  |\n| Vendor non-trade receivables                                                                                | $31,477,000,000  | $32,748,000,000  |\n| Inventories                                                                                                 | $6,331,000,000   | $4,946,000,000   |\n| Other current assets                                                                                        | $14,695,000,000  | $21,223,000,000  |\n| **Total Current Assets**                                                                                    | **$143,566,000,000** | **$135,405,000,000** |\n| **Non-Current Assets:**                                                                                    |                  |                  |\n| Marketable securities                                                                                       | $100,544,000,000 | $120,805,000,000 |\n| Property, plant and equipment, net                                                                          | $43,715,000,000  | $42,117,000,000  |\n| Other non-current assets                                                                                    | $64,758,000,000  | $54,428,000,000  |\n| **Total Non-Current Assets**                                                                                | **$209,017,000,000** | **$217,350,000,000** |\n| **Total Assets**                                                                                           | **$352,583,000,000** | **$352,755,000,000** |\n|                                                                                                           |                  |                  |\n| **LIABILITIES AND SHAREHOLDERS\u2019 EQUITY**                                                                  |                  |                  |\n| **Current Liabilities:**                                                                                   |                  |                  |\n| Accounts payable                                                                                           | $62,611,000,000  | $64,115,000,000  |\n| Other current liabilities                                                                                    | $58,829,000,000  | $60,845,000,000  |\n| Deferred revenue                                                                                           | $8,061,000,000   | $7,912,000,000   |\n| Commercial paper                                                                                           | $5,985,000,000   | $9,982,000,000   |\n| Term debt                                                                                                  | $9,822,000,000   | $11,128,000,000  |\n| **Total Current Liabilities**                                                                              | **$145,308,000,000** | **$153,982,000,000** |\n| **Non-Current Liabilities:**                                                                               |                  |                  |\n| Term debt                                                                                                  | $95,281,000,000  | $98,959,000,000  |\n| Other non-current liabilities                                                                                | $49,848,000,000  | $49,142,000,000  |\n| **Total Non-Current Liabilities**                                                                          | **$145,129,000,000** | **$148,101,000,000** |\n| **Total Liabilities**                                                                                      | **$290,437,000,000** | **$302,083,000,000** |\n|                                                                                                           |                  |                  |\n| **Commitments and Contingencies**                                                                          |                  |                  |\n| Common stock, shares outstanding (in shares)                                                               | 15,550,061,000   | 15,943,425,000   |\n| Common stock, shares issued (in shares)                                                                    | 15,550,061,000   | 15,943,425,000   |\n| **Shareholders\u2019 Equity:**                                                                                  |                  |                  |\n| Common stock and additional paid-in capital, $0.00001 par value: 50,400,000 shares authorized; 15,550,061 and 15,943,425 shares issued and outstanding, respectively | $73,812,000,000  | $64,849,000,000  |\n| Accumulated deficit                                                                                        | -$214,000,000    | -$3,068,000,000  |\n| Accumulated other comprehensive loss                                                                        | -$11,452,000,000 | -$11,109,000,000 |\n| **Total Shareholders\u2019 Equity**                                                                             | **$62,146,000,000** | **$50,672,000,000** |\n| **Total Liabilities and Shareholders\u2019 Equity**                                                            | **$352,583,000,000** | **$352,755,000,000** |\n\nThis balance sheet provides a snapshot of Apple Inc.'s financial position, detailing its assets, liabilities, and shareholders' equity for the years 2023 and 2022."
+                },
+                {
+                    "role": "user",
+                    "content": "in markdown format please"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Sure! Please provide the specific financial query or information you would like to know about AAPL, and I will format the response in Markdown for you."
+                },
+                {
+                    "role": "user",
+                    "content": "balance sheet"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here is the balance sheet for Apple Inc. (AAPL) for the years 2023 and 2022, based on the provided SEC filing data:\n\n### Apple Inc. Balance Sheet\n\n#### ASSETS\n- **Current Assets:**\n  - Cash and Cash Equivalents: $29,965,000,000 (2023) | $23,646,000,000 (2022)\n  - Marketable Securities: $31,590,000,000 (2023) | $24,658,000,000 (2022)\n  - Accounts Receivable, Net: $29,508,000,000 (2023) | $28,184,000,000 (2022)\n  - Vendor Non-Trade Receivables: $31,477,000,000 (2023) | $32,748,000,000 (2022)\n  - Inventories: $6,331,000,000 (2023) | $4,946,000,000 (2022)\n  - Other Current Assets: $14,695,000,000 (2023) | $21,223,000,000 (2022)\n  - **Total Current Assets:** $143,566,000,000 (2023) | $135,405,000,000 (2022)\n\n- **Non-Current Assets:**\n  - Marketable Securities: $100,544,000,000 (2023) | $120,805,000,000 (2022)\n  - Property, Plant and Equipment, Net: $43,715,000,000 (2023) | $42,117,000,000 (2022)\n  - Other Non-Current Assets: $64,758,000,000 (2023) | $54,428,000,000 (2022)\n  - **Total Non-Current Assets:** $209,017,000,000 (2023) | $217,350,000,000 (2022)\n\n- **Total Assets:** $352,583,000,000 (2023) | $352,755,000,000 (2022)\n\n---\n\n#### LIABILITIES AND SHAREHOLDERS\u2019 EQUITY\n- **Current Liabilities:**\n  - Accounts Payable: $62,611,000,000 (2023) | $64,115,000,000 (2022)\n  - Other Current Liabilities: $58,829,000,000 (2023) | $60,845,000,000 (2022)\n  - Deferred Revenue: $8,061,000,000 (2023) | $7,912,000,000 (2022)\n  - Commercial Paper: $5,985,000,000 (2023) | $9,982,000,000 (2022)\n  - Term Debt: $9,822,000,000 (2023) | $11,128,000,000 (2022)\n  - **Total Current Liabilities:** $145,308,000,000 (2023) | $153,982,000,000 (2022)\n\n- **Non-Current Liabilities:**\n  - Term Debt: $95,281,000,000 (2023) | $98,959,000,000 (2022)\n  - Other Non-Current Liabilities: $49,848,000,000 (2023) | $49,142,000,000 (2022)\n  - **Total Non-Current Liabilities:** $145,129,000,000 (2023) | $148,101,000,000 (2022)\n\n- **Total Liabilities:** $290,437,000,000 (2023) | $302,083,000,000 (2022)\n\n---\n\n#### SHAREHOLDERS\u2019 EQUITY\n- Common Stock, Shares Outstanding: 15,550,061,000 (2023) | 15,943,425,000 (2022)\n- Common Stock and Additional Paid-In Capital: $73,812,000,000 (2023) | $64,849,000,000 (2022)\n- Accumulated Deficit: -$214,000,000 (2023) | -$3,068,000,000 (2022)\n- Accumulated Other Comprehensive Loss: -$11,452,000,000 (2023) | -$11,109,000,000 (2022)\n- **Total Shareholders\u2019 Equity:** $62,146,000,000 (2023) | $50,672,000,000 (2022)\n\n---\n\n- **Total Liabilities and Shareholders\u2019 Equity:** $352,583,000,000 (2023) | $352,755,000,000 (2022)\n\nThis balance sheet provides a snapshot of Apple Inc.'s financial position as of the end of fiscal years 2023 and 2022. If you have any further questions or need additional details, feel free to ask!"
+                },
+                {
+                    "role": "user",
+                    "content": "tell me a joke"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I appreciate your interest in humor! However, my expertise lies in finance. If you have any questions about SEC filings, financial statements, or corporate reports, I\u2019d be more than happy to help you with that!"
+                },
+                {
+                    "role": "user",
+                    "content": "what are the company's legal issues mentioned in the report?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "To provide you with accurate information regarding the company's legal issues, I would need to know which specific report or company you are referring to. Legal issues are typically disclosed in the Management's Discussion and Analysis (MD&A) section or in the notes to the financial statements in SEC filings such as 10-K or 10-Q reports. If you can specify the company or the report, I can help you find the relevant details."
+                },
+                {
+                    "role": "user",
+                    "content": "legal issues"
+                },
+                {
+                    "role": "assistant",
+                    "content": "To provide you with accurate information regarding a company's legal issues mentioned in a report, I would need to know the specific company and the report you are referring to. Legal issues are typically disclosed in the Management's Discussion and Analysis (MD&A) section or in the notes to the financial statements in SEC filings such as 10-Ks or 10-Qs. If you can provide the name of the company or the specific report, I can help you find the relevant details."
+                },
+                {
+                    "role": "user",
+                    "content": "were there any major aquisitions by the company?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "To determine if there were any major acquisitions by Apple Inc. (AAPL) mentioned in the SEC filing, you would typically look for sections in the report that discuss business combinations, acquisitions, or investments. These sections often detail any significant transactions that could impact the company's financial position or operations.\n\nIf the report includes information about acquisitions, it would typically outline:\n\n1. **Details of the Acquisition**: The name of the acquired company, the date of the acquisition, and the purchase price.\n2. **Rationale**: The strategic reasons behind the acquisition, such as expanding product lines, entering new markets, or acquiring technology.\n3. **Financial Impact**: How the acquisition is expected to affect Apple's financial statements, including any goodwill recognized and changes in revenue or expenses.\n\nIf you have access to the specific SEC filing, you can search for keywords like \"acquisition,\" \"business combination,\" or \"merger\" to find relevant information. If no such information is present, it may indicate that there were no major acquisitions during the reporting period covered by the filing. \n\nFor the most accurate and detailed information, please refer directly to the latest SEC filing for Apple Inc. or their investor relations website."
+                },
+                {
+                    "role": "user",
+                    "content": "legal challenges"
+                },
+                {
+                    "role": "assistant",
+                    "content": "To provide a thorough response regarding the legal challenges mentioned in a company's report, I would need to look at specific details from the report itself, such as the nature of the legal issues, any ongoing litigation, or regulatory investigations. Typically, these challenges can impact a company's financial health, operational capabilities, and overall market perception.\n\nIf you have a specific company or report in mind, please share the details, and I can help analyze the legal challenges and their potential implications on the company's financial statements or SEC filings."
+                },
+                {
+                    "role": "user",
+                    "content": "deez"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It seems like you might be referencing something outside of finance. If you have any questions related to financial topics, such as SEC filings, financial statements, or corporate reports, I\u2019d be more than happy to help!"
+                },
+                {
+                    "role": "user",
+                    "content": "What about the income statement "
+                },
+                {
+                    "role": "assistant",
+                    "content": "I can provide detailed information regarding various aspects of the income statement for Apple Inc. (AAPL). Here are some key areas you might be interested in:\n\n1. **Net Sales**: Total revenue generated from products and services.\n2. **Cost of Sales**: Direct costs attributable to the production of the goods sold.\n3. **Gross Margin**: Difference between net sales and cost of sales, indicating profitability before operating expenses.\n4. **Operating Expenses**: Breakdown of expenses, including:\n   - Research and Development (R&D)\n   - Selling, General and Administrative (SG&A)\n5. **Operating Income**: Earnings before interest and taxes, calculated as gross margin minus total operating expenses.\n6. **Other Income/Expense**: Non-operating income or expenses that affect net income.\n7. **Income Before Provision for Income Taxes**: Earnings before tax obligations.\n8. **Provision for Income Taxes**: Amount set aside for income tax liabilities.\n9. **Net Income**: Profit after all expenses and taxes have been deducted.\n10. **Earnings Per Share (EPS)**: Profit allocated to each share of common stock, both basic and diluted.\n11. **Shares Used in Computing EPS**: Number of shares used to calculate earnings per share.\n\nIf you have a specific area of interest or need further analysis on any of these components, please let me know!"
+                },
+                {
+                    "role": "user",
+                    "content": "give me the income statement"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here is the income statement for Apple Inc. (AAPL) for the years 2021, 2022, and 2023:\n\n| **Income Statement**                          | **2023**         | **2022**         | **2021**         |\n|-----------------------------------------------|------------------|------------------|------------------|\n| **Net sales**                                 | $383,285,000,000 | $394,328,000,000 | $365,817,000,000 |\n| **Cost of sales**                             | $214,137,000,000 | $223,546,000,000 | $212,981,000,000 |\n| **Gross margin**                              | $169,148,000,000 | $170,782,000,000 | $152,836,000,000 |\n| **Operating expenses:**                       |                  |                  |                  |\n| - Research and development                    | $29,915,000,000  | $26,251,000,000  | $21,914,000,000  |\n| - Selling, general and administrative         | $24,932,000,000  | $25,094,000,000  | $21,973,000,000  |\n| **Total operating expenses**                  | $54,847,000,000  | $51,345,000,000  | $43,887,000,000  |\n| **Operating income**                          | $114,301,000,000 | $119,437,000,000 | $108,949,000,000 |\n| **Other income/(expense), net**              | $(565,000,000)   | $(334,000,000)   | $258,000,000     |\n| **Income before provision for income taxes**  | $113,736,000,000 | $119,103,000,000 | $109,207,000,000 |\n| **Provision for income taxes**                | $16,741,000,000  | $19,300,000,000  | $14,527,000,000  |\n| **Net income**                                | $96,995,000,000  | $99,803,000,000  | $94,680,000,000  |\n| **Earnings per share:**                       |                  |                  |                  |\n| - Basic (in dollars per share)               | $6.16            | $6.15            | $5.67            |\n| - Diluted (in dollars per share)             | $6.13            | $6.11            | $5.61            |\n| **Shares used in computing earnings per share:** |                  |                  |                  |\n| - Basic (in shares)                          | 15,744,231,000   | 16,215,963,000   | 16,701,272,000   |\n| - Diluted (in shares)                        | 15,812,547,000   | 16,325,819,000   | 16,864,919,000   |\n\nThis table summarizes Apple's income statement for the specified years, including key metrics such as net sales, gross margin, operating income, and net income."
+                }
+            ]
+        }
+    }
+}
