@@ -40,7 +40,9 @@ def create_app(mode):
     CORS(app)
 
     if mode == 'prod':
+        app.config['MODE'] = 'prod'
         app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
+        # app.config['REDIRECT_URL'] = 'http://localhost:5000'
 
          # Using client built static files in prod version
         @app.route('/')
@@ -52,6 +54,7 @@ def create_app(mode):
                 return render_template('index.html')
 
     elif mode == 'dev':
+        app.config['MODE'] = 'dev'
         app.config['REDIRECT_URL'] = 'http://localhost:8080'
         
     # Initializing database

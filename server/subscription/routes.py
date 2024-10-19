@@ -20,7 +20,8 @@ def subscribe_post():
         if not user['stripe_user_id']:
             response = stripe.Customer.create(name = user['name'], email = user['email'])
             log('debug', f'Stripe user created: {response}')
-            execute_query("UPDATE users SET stripe_user_id = %s WHERE email = %s", (response['id'], user_info['email']))
+            query = f"UPDATE users_{current_app.config['MODE']} SET stripe_user_id = %s WHERE email = %s"
+            execute_query(query, (response['id'], user_info['email']))
             customer = response['id']
 
         else: customer = user['stripe_user_id']
@@ -72,35 +73,39 @@ def webhook_post():
     response = event['data']['object']
 
     try:
-        if event['type'] == 'checkout.session.completed': 
+        if 'type' in event:
+            if event['type'] == 'checkout.session.completed': 
 
-            user = get_user_data_stripe(response['customer'])
-            log('debug', f'User completed checkout session: {user["email"]}')
-            execute_query("UPDATE users SET subscription_tokens_left = %s WHERE stripe_user_id = %s", (int(user['subscription_tokens_left']) + 1200, response['customer']))
+                user = get_user_data_stripe(response['customer'])
+                log('debug', f'User completed checkout session: {user["email"]}')
+                query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE stripe_user_id = %s"
+                execute_query(query, (int(user['subscription_tokens_left']) + 1200, response['customer']))
 
-        elif event['type'] == 'customer.subscription.created' or event['type'] == 'customer.subscription.updated':
+            elif event['type'] == 'customer.subscription.created' or event['type'] == 'customer.subscription.updated':
 
-            try: user = get_user_data_stripe(response['customer'])
-            except: return {'error': 'Error retrieving user data'}
-            
-
-            if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: 
-                tokens = 1200
-                product = 'basic'
-            elif response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: 
-                tokens = 2400
-                product = 'premium'
+                try: user = get_user_data_stripe(response['customer'])
+                except: return {'error': 'Error retrieving user data'}
                 
-            if user['subscription_tokens_left'] != None:
-                tokens += int(user['subscription_tokens_left'])
 
-            log('debug', f'User completed checkout session: {user["email"]}')
-            execute_query("UPDATE users SET subscription = %s, subscription_tokens_left = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s", (product, tokens, response['id'], response['customer']))
+                if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: 
+                    tokens = 1200
+                    product = 'basic'
+                elif response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: 
+                    tokens = 2400
+                    product = 'premium'
+                    
+                if user['subscription_tokens_left'] != None:
+                    tokens += int(user['subscription_tokens_left'])
 
-        elif response['type'] == 'customer.subscription.deleted':
+                log('debug', f'User completed checkout session: {user["email"]}')
+                query = f"UPDATE users_{current_app.config['MODE']} SET subscription = %s, subscription_tokens_left = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s"
+                execute_query(query, (product, tokens, response['id'], response['customer']))
 
-            log('debug', f'User canceled subscription: {response["customer"]}')
-            execute_query("UPDATE users SET subscription = 'none', subscription_tokens_left = 0, stripe_subscription_id = NULL WHERE stripe_user_id = %s", (response['customer'],))
+            elif event['type'] == 'customer.subscription.deleted':
+
+                log('debug', f'User canceled subscription: {response["customer"]}')
+                query = f"UPDATE users_{current_app.config['MODE']} SET subscription = 'none', subscription_tokens_left = 0, stripe_subscription_id = NULL WHERE stripe_user_id = %s"
+                execute_query(query, (response['customer'],))
 
     except Exception as error: log('error', f'Error in webhook: {error}')
     return {}
