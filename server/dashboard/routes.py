@@ -1,6 +1,6 @@
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils import get_filing, get_vectorstore, get_assistant_response
-from flask import request, Blueprint
+from flask import request, Blueprint, current_app
 from edgar import *
 from .. import socketio
 
@@ -54,7 +54,8 @@ def new_chat_post():
     get_vectorstore(filing, new_chat=True)
 
     log('debug', f'New chat created for {user_info["email"]}: {request.json.get("chat")}')
-    execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
+    query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
+    execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
 
     user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_chat
     token = encode_token(user_info)
@@ -127,8 +128,8 @@ def delete_chat_post():
     return {'success': True}
 
 
-@routes.route('/new-message', methods=['POST'])
-def new_message_post():
+@routes.route('/new-message-user', methods=['POST'])
+def new_message_user_post():
 
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
@@ -138,6 +139,10 @@ def new_message_post():
 
     message_history = (request.json.get('lastXMessages'))
 
+    with open("database/memory/chats.json", "r") as file: chat_memory = json.load(file)
+    chat_memory[user_info["email"]][request.json.get('chat')]["messages"].append({"role": "user", "content": request.json.get('message')})
+    with open("database/memory/chats.json", "w") as f: json.dump(chat_memory, f, indent=4)
+
     get_assistant_response(
         user_prompt = request.json.get('message'),
         message_history = message_history,
@@ -146,13 +151,26 @@ def new_message_post():
         socket_id = request.json.get('socketId'),
         filing_date = request.json.get('filingDate')
     )
-    
-    execute_query("UPDATE users SET subscription_tokens_left = %s WHERE email = %s", (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
+
+    query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
+    execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
 
     user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_message
     token = encode_token(user_info)
     return {'token': token}
 
+
+@routes.route('/new-message-assistant', methods=['POST'])
+def new_message_assistant_post():
+
+    try: user_info = decode_token(request.json.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open("database/memory/chats.json", "r") as file: chat_memory = json.load(file)
+    chat_memory[user_info["email"]][request.json.get('chat')]["messages"].append({"role": "assistant", "content": request.json.get('message')})
+    with open("database/memory/chats.json", "w") as f: json.dump(chat_memory, f, indent=4)
+
+    return {'success': True}
 
 # Handle a connection event
 @socketio.on('connect')

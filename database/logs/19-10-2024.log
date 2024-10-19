@@ -1,0 +1,597 @@
+2024-10-19 07:41:31,241 - ERROR - Exception on /api/subscribe [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 53, in subscribe_post
+    session = stripe.checkout.Session.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\checkout\_session.py", line 4180, in create
+    cls._static_request(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_resource.py", line 177, in _static_request
+    return _APIRequestor._global_instance().request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 196, in request
+    resp = requestor._interpret_response(rbody, rcode, rheaders)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 732, in _interpret_response
+    self.handle_error_response(rbody, rcode, resp.data, rheaders)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 321, in handle_error_response
+    raise err
+stripe._error.InvalidRequestError: Request req_Fm6yKUHCj1KJs3: No such customer: 'cus_R3RfETGWpPuwyG'; a similar object exists in live mode, but a test mode key was used to make this request.
+2024-10-19 07:41:49,165 - ERROR - Exception on /api/subscribe [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 53, in subscribe_post
+    session = stripe.checkout.Session.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\checkout\_session.py", line 4180, in create
+    cls._static_request(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_resource.py", line 177, in _static_request
+    return _APIRequestor._global_instance().request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 196, in request
+    resp = requestor._interpret_response(rbody, rcode, rheaders)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 732, in _interpret_response
+    self.handle_error_response(rbody, rcode, resp.data, rheaders)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 321, in handle_error_response
+    raise err
+stripe._error.InvalidRequestError: Request req_iWnYMQDs9Ptfp9: No such customer: 'cus_R3RfETGWpPuwyG'; a similar object exists in live mode, but a test mode key was used to make this request.
+2024-10-19 07:42:25,750 - ERROR - Exception on /api/subscribe [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 53, in subscribe_post
+    session = stripe.checkout.Session.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\checkout\_session.py", line 4180, in create
+    cls._static_request(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_resource.py", line 177, in _static_request
+    return _APIRequestor._global_instance().request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 196, in request
+    resp = requestor._interpret_response(rbody, rcode, rheaders)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 732, in _interpret_response
+    self.handle_error_response(rbody, rcode, resp.data, rheaders)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 321, in handle_error_response
+    raise err
+stripe._error.InvalidRequestError: Request req_CK2IjyQQotSOUO: No such customer: 'cus_R3RfETGWpPuwyG'; a similar object exists in live mode, but a test mode key was used to make this request.
+2024-10-19 08:04:31,027 - ERROR - Error [Get User Data]: 'mode'
+2024-10-19 08:04:31,137 - CRITICAL - Failed to retrieve user data after multiple attempts.
+2024-10-19 08:04:31,211 - ERROR - Exception on /api/get-user-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 31, in get_user_data_get
+    'email': user['email'],
+             ~~~~^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2024-10-19 08:04:46,629 - ERROR - Error [Get User Data]: 'mode'
+2024-10-19 08:04:46,711 - CRITICAL - Failed to retrieve user data after multiple attempts.
+2024-10-19 08:04:46,798 - ERROR - Exception on /api/get-user-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 31, in get_user_data_get
+    'email': user['email'],
+             ~~~~^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2024-10-19 08:06:02,322 - ERROR - Error [Get User Data]: 'mode'
+2024-10-19 08:06:02,456 - CRITICAL - Failed to retrieve user data after multiple attempts.
+2024-10-19 08:09:02,692 - INFO - New user joined through Google: planetchars@gmail.com
+2024-10-19 08:09:15,792 - DEBUG - Stripe user created: {
+  "address": null,
+  "balance": 0,
+  "created": 1729318155,
+  "currency": null,
+  "default_source": null,
+  "delinquent": false,
+  "description": null,
+  "discount": null,
+  "email": "planetchars@gmail.com",
+  "id": "cus_R3d6zUqQ70yPvm",
+  "invoice_prefix": "01A96F57",
+  "invoice_settings": {
+    "custom_fields": null,
+    "default_payment_method": null,
+    "footer": null,
+    "rendering_options": null
+  },
+  "livemode": false,
+  "metadata": {},
+  "name": "Paul Martian",
+  "object": "customer",
+  "phone": null,
+  "preferred_locales": [],
+  "shipping": null,
+  "tax_exempt": "none",
+  "test_clock": null
+}
+2024-10-19 08:09:16,235 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:02,959 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:03,368 - DEBUG - User completed checkout session: planetchars@gmail.com
+2024-10-19 08:11:03,512 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:03,626 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:03,701 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:03,829 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:03,887 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:04,011 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:04,057 - ERROR - Error in webhook: 'type'
+2024-10-19 08:11:04,149 - ERROR - Error in webhook: 'type'
+2024-10-19 08:12:22,991 - ERROR - Error in webhook: 'type'
+2024-10-19 08:14:08,505 - DEBUG - Error in webhook: 'type'
+2024-10-19 08:14:59,452 - DEBUG - Error in webhook: 'type'
+2024-10-19 08:16:20,765 - DEBUG - Error in webhook: 'type'
+2024-10-19 08:16:20,811 - DEBUG - Error in webhook: 'type'
+2024-10-19 08:17:31,241 - ERROR - Exception on /api/webhook [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 106, in webhook_post
+    elif response['type'] == 'customer.subscription.deleted':
+         ~~~~~~~~^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_stripe_object.py", line 214, in __getitem__
+    raise err
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_stripe_object.py", line 202, in __getitem__
+    return super(StripeObject, self).__getitem__(k)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'type'
+2024-10-19 08:17:31,393 - ERROR - Exception on /api/webhook [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 106, in webhook_post
+    elif response['type'] == 'customer.subscription.deleted':
+         ~~~~~~~~^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_stripe_object.py", line 214, in __getitem__
+    raise err
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_stripe_object.py", line 202, in __getitem__
+    return super(StripeObject, self).__getitem__(k)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'type'
+2024-10-19 08:18:21,201 - ERROR - Exception on /api/webhook [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 106, in webhook_post
+    elif event['type'] == 'customer.subscription.deleted':
+         ^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_stripe_object.py", line 214, in __getitem__
+    raise err
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_stripe_object.py", line 202, in __getitem__
+    return super(StripeObject, self).__getitem__(k)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'type'
+2024-10-19 08:19:02,457 - DEBUG - User completed checkout session: planetchars@gmail.com
+2024-10-19 08:20:14,395 - DEBUG - User completed checkout session: planetchars@gmail.com
+2024-10-19 08:51:09,489 - WARNING - Connection error [Attempt 1/3]: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2024-10-19 08:51:09,787 - DEBUG - Reconnected to database successfully.
+2024-10-19 08:51:20,467 - ERROR - Exception on /api/get-filing-selection-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 74, in get_list_tickers
+    if user_info['subscription'] == 'basic': filings_new = [filing for filing in filings_new if '10-Q' not in filing]
+       ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'subscription'
+2024-10-19 08:53:02,052 - ERROR - Exception on /api/get-filing-selection-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 74, in get_list_tickers
+    if user_info['subscription'] == 'basic': filings_new = [filing for filing in filings_new if '10-Q' not in filing]
+       ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'subscription'
+2024-10-19 08:56:43,270 - ERROR - Exception on /api/get-filing-selection-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 76, in get_list_tickers
+    if user_info['subscription'] == 'basic': filings_new = [filing for filing in filings_new if '10-Q' not in filing]
+       ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'subscription'
+2024-10-19 08:56:53,439 - ERROR - Exception on /api/get-filing-selection-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 76, in get_list_tickers
+    if user_info['subscription'] == 'basic': filings_new = [filing for filing in filings_new if '10-Q' not in filing]
+       ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'subscription'
+2024-10-19 08:59:32,434 - ERROR - Exception on /api/get-filing-selection-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 76, in get_list_tickers
+    return {'tickers': list(filings_available.keys()), 'newFilings': filings_new}
+       ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'subscription'
+2024-10-19 09:02:52,203 - INFO - Created Vectorstore for AAGH-2015-10-13
+2024-10-19 09:02:52,205 - DEBUG - New chat created for planetchars@gmail.com: AAGH-2015-10K
+2024-10-19 09:03:39,252 - ERROR - Exception on /api/new-message [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 144, in new_message_post
+    message_history = message_history,
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 193, in get_assistant_response
+    vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, k=1, table_prepend_k=table_prepend_k)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: get_vectorstore() got an unexpected keyword argument 'k'
+2024-10-19 09:07:57,477 - DEBUG - New chat created for planetchars@gmail.com: IMTH-2024-10K
+2024-10-19 09:11:21,353 - DEBUG - New chat created for planetchars@gmail.com: SRBK-2024-10K
+2024-10-19 09:17:52,205 - ERROR - Exception on /api/new-chat [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 53, in new_chat_post
+    filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 390, in get_filing
+    else: raise Exception(f"Unsupported filing type {filing_type}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Exception: Unsupported filing type 
+2024-10-19 09:31:22,778 - INFO - Created Vectorstore for IMTH-None
+2024-10-19 09:31:22,782 - DEBUG - New chat created for planetchars@gmail.com: IMTH-2024-10K
+2024-10-19 09:43:48,266 - DEBUG - New chat created for planetchars@gmail.com: SRBK-2024-10K
+2024-10-19 09:48:58,937 - DEBUG - New chat created for planetchars@gmail.com: SNA-2024-10Q
+2024-10-19 11:36:24,664 - WARNING - Connection error [Attempt 1/3]: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2024-10-19 11:36:24,937 - DEBUG - Reconnected to database successfully.
+2024-10-19 11:55:22,665 - WARNING - Connection error [Attempt 1/3]: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2024-10-19 11:55:22,870 - DEBUG - Reconnected to database successfully.
+2024-10-19 12:00:29,148 - DEBUG - New chat created for planetchars@gmail.com: UPYY-2024-10Q
+2024-10-19 13:26:31,999 - WARNING - Connection error [Attempt 1/3]: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2024-10-19 13:26:32,236 - DEBUG - Reconnected to database successfully.
+2024-10-19 13:56:50,076 - ERROR - Exception on /api/new-message-assistant [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 883, in full_dispatch_request
+    return self.finalize_request(rv)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 902, in finalize_request
+    response = self.make_response(rv)
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1174, in make_response
+    raise TypeError(
+TypeError: The view function for 'dashboard.new_message_assistant_post' did not return a valid response. The function either returned None or ended without a return statement.
+2024-10-19 14:13:19,729 - DEBUG - Email of type "signUp" sent successfully to paul.bezko@hotmail.com
+2024-10-19 14:13:19,731 - DEBUG - Signup email sent to paul.bezko@hotmail.com
+2024-10-19 14:13:25,440 - DEBUG - Signup email confirmed for paul.bezko@hotmail.com
+2024-10-19 14:14:33,282 - DEBUG - Email of type "signUp" sent successfully to paul.bezko@hotmail.com
+2024-10-19 14:14:33,284 - DEBUG - Signup email sent to paul.bezko@hotmail.com
+2024-10-19 14:14:39,904 - DEBUG - Signup email confirmed for paul.bezko@hotmail.com
+2024-10-19 14:27:39,606 - ERROR - Exception on /api/get-user-data [GET]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\general\routes.py", line 31, in get_user_data_get
+    'email': user['email'],
+             ~~~~^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2024-10-19 14:30:11,877 - DEBUG - Signup email confirmed for paul.bezko@hotmail.com
+2024-10-19 14:30:46,558 - DEBUG - Signup email confirmed for paul.bezko@hotmail.com
+2024-10-19 14:32:54,271 - DEBUG - Signup email confirmed for paul.bezko@hotmail.com
+2024-10-19 14:33:28,881 - ERROR - Exception on /api/signup [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\server\authentication\routes.py", line 47, in signup_post
+    log('debug', f'User account created for {email}')
+                                             ^^^^^
+UnboundLocalError: cannot access local variable 'email' where it is not associated with a value
+2024-10-19 14:35:24,410 - DEBUG - User account created for paul.bezko@hotmail.com
+2024-10-19 14:35:24,412 - INFO - New user joined through email: paul.bezko@hotmail.com
+2024-10-19 14:35:35,267 - DEBUG - Stripe user created: {
+  "address": null,
+  "balance": 0,
+  "created": 1729341335,
+  "currency": null,
+  "default_source": null,
+  "delinquent": false,
+  "description": null,
+  "discount": null,
+  "email": "paul.bezko@hotmail.com",
+  "id": "cus_R3jLty8mnIkfrR",
+  "invoice_prefix": "0F5ED86F",
+  "invoice_settings": {
+    "custom_fields": null,
+    "default_payment_method": null,
+    "footer": null,
+    "rendering_options": null
+  },
+  "livemode": false,
+  "metadata": {},
+  "name": "Paul Bezkorovainijs",
+  "object": "customer",
+  "phone": null,
+  "preferred_locales": [],
+  "shipping": null,
+  "tax_exempt": "none",
+  "test_clock": null
+}
+2024-10-19 14:35:35,572 - ERROR - Exception on /api/subscribe [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\server\subscription\routes.py", line 29, in subscribe_post
+    session = stripe.checkout.Session.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\checkout\_session.py", line 4180, in create
+    cls._static_request(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_resource.py", line 177, in _static_request
+    return _APIRequestor._global_instance().request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 196, in request
+    resp = requestor._interpret_response(rbody, rcode, rheaders)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 732, in _interpret_response
+    self.handle_error_response(rbody, rcode, resp.data, rheaders)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\stripe\_api_requestor.py", line 321, in handle_error_response
+    raise err
+stripe._error.InvalidRequestError: Request req_6pWVKku3rDsWvW: Invalid URL: None/dashboard. URLs must begin with http or https.
+2024-10-19 14:37:24,268 - DEBUG - User completed checkout session: paul.bezko@hotmail.com
+2024-10-19 14:37:28,987 - DEBUG - User completed checkout session: paul.bezko@hotmail.com
+2024-10-19 14:37:29,076 - DEBUG - User completed checkout session: paul.bezko@hotmail.com
+2024-10-19 14:37:30,928 - INFO - Client connected: j4eu146YsloQoG3EAAAB
+2024-10-19 14:41:23,236 - INFO - Client connected: QCiHSUrqP-99ir1fAAAB
+2024-10-19 14:41:31,191 - INFO - Client connected: YPw101osjhbfAEdHAAAD
+2024-10-19 14:42:28,223 - DEBUG - Updated Vectorstore for VYEY-2024-10-17, 10000, 3, 3
+2024-10-19 14:42:28,225 - DEBUG - New chat created for paul.bezko@hotmail.com: VYEY-2024-10Q
+2024-10-19 14:52:09,404 - INFO - Client connected: Ry0GB_adB7RBXUmGAAAF
+2024-10-19 14:52:54,820 - INFO - Client connected: QvvqBxJESOre3Q0xAAAB
+2024-10-19 14:53:28,164 - INFO - Client connected: ZIyT6KOyFXBXGk3YAAAB
+2024-10-19 14:54:13,928 - INFO - Client connected: p8jCpIzgun3T7VV5AAAB
+2024-10-19 14:54:18,050 - INFO - Client connected: OLiF2TtvQZTkqpmPAAAD
+2024-10-19 14:59:21,123 - INFO - Client connected: p3yQExXy0m4fzevyAAAB
+2024-10-19 14:59:27,866 - INFO - Client connected: TNELmQ7PKqDLft0_AAAD
+2024-10-19 14:59:37,052 - INFO - Client connected: X8CQpVAO_aBDaYZsAAAF
