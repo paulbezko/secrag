@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from logtail import LogtailHandler
 from server import create_app, handler
 import logging
