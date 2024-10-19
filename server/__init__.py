@@ -32,6 +32,7 @@ def create_app(mode):
     from .authentication.routes import routes as auth_routes
     from .dashboard.routes import routes as dashboard_routes
     from .subscription.routes import routes as subscription_routes
+    from .github.routes import routes as github_routes
 
     app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist')
 
@@ -88,6 +89,7 @@ def create_app(mode):
     app.register_blueprint(auth_routes, name='auth', url_prefix='/api/')
     app.register_blueprint(subscription_routes, name='subscription', url_prefix='/api/')
     app.register_blueprint(dashboard_routes, name='dashboard', url_prefix='/api/')
+    app.register_blueprint(github_routes, name='github', url_prefix='/gh/')
     socketio.init_app(app)
 
     return app

@@ -2,17 +2,19 @@ import hmac
 import hashlib
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, abort
+from flask import Blueprint, Flask, request, abort
 import subprocess
 
-app = Flask(__name__)
 load_dotenv('.env', override=True)
 # Your secret (set the same as in GitHub webhook settings)
 SECRET = os.getenv('GITHUB_WEBHOOK_SECRET').encode('utf-8')
 
-PATH_TO_THE_REPO = '/path/to/your/repo'
+PATH_TO_THE_REPO = '.'
 # Specify the branch you want to listen for
-TARGET_BRANCH = 'test_webhook'  # Change this to your target branch
+TARGET_BRANCH = 'prod'  # Change this to your target branch
+
+# Routes initialization
+routes = Blueprint('routes', __name__)
 
 def verify_signature(payload):
     signature = request.headers.get('X-Hub-Signature')
@@ -25,7 +27,7 @@ def verify_signature(payload):
     hash = hmac.new(SECRET, payload, hashlib.sha1)
     return hmac.compare_digest(signature, hash.hexdigest())
 
-@app.route('/push', methods=['POST'])
+@routes.route('/push', methods=['POST'])
 def webhook():
     payload = request.get_data()
 
@@ -37,7 +39,8 @@ def webhook():
 
     # Check if the push is on the desired branch
     if 'ref' in data and data['ref'] == f'refs/heads/{TARGET_BRANCH}':
-        os.chdir(PATH_TO_THE_REPO) 
+        # os.chdir(PATH_TO_THE_REPO) 
+        print("[SecRag] Updated detected. Begin update...")
         subprocess.run(['git', 'pull', 'origin', TARGET_BRANCH])
         # Restart the Gunicorn service
         subprocess.run(['systemctl', 'restart', 'secrag.service'])
