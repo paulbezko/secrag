@@ -41,8 +41,8 @@ def create_app(mode):
 
     if mode == 'prod':
         app.config['MODE'] = 'prod'
-        app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
-        # app.config['REDIRECT_URL'] = 'http://localhost:5000'
+        # app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
+        app.config['REDIRECT_URL'] = 'http://localhost:5000'
 
          # Using client built static files in prod version
         @app.route('/')
