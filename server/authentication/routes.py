@@ -1,7 +1,7 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..general.utils import get_user_data, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp, log
 from datetime import datetime, timezone, timedelta
-from flask import request, Blueprint
+from flask import request, Blueprint, current_app
 
 # Routes initialization
 routes = Blueprint('routes', __name__)
@@ -44,9 +44,10 @@ def signup_post():
 
         password_encrypted = generate_password_hash(request.json.get('password'))
 
-        log('debug', f'User account created for {email}')
-        log('info', f'New user joined through email: {email}')
-        execute_query("UPDATE users SET name = %s, auth_type = 'password', password = %s WHERE email = %s", (request.json.get('name'), password_encrypted, user_info['email']))
+        log('debug', f'User account created for {user_info['email']}')
+        log('info', f'New user joined through email: {user_info['email']}')
+        query = f"UPDATE users_{current_app.config['MODE']} SET name = %s, auth_type = 'password', password = %s WHERE email = %s"
+        execute_query(query, (request.json.get('name'), password_encrypted, user_info['email']))
 
         user_info['name'] = request.json.get('name')
         user_info['subscription'] = 'none'
@@ -68,7 +69,8 @@ def signup_get():
     if get_user_data(email_payload['email']): return {'critical': 'userExists'}
 
     log('debug', f'Signup email confirmed for {email_payload['email']}')
-    execute_query("INSERT INTO users (email) VALUES (%s)", (email_payload['email'],))
+    query = f"INSERT INTO users_{current_app.config['MODE']} (email) VALUES (%s)"
+    execute_query(query, (email_payload['email'],))
 
     user_info = email_payload
     user_info['onboarding'] = True
@@ -117,7 +119,8 @@ def reset_password_post():
 
         token = encode_token(email_payload)
         send_email_from_template(email = request.json.get('email').lower(), template = 'resetPassword', payload = token)
-        execute_query("UPDATE users SET link_token = %s WHERE email = %s", (token, request.json.get('email').lower()))
+        query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
+        execute_query(query, (token, request.json.get('email').lower()))
         return {'message': 'Confirmation email sent'}
     
     elif request.json.get('action') == 'resetPasswordAfter':
@@ -126,6 +129,7 @@ def reset_password_post():
         except: return {'error': 'Error decoding token'}
 
         password_encrypted = generate_password_hash(request.json.get('password'))
+        query = f"UPDATE users_{current_app.config['MODE']} SET password = %s, WHERE email = %s"
         execute_query("UPDATE users SET password = %s WHERE email = %s", (password_encrypted, user_info['email']))
 
         return {'message': 'Password reset successful'}
@@ -144,7 +148,8 @@ def reset_password_get():
     if not user: return {'error': 'User does not exist'}
     if user['link_token'] != request.args.get('token'): return {'error': 'linkExpired'}
 
-    execute_query("UPDATE users SET link_token = %s WHERE email = %s", (None, email_payload['email'].lower()))
+    query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
+    execute_query(query, (None, email_payload['email'].lower()))
 
     return {}
 
@@ -155,11 +160,19 @@ def authenticate_post():
     user = get_user_data(request.json.get('email').lower())
     if not user:
         log('info', f'New user joined through Google: {request.json.get('email').lower()}')
-        execute_query("INSERT INTO users (email, name, auth_type, supabase_user_id) VALUES (%s, %s, %s, %s)", (
-            request.json.get('email').lower(), request.json.get('name'), 
-            request.json.get('auth_type'), request.json.get('id')
-            ))
+        query = f"INSERT INTO users_{current_app.config['MODE']} (email, name, auth_type, supabase_user_id) VALUES (%s, %s, %s, %s)"
+        execute_query(query, (request.json.get('email').lower(), request.json.get('name'), request.json.get('auth_type'), request.json.get('id')))
     elif user['auth_type'] != 'google': return {'error': 'authMethodIncorrect'}    
     
-    token = encode_token({'email': request.json.get('email').lower()})
+    user_info = {
+        'email': request.json.get('email').lower(),
+        'name': user['name'],
+        'auth_type': user['auth_type'],
+        'subscription': user['subscription'],
+        'subscription_tokens_left': user['subscription_tokens_left'],
+        'stripe_subscription_id': user['stripe_subscription_id'],
+        'stripe_user_id': user['stripe_user_id'],
+    }
+
+    token = encode_token(user_info)
     return {'token': token}
