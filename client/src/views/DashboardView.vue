@@ -119,7 +119,7 @@
                   v-if="index === currentMessages.length - 1" 
                   :src="newMessage !== '' 
                     ? require('@/assets/dashboard/face_with_monocle_3d.png')
-                    : (assistantMessageIndex === index 
+                    : (assistantMessageIndex === index && assistantMessageLoading
                       ? require('@/assets/dashboard/thinking_face_3d.png')
                       : require('@/assets/dashboard/slightly_smiling_face_3d.png'))"
                   class="bot-image"
@@ -424,7 +424,7 @@ export default {
       textarea.style.height = '40px'
 
       if (this.newMessage.trim() !== '') {
-        
+
         this.responseStopped = false
         this.stopButtonShown = true
         this.currentMessages.push({role: 'user', content: this.newMessage});
