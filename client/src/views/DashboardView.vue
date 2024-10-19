@@ -55,7 +55,7 @@
     <!-- New Chat Section -->
     <SpinnerCompInside v-if="newChatLoading"></SpinnerCompInside>
     <div v-if="!newChatLoading && newChat" class="flex-column center gap-2" style="padding: 2rem">
-      <div class="subheading">Create a new Chat</div>
+      <div class="subheading">Created a new Chat</div>
       <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
       <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-row switch-row-to-column gap-1 width-100">
