@@ -41,7 +41,7 @@ def webhook():
     if 'ref' in data and data['ref'] == f'refs/heads/{TARGET_BRANCH}':
         # os.chdir(PATH_TO_THE_REPO) 
         print("[SecRag] Updated detected. Begin update...")
-        subprocess.run(['git', 'pull', 'origin', TARGET_BRANCH])
+        subprocess.run(['git', 'pull', 'origin', TARGET_BRANCH], cwd="/home/ubuntu/secrag/Collab-Project-1")
         # Restart the Gunicorn service
         subprocess.run(['systemctl', 'restart', 'secrag.service'])
         return '', 200
