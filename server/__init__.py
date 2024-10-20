@@ -95,4 +95,4 @@ def create_app(mode):
     app.register_blueprint(github_routes, name='github', url_prefix='/gh/')
     socketio.init_app(app)
 
-    return app
+    return app, socketio

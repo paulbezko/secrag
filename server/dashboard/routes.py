@@ -1,5 +1,5 @@
 from ..general.utils import encode_token, decode_token, execute_query, log
-from .utils import get_filing, get_vectorstore, get_assistant_response
+from .utils import get_filing, get_vectorstore, get_assistant_response, vectorstore_manager
 from flask import request, Blueprint, current_app
 from edgar import *
 from .. import socketio
@@ -51,8 +51,8 @@ def new_chat_post():
     with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
     
     filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
-    get_vectorstore(filing, new_chat=True)
-
+    #get_vectorstore(filing, new_chat=True)
+    vectorstore_manager.new_chat(filing)
     log('debug', f'New chat created for {user_info["email"]}: {request.json.get("chat")}')
     query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
     execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
