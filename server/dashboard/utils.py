@@ -17,6 +17,10 @@ import time
 import os
 import re
 
+# Load balancing tool
+from celery import Celery
+celery_app = Celery('tasks', broker='redis://localhost:6379/0', backend=None)
+
 system_prompt_reformulate = """
     You are presented with a current request and the latest chat messages from a human. Your task is to assess whether the current request is a follow-up to one of the latest chat messages.
 
@@ -80,6 +84,23 @@ class FilingObject():
         self.filing_date = filing_date
         self.filing_type = filing_type
         self.filing_year = filing_year
+
+    def to_dict(self):
+        return {
+            'ticker': self.ticker,
+            'filing_date': self.filing_date,
+            'filing_type': self.filing_type,
+            'filing_year': self.filing_year
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return FilingObject(
+            ticker=data['ticker'],
+            filing_date=data['filing_date'],
+            filing_type=data['filing_type'],
+            filing_year=data['filing_year']
+        )
 
 # Creating a class for enhanced filing information
 class SECFilingObject():
@@ -165,7 +186,7 @@ class KewordsFilingTables(BaseModel):
 
 # Getting assistant response
 def get_assistant_response(user_prompt, message_history, user_email, filing_id, socket_id, filing_date):
-
+    print("LLM")
     chunk_size = 10000
     k = 3
     chunk_overlap = 3
@@ -190,8 +211,8 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
         prompt_keywords_and_filing_tables = llm.with_structured_output(KewordsFilingTables).invoke(system_prompt)
 
         # Getting vectorsore to get context chunks from
-        vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, table_prepend_k=table_prepend_k)
-
+        #vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, table_prepend_k=table_prepend_k)
+        vectorstore = vectorstore_manager.vectorstore
         # Initializing metadata model
         chunk_metadata_model = {
             "ticker": filing.ticker, 
@@ -255,7 +276,7 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
         for chunk in llm.stream(system_prompt):
             buffer += chunk.content
             socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
-
+    print("BUFFER", buffer)
     # Finishing the response
     socketio.emit('llm_response_complete', to=socket_id)
 
@@ -664,3 +685,89 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
         data = []
 
     return final_chunks
+
+class VectorstoreManager:
+    
+    vectorstore_dir = "database/vectorstore"
+
+    def __init__(self) -> FAISS:
+        self.vectorstore = self.get_vectorstore()
+    # Getting vectorstore
+    def get_vectorstore(
+            self
+        ):
+        """
+        Manages vectorstore for a given filing and configuration.
+
+        Args:
+            filing (CustomCompanyFiling): The filing object to be converted.
+            chunk_size (int, optional): The maximum size of each chunk. Defaults to 5000.
+            chunk_overlap (int, optional): The number of rows to overlap between chunks. Defaults to 1000.
+            k (int, optional): The number of similar documents to return. Defaults to 1.
+            table_prepend_k (int, optional): The number of rows to prepend to each table chunk. Defaults to 3.
+            splitter_mode (str, optional): The text splitter to use. Defaults to "edgartools".
+
+        Returns:
+            FAISS: The vectorstore object.
+        """
+        embeddings = OpenAIEmbeddings()
+
+        # Check if vectorstore exists
+        if os.path.exists(self.vectorstore_dir):
+            # Load vectorstore
+            vectorstore = FAISS.load_local(self.vectorstore_dir, embeddings=embeddings, allow_dangerous_deserialization=True)
+
+        # Create vectorstore if it doesn't exist
+        else:
+            # Create new embedding and vectorstore, and save the vectorstore 
+            init_document_list = [Document(page_content="", metadata={"chunk_description":"init"})]
+            vectorstore = FAISS.from_documents(init_document_list, embedding=embeddings)
+            vectorstore.save_local(self.vectorstore_dir)
+            # log('info', f"Created Vectorstore")
+
+        return vectorstore
+    
+    def new_chat(
+        self,
+        filing : FilingObject, 
+
+        # Optional args
+        chunk_size = 10000, 
+        chunk_overlap = 3, 
+        table_prepend_k = 3,
+    ):
+        chunk_metadata_model = {
+            "ticker": filing.ticker, 
+            "date": filing.filing_date,
+            "form": filing.filing_type,
+            "year": filing.filing_year,
+            "chunk_description": "",
+            "chunk_size": chunk_size,
+            "chunk_overlap": chunk_overlap,
+            "table_prepend_k": table_prepend_k
+        }  
+
+        check_for_existing_embeddings = self.vectorstore.similarity_search("", k=3, filter=chunk_metadata_model)
+        # Case when embedding does not exist
+        if len(check_for_existing_embeddings) == 0:
+            # sec_filing_object = get_sec_filing_object(filing)
+            # chunks = sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
+            # self.vectorstore.add_documents(chunks)
+            # self.vectorstore.save_local(self.vectorstore_dir)
+            self._perform_embedding.delay(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
+            log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+        # Case when embedding already exists       
+        else:
+            log('debug', f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+
+    @staticmethod
+    @celery_app.task
+    def _perform_embedding(filing_data, chunk_size, chunk_overlap, table_prepend_k):
+        filing = FilingObject.from_dict(filing_data)
+        vectorstore_manager = VectorstoreManager()
+        sec_filing_object = get_sec_filing_object(filing)
+        chunks = sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
+        vectorstore_manager.vectorstore.add_documents(chunks)
+        vectorstore_manager.vectorstore.save_local(vectorstore_manager.vectorstore_dir)
+
+vectorstore_manager = VectorstoreManager()
