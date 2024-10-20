@@ -5,7 +5,7 @@
       <div class="flex-column gap-4 center" style="max-width: 52rem;">
         <div class="heading fade-in delay-1">{{ heroHeading }}</div>
         <div class="text-1 fade-in delay-2">{{ heroSubheading }}</div>
-        <div class="flex-row width-100 gap-2 switch-row-to-column" style="justify-content: start;">
+        <div class="flex-row width-100 gap-2 switch-row-to-column" style="justify-content: start; align-items: start;">
           <div class="fade-in delay-3 flex-column center"><router-link to="/signup" class="button button-primary">Get Started -></router-link></div>
           <div class="fade-in delay-4 flex-column center"><a href="#about" class="button button-secondary">Learn More</a></div>
         </div>
@@ -81,15 +81,15 @@
         <div class="flex-row width-100 space-between">
           <img src="../assets/home/logos/image 6.png" class="fade-in delay-1" style="object-fit: contain;">
           <img src="../assets/home/logos/image 7.png" class="fade-in delay-2" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 8.png" class="fade-in delay-3" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 9.png" class="fade-in delay-4" style="object-fit: contain;">
+          <img src="../assets/home/logos/image 8.png" class="fade-in delay-1" style="object-fit: contain;">
+          <img src="../assets/home/logos/image 9.png" class="fade-in delay-2" style="object-fit: contain;">
         </div>
         <div class="flex-row width-100 space-between">
-          <img src="../assets/home/logos/image 10.png" class="fade-in delay-1" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 11.png" class="fade-in delay-2" style="object-fit: contain;">
+          <img src="../assets/home/logos/image 10.png" class="fade-in delay-3" style="object-fit: contain;">
+          <img src="../assets/home/logos/image 11.png" class="fade-in delay-4" style="object-fit: contain;">
           <img src="../assets/home/logos/image 14.png" class="fade-in delay-3" style="object-fit: contain;">
           <img src="../assets/home/logos/image 15.png" class="fade-in delay-4" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 16.png" class="fade-in delay-1" style="object-fit: contain;">
+          <img src="../assets/home/logos/image 16.png" class="fade-in delay-3" style="object-fit: contain;">
         </div>
       </div>
     </div>

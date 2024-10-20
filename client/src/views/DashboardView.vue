@@ -147,7 +147,7 @@
           <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
           <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
         </div>
-        <div class="flex-row width-100 gap-1" :style="isSmallScreen ? 'padding-inline: 1rem' : ''" style="max-width: 75rem; align-items: end;">
+        <div class="flex-row width-100 gap-1" :style="isSmallScreen ? 'padding-inline: 1rem' : ''" style="max-width: 75rem;">
           <textarea 
             placeholder="Enter your message here"
             class="chat-input" 
@@ -158,19 +158,20 @@
             @input="adjustTextareaHeight('textarea')" 
             style="resize: none;" 
             ref="textarea"
+            :disabled="assistantMessageLoading"
             >
           </textarea>
           <!-- Input Buttons Large -->
-          <div v-if="stopButtonShown"><div class="button-icon" v-if="!isSmallScreen" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div></div>
-          <div v-else><div class="button-icon" v-if="!isSmallScreen" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div></div>
+          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="!isSmallScreen && !stopButtonShown" class="button-icon" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
           
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
           <!-- Input Buttons Small -->
-          <div class="button-icon show-on-small" v-if="newMessage == '' && isSmallScreen" @click="toggleFilingView">
+          <div class="button-icon show-on-small" v-if="newMessage == '' && isSmallScreen && !stopButtonShown" @click="toggleFilingView">
             <div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div>
           </div>
-          <div v-if="stopButtonShown"><div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div></div>
-          <div v-else><div class="button-icon" v-if="!newMessage == '' && isSmallScreen" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div></div>
+          <div class="button-icon" v-if="newMessage == '' && isSmallScreen && stopButtonShown" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
+          <div class="button-icon" v-if="!newMessage == '' && isSmallScreen && !stopButtonShown" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
         </div>
       </div>
       <!-- Filing Container Large -->
@@ -469,7 +470,7 @@ export default {
       }
     },
 
-    stopResponse() {this.stopButtonShown = false; this.responseStopped = true; this.saveAssitantResponse();},
+    stopResponse() {this.stopButtonShown = false; this.responseStopped = true; this.saveAssitantResponse(); this.assistantMessageLoading = false;},
     async saveAssitantResponse() {          
       try {
           let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
