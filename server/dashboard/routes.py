@@ -1,3 +1,4 @@
+from .utils.miscellaneous import save_message
 from .utils.vectorstore import get_vectorstore
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
@@ -140,10 +141,7 @@ def new_message_user_post():
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
     message_history = (request.json.get('lastXMessages'))
-
-    with open("database/memory/chats.json", "r") as file: chat_memory = json.load(file)
-    chat_memory[user_info["email"]][request.json.get('chat')]["messages"].append({"role": "user", "content": request.json.get('message')})
-    with open("database/memory/chats.json", "w") as f: json.dump(chat_memory, f, indent=4)
+    save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'user', message = request.json.get('message'))
 
     get_assistant_response(
         user_prompt = request.json.get('message'),
@@ -168,13 +166,10 @@ def new_message_assistant_post():
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open("database/memory/chats.json", "r") as file: chat_memory = json.load(file)
-    chat_memory[user_info["email"]][request.json.get('chat')]["messages"].append({"role": "assistant", "content": request.json.get('message')})
-    with open("database/memory/chats.json", "w") as f: json.dump(chat_memory, f, indent=4)
-
+    save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'assistant', message = request.json.get('message'))
     return {'success': True}
 
-# Handle a connection event
+
 @socketio.on('connect')
 def handle_connect():
     log('info', f'Client connected: {request.sid}')
