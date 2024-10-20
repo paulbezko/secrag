@@ -2,7 +2,7 @@
 const dev = {
   apiUrl: 'http://localhost:5000',
   webUrl: 'http://localhost:8080',
-  socketUrl: 'http://localhost:8080' 
+  socketUrl: 'http://localhost:5000' 
 };
 
 // const prod = {
