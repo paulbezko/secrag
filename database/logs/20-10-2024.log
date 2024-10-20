@@ -1074,3 +1074,5 @@ Traceback (most recent call last):
   File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
     raise APIConnectionError(request=request) from err
 openai.APIConnectionError: Connection error.
+2024-10-20 16:29:10,439 - DEBUG - Updated Vectorstore for WBA-2024-10-15, 10000, 3, 3
+2024-10-20 16:29:10,443 - DEBUG - New chat created for planetchars@gmail.com: WBA-2024-10K

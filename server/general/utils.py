@@ -233,3 +233,18 @@ def check_timestamp(timestamp):
 
     if datetime.now(timezone.utc) > datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc): return False
     else: return True
+
+
+def try_except(func, default=None, expected_exc=(Exception,)):
+    """
+    Tries to execute a given function, and if it fails with one of the specified
+    exceptions, returns a default value instead.
+
+    :param func: The function to try to execute
+    :param default: The value to return if an exception is raised
+    :param expected_exc: A tuple of exception types that are expected to be raised
+    :return: The result of the function, or the default value if an exception was
+             raised
+    """
+    try: return func()
+    except expected_exc: return default
