@@ -1,5 +1,5 @@
 import eventlet
-eventlet.monkey_patch()
+eventlet.monkey_patch(socket=True, select=True)
 
 from logtail import LogtailHandler
 from server import create_app, handler

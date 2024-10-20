@@ -20,6 +20,23 @@ class FilingObject():
         self.filing_type = filing_type
         self.filing_year = filing_year
 
+    def to_dict(self):
+        return {
+            'ticker': self.ticker,
+            'filing_date': self.filing_date,
+            'filing_type': self.filing_type,
+            'filing_year': self.filing_year
+        }
+    
+    @staticmethod
+    def from_dict(data):
+        return FilingObject(
+            ticker=data['ticker'],
+            filing_date=data['filing_date'],
+            filing_type=data['filing_type'],
+            filing_year=data['filing_year']
+        )
+
 # Creating a class for enhanced filing information
 class SECFilingObject():
     def __init__(self, filing, markdown, file_number, filing_html, cik, ticker, filing_date, filing_year, company_name, filing_type, balance_sheet = None, income_statement = None, cash_flow_statement = None, statement_of_comprehensive_income = None, statement_of_changes_in_equity = None):

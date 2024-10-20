@@ -1076,3 +1076,9 @@ Traceback (most recent call last):
 openai.APIConnectionError: Connection error.
 2024-10-20 16:29:10,439 - DEBUG - Updated Vectorstore for WBA-2024-10-15, 10000, 3, 3
 2024-10-20 16:29:10,443 - DEBUG - New chat created for planetchars@gmail.com: WBA-2024-10K
+2024-10-20 20:56:11,205 - DEBUG - Updated Vectorstore for CMC-2024-10-17, 10000, 3, 3
+2024-10-20 20:56:11,207 - DEBUG - New chat created for planetchars@gmail.com: CMC-2024-10K
+2024-10-20 21:00:52,164 - DEBUG - Updated Vectorstore for CMC-2024-10-17, 10000, 3, 3
+2024-10-20 21:00:52,167 - DEBUG - New chat created for planetchars@gmail.com: CMC-2024-10K
+2024-10-20 21:04:22,701 - DEBUG - Updated Vectorstore for CMC-2024-10-17, 10000, 3, 3
+2024-10-20 21:04:22,705 - DEBUG - New chat created for planetchars@gmail.com: CMC-2024-10K

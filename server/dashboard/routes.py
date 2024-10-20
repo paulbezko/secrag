@@ -1,5 +1,5 @@
 from .utils.miscellaneous import save_message
-from .utils.vectorstore import get_vectorstore
+from .utils.vectorstore import vectorstore_manager
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
 from .utils.llm import get_assistant_response
@@ -54,7 +54,7 @@ def new_chat_post():
     with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
     
     filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
-    get_vectorstore(filing, new_chat=True)
+    vectorstore_manager.new_chat(filing)
 
     log('debug', f'New chat created for {user_info["email"]}: {request.json.get("chat")}')
     query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"

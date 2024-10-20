@@ -1,4 +1,4 @@
-from .vectorstore import get_vectorstore
+from .vectorstore import vectorstore_manager
 from .secedgar import get_filing
 from pydantic import BaseModel
 from typing import Literal, List
@@ -103,7 +103,7 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
         prompt_keywords_and_filing_tables = llm.with_structured_output(KewordsFilingTables).invoke(system_prompt)
 
         # Getting vectorsore to get context chunks from
-        vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, table_prepend_k=table_prepend_k)
+        vectorstore = vectorstore_manager.vectorstore
 
         # Initializing metadata model
         chunk_metadata_model = {
@@ -142,16 +142,17 @@ def get_assistant_response(user_prompt, message_history, user_email, filing_id, 
             "date": filing.filing_date,
             "form": filing.filing_type,
             "year": filing.filing_year,
-            "chunk_description": "",
+            # "chunk_description": "",
             "chunk_size": chunk_size,
             "chunk_overlap": chunk_overlap,
             "table_prepend_k": table_prepend_k
         }
 
         list_retrieved_chunks = vectorstore.similarity_search_with_score(prompt_keywords_and_filing_tables.keywords, k=k, filter=chunk_metadata_model, fetch_k=1000)
+        print(len(list_retrieved_chunks))
         for chunk in list_retrieved_chunks:
             if chunk[0].page_content not in list_context_chunks:
-                list_context_chunks += chunk.page_content + "\n"
+                list_context_chunks += chunk[0].page_content + "\n"
             
         system_prompt = system_prompt_rag.format(filing=filing, reformulated_prompt=reformulated_prompt, list_context_chunks=list_context_chunks)
 
