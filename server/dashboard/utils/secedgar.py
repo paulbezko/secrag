@@ -1,77 +1,16 @@
-from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
-from langchain_openai import OpenAIEmbeddings
+from ...general.utils import try_except, log
 from edgar.financials import Financials
 from edgar.htmltools import TableBlock
-from ..general.utils import log
 from edgar.entities import Company
 from edgar.core import set_identity
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Literal, List
-from server import socketio, llm
+
 import pandas as pd
+
 import threading
-import json
 import time
-import os
 import re
-
-system_prompt_reformulate = """
-    You are presented with a current request and the latest chat messages from a human. Your task is to assess whether the current request is a follow-up to one of the latest chat messages.
-
-    To determine if the current request is a follow-up, consider the following:
-
-    - It qualifies as a follow-up if it implicitly or explicitly asks for further detail about the previous topic, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
-    - If the current request relates to previous messages and pertains specifically to SEC filings or financial statements, it may be relevant to the filing ID: {filing_id}. Reformulate it to include relevant context only if necessary.
-    - **If the current request is about general financial concepts (e.g., explaining what a balance sheet is or the significance of a 10-Q), do not include historical context in the reformulation.**
-    - Do not classify it as a follow-up if the request addresses a different financial statement, topic, or request that doesn’t build upon the previous requests.
-
-    If the current request qualifies as a follow-up, reformulate it to clearly state what information is being requested, ensuring that no irrelevant historical context is included if the question is general.
-    If the current request does not qualify as a follow-up, return it as is. Return nothing else but the request.
-
-    Latest chat messages: {message_history}
-    Request: {user_prompt}
-    """
-system_prompt_rag_needed = """
-    You are an expert in financial documents, particularly SEC filings such as 10-K and 10-Q reports. \
-    The user is referencing the filing ID: {filing_id}. \
-    Based on the following message, determine if the user is asking for information related to financial documents \
-    specifically associated with this filing ID. \
-    This includes details like balance sheets, income statements, cash flow statements, and any other relevant financial data typically found in SEC filings.
-    
-    Message: {reformulated_prompt}
-    """
-system_prompt_keywords_filings_tables = """
-    You are a helpful assistant. Your task is to analyze the user's prompt and derive any useful keywords that can be used to answer their question.
-    If the user is asking about specific financial statements like a balance sheet, income statement, etc., return those financial statements. If the user asks for multiple financial statements, return all that are relevant.
-
-    Only return a filing_table_selection if the user is asking for or implying financial data related to a specific financial report, like a balance sheet or income statement. If no financial statement is implied, leave filing_table_selection empty.
-
-    The output should be structured as:
-        keywords: str
-        filing_table_selection: Optional[List[Literal["balance_sheet", "income_statement", "cash_flow_statement", "statement_of_changes_in_equity", "statement_of_comprehensive_income"]]] = None
-
-    User prompt:
-    {reformulated_prompt}
-    """
-system_prompt_rag = """
-    You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
-    Your role is to provide clear, concise, and detailed answers to any financial questions the user may have. \
-    Your goal is to provide relevant financial data related to the user's prompt. \
-    The context provided is from the SEC filing for {filing.ticker} (ticker: {filing.ticker}, filing date: {filing.filing_date}). \
-    The context is as follows: {list_context_chunks}
-
-    User prompt: {reformulated_prompt}
-    """
-system_prompt_not_rag = """
-    You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
-    Your role is to provide clear, concise, and detailed answers to any financial questions the user may have. \
-    However, if the user asks a question unrelated to finance, your goal is to politely steer the conversation back to financial topics, gently reminding the user that you specialize in finance. \
-    You may give a brief, polite response to the unrelated question, but then guide the user back to finance-related matters.
-
-    User prompt: {reformulated_prompt}
-    """
 
 # Creating a class for filing information
 class FilingObject():
@@ -148,235 +87,6 @@ class SECFilingObject():
             ))
         return list_documents
 
-# Pydantic model for rag need
-class RagNeeded(BaseModel):
-    relevant: bool
-
-# Pydantic model for the Contextual Question LLM
-class KewordsFilingTables(BaseModel):
-    keywords: str
-    filing_table_selection: List[Literal[
-        "balance_sheet", 
-        "income_statement", 
-        "cash_flow_statement", 
-        "statement_of_changes_in_equity", 
-        "statement_of_comprehensive_income"
-    ]] = []
-
-# Getting assistant response
-def get_assistant_response(user_prompt, message_history, user_email, filing_id, socket_id, filing_date):
-
-    chunk_size = 10000
-    k = 3
-    chunk_overlap = 3
-    table_prepend_k = 3
-
-    # Creating filing info object
-    filing = get_filing(filing_id, filing_date)
-
-    # Reformatting user message history and most recent message into a single prompt
-    system_prompt = system_prompt_reformulate.format(filing_id=filing_id, user_prompt=user_prompt, message_history=message_history, user_email=user_email)
-    reformulated_prompt = llm.invoke(system_prompt).content
-
-    # Determining if RAG is needed for the answer
-    system_prompt = system_prompt_rag_needed.format(filing_id=filing_id, reformulated_prompt=reformulated_prompt)
-    bool_rag_needed = llm.with_structured_output(RagNeeded).invoke(system_prompt).relevant
-
-    # Handle a case where the reformulated prompt is relevant to the filing
-    if bool_rag_needed:
-        
-        # Get keywords and filing table selection
-        system_prompt = system_prompt_keywords_filings_tables.format(reformulated_prompt=reformulated_prompt)
-        prompt_keywords_and_filing_tables = llm.with_structured_output(KewordsFilingTables).invoke(system_prompt)
-
-        # Getting vectorsore to get context chunks from
-        vectorstore = get_vectorstore(filing, new_chat=False, chunk_size=chunk_size, chunk_overlap=chunk_overlap, table_prepend_k=table_prepend_k)
-
-        # Initializing metadata model
-        chunk_metadata_model = {
-            "ticker": filing.ticker, 
-            "date": filing.filing_date,
-            "form": filing.filing_type,
-            "year": filing.filing_year,
-            "chunk_description": "",
-            "chunk_size": chunk_size,
-            "chunk_overlap": chunk_overlap,
-            "table_prepend_k": table_prepend_k
-        }
-
-        # Initializing empty context string
-        list_context_chunks = ""
-
-        # Fetching filing tables for context
-        if len(prompt_keywords_and_filing_tables.filing_table_selection) > 0:
-            for table in prompt_keywords_and_filing_tables.filing_table_selection:
-                chunk_metadata_model = {
-                    "ticker": chunk_metadata_model["ticker"], 
-                    "year": chunk_metadata_model["year"],
-                    "chunk_size": chunk_metadata_model["chunk_size"],
-                    "chunk_overlap": chunk_metadata_model["chunk_overlap"],
-                    "table_prepend_k": chunk_metadata_model["table_prepend_k"],
-                    "chunk_description": table,
-                }
-
-                list_retrieved_chunks = vectorstore.similarity_search("", k=1, fetch_k=1000, filter=chunk_metadata_model)
-                for chunk in list_retrieved_chunks:
-                    list_context_chunks += chunk.page_content + "\n"
-        
-        # Fetching regular contexts from keywords
-        chunk_metadata_model = {
-            "ticker": filing.ticker, 
-            "date": filing.filing_date,
-            "form": filing.filing_type,
-            "year": filing.filing_year,
-            "chunk_description": "",
-            "chunk_size": chunk_size,
-            "chunk_overlap": chunk_overlap,
-            "table_prepend_k": table_prepend_k
-        }
-
-        list_retrieved_chunks = vectorstore.similarity_search_with_score(prompt_keywords_and_filing_tables.keywords, k=k, filter=chunk_metadata_model, fetch_k=1000)
-        for chunk in list_retrieved_chunks:
-            if chunk[0].page_content not in list_context_chunks:
-                list_context_chunks += chunk.page_content + "\n"
-            
-        system_prompt = system_prompt_rag.format(filing=filing, reformulated_prompt=reformulated_prompt, list_context_chunks=list_context_chunks)
-
-        buffer = ""
-        for chunk in llm.stream(system_prompt):
-            buffer += chunk.content
-            socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
-        
-    # Handle a case where the reformulated prompt is unrelated to the filing itself
-    else:
-        system_prompt = system_prompt_not_rag.format(reformulated_prompt=reformulated_prompt)
-        buffer = ""
-
-        for chunk in llm.stream(system_prompt):
-            buffer += chunk.content
-            socketio.emit('llm_response', {'word': chunk.content}, to=socket_id)
-
-    # Finishing the response
-    socketio.emit('llm_response_complete', to=socket_id)
-
-
-# Getting vectorstore
-def get_vectorstore(
-        filing : FilingObject, 
-        new_chat : bool,
-
-        # Optional args
-        chunk_size = 10000, 
-        chunk_overlap = 3, 
-        table_prepend_k = 3, 
-    ):
-    """
-    Manages vectorstore for a given filing and configuration.
-
-    Args:
-        filing (CustomCompanyFiling): The filing object to be converted.
-        chunk_size (int, optional): The maximum size of each chunk. Defaults to 5000.
-        chunk_overlap (int, optional): The number of rows to overlap between chunks. Defaults to 1000.
-        k (int, optional): The number of similar documents to return. Defaults to 1.
-        table_prepend_k (int, optional): The number of rows to prepend to each table chunk. Defaults to 3.
-        splitter_mode (str, optional): The text splitter to use. Defaults to "edgartools".
-
-    Returns:
-        FAISS: The vectorstore object.
-    """
-
-    # Initialize metadata model
-    chunk_metadata_model = {
-        "ticker": filing.ticker, 
-        "date": filing.filing_date,
-        "form": filing.filing_type,
-        "year": filing.filing_year,
-        "chunk_description": "",
-        "chunk_size": chunk_size,
-        "chunk_overlap": chunk_overlap,
-        "table_prepend_k": table_prepend_k
-    }
-
-    vectorstore_dir = "database/vectorstore"
-    embeddings = OpenAIEmbeddings()
-
-    # Check if vectorstore exists
-    if os.path.exists(vectorstore_dir):
-
-        # Load vectorstore
-        vectorstore = FAISS.load_local(vectorstore_dir, embeddings=embeddings, allow_dangerous_deserialization=True)
-
-        # Check if embedding already exists for a given filing and embedding config
-        if new_chat:
-            check_for_existing_embeddings = vectorstore.similarity_search("", k=3, filter=chunk_metadata_model)
-            # Case when embedding does not exist
-            if len(check_for_existing_embeddings) == 0:
-                sec_filing_object = get_sec_filing_object(filing)
-                chunks = sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
-                vectorstore.add_documents(chunks)
-                vectorstore.save_local(vectorstore_dir)
-                log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
-            # Case when embedding already exists       
-            else:
-                log('debug', f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
-
-    # Create vectorstore if it doesn't exist
-    else:
-        # Create new embedding and vectorstore, and save the vectorstore 
-        sec_filing_object = get_sec_filing_object(filing)
-        chunks = sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
-        vectorstore = FAISS.from_documents(chunks, embedding=embeddings)
-        vectorstore.save_local(vectorstore_dir)
-        log('info', f"Created Vectorstore for {filing.ticker}-{filing.filing_date}")
-
-    return vectorstore
-
-# Creating a class for rate limiting
-class RateLimiter:
-    def __init__(self, rate_limit):
-        self.rate_limit = rate_limit  # Maximum number of calls per second
-        self.semaphore = threading.Semaphore(rate_limit)
-        self.lock = threading.Lock()
-        self.reset_time = time.time() + 1
-
-    def current_time(self):
-        """Helper function to get current time in yyyy-mm-dd : hh-mm-ss.ms format."""
-        return datetime.now().strftime('%Y-%m-%d : %H-%M-%S.%f')[:-3]
-
-    def acquire(self):
-        with self.lock:
-            current_time = time.time()
-            if current_time >= self.reset_time:
-                # Reset the semaphore and reset_time every second
-                self.semaphore = threading.Semaphore(self.rate_limit)
-                self.reset_time = current_time + 1
-
-        # Check if semaphore is already exhausted
-        if self.semaphore._value == 0:
-            log('warning', f"Rate limit exceeded at {self.current_time()} - waiting for capacity")
-
-        # Block until semaphore is acquired (no timeout, it will wait)
-        self.semaphore.acquire()
-        # print(f"Semaphore acquired at {self.current_time()}")
-
-    def release(self):
-        self.semaphore.release()
-
-# Util try except oneliner
-def try_except(func, default=None, expected_exc=(Exception,)):
-    """
-    Tries to execute a given function, and if it fails with one of the specified
-    exceptions, returns a default value instead.
-
-    :param func: The function to try to execute
-    :param default: The value to return if an exception is raised
-    :param expected_exc: A tuple of exception types that are expected to be raised
-    :return: The result of the function, or the default value if an exception was
-             raised
-    """
-    try: return func()
-    except expected_exc: return default
-
 # Getting filing object
 def get_filing(filing_id, filing_date) -> FilingObject:
 
@@ -443,6 +153,39 @@ def get_sec_filing_object(filing_info : FilingObject):
 
     finally:
         rate_limiter.release()   
+
+
+# Creating a class for rate limiting
+class RateLimiter:
+    def __init__(self, rate_limit):
+        self.rate_limit = rate_limit  # Maximum number of calls per second
+        self.semaphore = threading.Semaphore(rate_limit)
+        self.lock = threading.Lock()
+        self.reset_time = time.time() + 1
+
+    def current_time(self):
+        """Helper function to get current time in yyyy-mm-dd : hh-mm-ss.ms format."""
+        return datetime.now().strftime('%Y-%m-%d : %H-%M-%S.%f')[:-3]
+
+    def acquire(self):
+        with self.lock:
+            current_time = time.time()
+            if current_time >= self.reset_time:
+                # Reset the semaphore and reset_time every second
+                self.semaphore = threading.Semaphore(self.rate_limit)
+                self.reset_time = current_time + 1
+
+        # Check if semaphore is already exhausted
+        if self.semaphore._value == 0:
+            log('warning', f"Rate limit exceeded at {self.current_time()} - waiting for capacity")
+
+        # Block until semaphore is acquired (no timeout, it will wait)
+        self.semaphore.acquire()
+        # print(f"Semaphore acquired at {self.current_time()}")
+
+    def release(self):
+        self.semaphore.release()
+
 
 # Custom character text splitter for SEC filings
 def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3, verbose = False):

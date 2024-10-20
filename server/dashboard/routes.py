@@ -1,5 +1,7 @@
+from .utils.vectorstore import get_vectorstore
 from ..general.utils import encode_token, decode_token, execute_query, log
-from .utils import get_filing, get_vectorstore, get_assistant_response
+from .utils.secedgar import get_filing
+from .utils.llm import get_assistant_response
 from flask import request, Blueprint, current_app
 from edgar import *
 from .. import socketio
