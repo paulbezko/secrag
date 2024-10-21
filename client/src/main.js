@@ -90,7 +90,7 @@ router.beforeEach(async (to, from, next) => {
       }
 
       // Check if user is trying to access the subscribed when already is
-      if (to.path === '/subscribed') {
+      if (to.path === '/subscribe') {
         if (navbarInfo.isSubscribed === true) {
           return next('/dashboard'); // Redirect to dashboard if subscribed
         }
