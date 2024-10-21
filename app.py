@@ -14,7 +14,9 @@ app.logger.setLevel(logging.DEBUG)
 app.logger.addHandler(handler)
 app.logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
 
-send_autoupdate_log()
+@app.before_first_request
+def init_send_logs():
+    send_autoupdate_log()
 
 # Handle stop signal. Could not seem to make it work inside routes or init.
 from flask import request
