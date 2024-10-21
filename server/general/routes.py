@@ -16,7 +16,7 @@ routes = Blueprint('routes', __name__)
 def router_get():
 
     try: user_info = decode_token(request.args.get('token'))
-    except Exception as error: return {'error': 'Error decoding token: ' + str(error)}
+    except Exception as error: return {'critical': 'Error decoding token: ' + str(error)}
     return {'authenticated': True, 'subscription': user_info.get('subscription', False), 'onboarding': user_info.get('onboarding', False)}
 
 
@@ -24,7 +24,7 @@ def router_get():
 def get_user_data_get():
 
     try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    except: return {'critical': 'Error decoding token'}
 
     user = get_user_data(user_info['email'])
     user_info = {
@@ -52,7 +52,7 @@ def get_user_data_get():
 def edit_user_post():
 
     try: user_info = decode_token(request.json.get('token'))
-    except: return {'error': 'Error decoding token'}
+    except: return {'critical': 'Error decoding token'}
     user = get_user_data(user_info['email'])
 
     if request.json.get('action') == 'changeName':
@@ -111,7 +111,7 @@ def edit_user_post():
 def change_email_get():
 
     try: email_payload = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    except: return {'critical': 'Error decoding token'}
 
     user = get_user_data(email_payload['email'])
 
@@ -134,7 +134,7 @@ def change_email_get():
 def get_captcha_get():
 
     try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    except: return {'critical': 'Error decoding token'}
             
     captcha_question = str(random.randint(100, 999))
     image = ImageCaptcha(width = 170, height = 100)
