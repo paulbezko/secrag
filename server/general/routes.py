@@ -26,26 +26,31 @@ def get_user_data_get():
     try: user_info = decode_token(request.args.get('token'))
     except: return {'critical': 'Error decoding token'}
 
-    user = get_user_data(user_info['email'])
-    user_info = {
-        'email': user['email'],
-        'name': user['name'],
-        'auth_type': user['auth_type'],
-        'subscription': user['subscription'],
-        'subscription_tokens_left': user['subscription_tokens_left'],
-        'stripe_subscription_id': user['stripe_subscription_id'],
-        'stripe_user_id': user['stripe_user_id'],
-    }
-
-    token = encode_token(user_info)
-    return {
-        'token': token,
-        'email': user_info['email'],
-        'name': user_info['name'],
-        'auth_type': user_info['auth_type'],
-        'subscription': user_info['subscription'],
-        'subscription_tokens_left': user['subscription_tokens_left']
+    try:
+        user = get_user_data(user_info['email'])
+        user_info = {
+            'email': user['email'],
+            'name': user['name'],
+            'auth_type': user['auth_type'],
+            'subscription': user['subscription'],
+            'subscription_tokens_left': user['subscription_tokens_left'],
+            'stripe_subscription_id': user['stripe_subscription_id'],
+            'stripe_user_id': user['stripe_user_id'],
         }
+
+        token = encode_token(user_info)
+        return {
+            'token': token,
+            'email': user_info['email'],
+            'name': user_info['name'],
+            'auth_type': user_info['auth_type'],
+            'subscription': user_info['subscription'],
+            'subscription_tokens_left': user['subscription_tokens_left']
+            }
+    
+    except Exception as error:
+        log('critical', 'Error retrieving user data: ' + str(error))
+        return {'critical': 'Error retrieving user data: ' + str(error)}
 
 
 @routes.route('/edit-user', methods=['POST'])
@@ -53,58 +58,64 @@ def edit_user_post():
 
     try: user_info = decode_token(request.json.get('token'))
     except: return {'critical': 'Error decoding token'}
-    user = get_user_data(user_info['email'])
 
-    if request.json.get('action') == 'changeName':
-        query = f"UPDATE users_{current_app.config['MODE']} SET name = %s WHERE email = %s"
-        execute_query(query, (request.json.get('name'), user_info['email']))
+    try:
+        user = get_user_data(user_info['email'])
+
+        if request.json.get('action') == 'changeName':
+            query = f"UPDATE users_{current_app.config['MODE']} SET name = %s WHERE email = %s"
+            execute_query(query, (request.json.get('name'), user_info['email']))
+            
+            if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], name = request.json.get('name'))
+            user_info['name'] = request.json.get('name')
+            token = encode_token(user_info)
+
+            return {'token': token, 'message': 'Name change successful'}
         
-        if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], name = request.json.get('name'))
-        user_info['name'] = request.json.get('name')
-        token = encode_token(user_info)
+        elif request.json.get('action') == 'changeEmail':
 
-        return {'token': token, 'message': 'Name change successful'}
-    
-    elif request.json.get('action') == 'changeEmail':
-
-        if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
-        if get_user_data(request.json.get('password')): return {'error': 'User with this email already exists'}
-
-        email_payload = user_info
-        email_payload['action'] = 'changeEmail'
-        email_payload['emailNew'] = request.json.get('emailNew')
-        email_payload['expiry'] = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
-
-        token = encode_token(email_payload)
-        send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
-
-        query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
-        execute_query(query, (token, user_info['email']))
-        return {'message': 'Confirmation email sent'}
-    
-    elif request.json.get('action') == 'changePassword':
-
-        if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
-
-        password_encrypted = generate_password_hash(request.json.get('passwordNew'))
-
-        query = f"UPDATE users_{current_app.config['MODE']} SET password = %s WHERE email = %s"
-        execute_query(query, (password_encrypted, user_info['email']))
-        return {'message': 'Password change successful'}
-    
-    elif request.json.get('action') == 'deleteAccount':
-
-        if user['auth_type'] == 'password':
             if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
+            if get_user_data(request.json.get('password')): return {'error': 'User with this email already exists'}
+
+            email_payload = user_info
+            email_payload['action'] = 'changeEmail'
+            email_payload['emailNew'] = request.json.get('emailNew')
+            email_payload['expiry'] = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+
+            token = encode_token(email_payload)
+            send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
+
+            query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
+            execute_query(query, (token, user_info['email']))
+            return {'message': 'Confirmation email sent'}
         
-        if user['auth_type'] != 'password': 
-            if user_info['captcha_answer'] != request.json.get('captcha'): return {'error': 'Captcha is not correct'}
+        elif request.json.get('action') == 'changePassword':
 
-        if user['stripe_user_id']: stripe.Customer.delete(user['stripe_user_id'])
+            if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
 
-        query = f"DELETE FROM users_{current_app.config['MODE']} WHERE email = %s"
-        execute_query(query, (user_info['email'],))
-        return {}
+            password_encrypted = generate_password_hash(request.json.get('passwordNew'))
+
+            query = f"UPDATE users_{current_app.config['MODE']} SET password = %s WHERE email = %s"
+            execute_query(query, (password_encrypted, user_info['email']))
+            return {'message': 'Password change successful'}
+        
+        elif request.json.get('action') == 'deleteAccount':
+
+            if user['auth_type'] == 'password':
+                if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
+            
+            if user['auth_type'] != 'password': 
+                if user_info['captcha_answer'] != request.json.get('captcha'): return {'error': 'Captcha is not correct'}
+
+            if user['stripe_user_id']: stripe.Customer.delete(user['stripe_user_id'])
+
+            query = f"DELETE FROM users_{current_app.config['MODE']} WHERE email = %s"
+            execute_query(query, (user_info['email'],))
+            return {}
+
+    except Exception as error:
+        log('critical', 'Error editing user data: ' + str(error))
+        return {'critical': 'Error editing user data: ' + str(error)}
 
 
 @routes.route('/change-email', methods=['GET'])
@@ -156,21 +167,6 @@ def get_captcha_get():
         'captcha_image': f"data:image/png;base64,{image_base64}",
         'token': token
     })
-
-
-@routes.route('/contact', methods=['POST'])
-def contact_post():
-
-    payload = f"""
-Sender name: {request.json.get('name')}
-Sender email: {request.json.get('email')}
-Message: {request.json.get('message')}
-"""
-
-    try: 
-        send_email_from_template(email = current_app.config['MAIL_CONTACT_USER'], template = 'contact', payload = payload)
-        return {}
-    except: return {'error': 'Error sending message.'}
 
 
 @routes.route('/get-policy', methods=['GET'])
