@@ -15,9 +15,12 @@ routes = Blueprint('routes', __name__)
 @routes.route('/router', methods=['GET'])
 def router_get():
 
-    try: user_info = decode_token(request.args.get('token'))
-    except Exception as error: return {'critical': 'Error decoding token: ' + str(error)}
-    return {'authenticated': True, 'subscription': user_info.get('subscription', False), 'onboarding': user_info.get('onboarding', False)}
+    try: 
+        user_info = decode_token(request.args.get('token'))
+        return {'authenticated': True, 'subscription': user_info.get('subscription', False), 'onboarding': user_info.get('onboarding', False)}
+    except Exception as error: 
+        return {'critical': 'Error decoding token: ' + str(error)}
+    
 
 
 @routes.route('/get-user-data', methods=['GET'])
