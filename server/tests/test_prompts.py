@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
-
+from typing import List, Literal
 
 model = ChatOpenAI(temperature=0, api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS", model_name="gpt-4o-mini")
 
@@ -11,12 +11,12 @@ def get_reformulated_prompt_from_history(user_prompt, history, filing_id="AAPL-1
 
     To determine if the current request is a follow-up, consider the following:
 
-    - It qualifies as a follow-up if it implicitly or explicitly asks for further detail about the previous topic, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
-    - If the current request relates to previous messages and pertains specifically to SEC filings or financial statements, it may be relevant to the filing ID: {filing_id}. Reformulate it to include relevant context only if necessary.
-    - **If the current request is about general financial concepts (e.g., explaining what a balance sheet is or the significance of a 10-Q), do not include historical context in the reformulation.**
-    - Do not classify it as a follow-up if the request addresses a different financial statement, topic, or request that doesn’t build upon the previous requests.
+    It qualifies as a follow-up if it implicitly or explicitly asks for further detail about the previous topic, uses ambiguous terms (e.g., "it," "this") that refer to the last specific message, requests additional formatting (e.g., "return as markdown"), or seeks clarification on a specific aspect of the last prompt.
+    If the current request relates to previous messages and pertains specifically to SEC filings or financial statements, it may be relevant to the filing ID: {filing_id}. Reformulate it to include relevant context only if necessary.
+    If the current request is about general financial concepts (e.g., explaining what a balance sheet is or the significance of a 10-Q), do not include historical context in the reformulation.
+    Do not classify it as a follow-up if the request addresses a different financial statement, topic, or request that doesn’t build upon the previous requests.
+    If the current request qualifies as a follow-up, reformulate it to clearly state what information is being requested, replacing vague references (e.g., "it," "this") with the specific topic from the previous message, ensuring that no irrelevant historical context is included if the question is general.
 
-    If the current request qualifies as a follow-up, reformulate it to clearly state what information is being requested, ensuring that no irrelevant historical context is included if the question is general.
     If the current request does not qualify as a follow-up, return it as is. Return nothing else but the request.
 
     Latest chat messages: {history}
@@ -47,192 +47,119 @@ def get_decision(reformulated_prompt, filing_id):
     return response
 
 
+
+def get_decision_v2(prompt, history, filing_id):
+
+    class Keywords(BaseModel):
+        keywords: list[str] = []
+        filing_table_selection: List[Literal[
+            "balance_sheet", 
+            "income_statement", 
+            "cash_flow_statement", 
+            "statement_of_changes_in_equity", 
+            "statement_of_comprehensive_income"
+        ]] = []
+
+    system_prompt = f"""
+    You are an expert in financial documents, particularly SEC filings such as 10-K and 10-Q reports. You are presented with a current request and the latest chat messages from a human.
+    
+    Based on the following message, determine if the user is asking for information related to specific financial tables (e.g., balance sheet, income statement, cash flow statement) within this filing ID. This includes selecting relevant tables such as balance sheets, income statements, or cash flow statements, as well as identifying other key financial terms not directly tied to specific tables.
+    
+    When deciding, consider the following guidelines:
+    
+    - If the user is asking for specific financial documents (e.g., "show me the balance sheet"), populate the **filing_table_selection** field with the relevant tables such as 'balance_sheet', 'income_statement', or 'cash_flow_statement'.
+    - If the user's message references financial data that could span multiple tables (e.g., "What do you think about their liquidity?"), add the specific table(s) related to that concept and populate the **keywords** field with other relevant financial terms (e.g., 'liquidity', 'assets').
+    - Ensure precision in determining what the user is asking for, and only fill **filing_table_selection** with tables specifically related to the question. Use **keywords** for related terms not directly referencing specific tables.
+    - If the question is unrelated to financial documents or tables, leave both **filing_table_selection** and **keywords** empty.
+    
+    Return the following:
+    
+    - Populate **filing_table_selection** with the relevant financial tables.
+    - Populate **keywords** with other financial terms that are relevant but do not correspond to a specific table.
+
+    Chat history: {history}
+    Latest message: {prompt}
+    Filing ID: {filing_id}
+    """
+
+    # Get response from the model and populate the keywords.
+    response = model.with_structured_output(Keywords).invoke(system_prompt)
+
+    return response.keywords, response.filing_table_selection
+
+
 list_chats = [
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What is your favorite movie?'},
-    #         {'role': 'user', 'content': 'Give me balance sheet figures.'},
-    #         {'role': 'user', 'content': 'What do you think about the new tech trends?'},
-    #         {'role': 'user', 'content': 'Can you summarize the cash flow statement for the last quarter?'},
-    #         {'role': 'user', 'content': 'Tell me about the weather in New York.'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What were the total assets listed in the last balance sheet?": True,
-    #         "What were the liabilities reported in the most recent filing?": True,
-    #         "Show the revenue for the last fiscal year in the 10-K.": True,
-    #         "Can you explain what a balance sheet is?": False,
-    #         "How do stock markets work?": False,
-    #         "What information is included in the financial statements of a 10-K?": False,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What hobbies do you have?'},
-    #         {'role': 'user', 'content': 'Summarize the major risks in the 10-Q.'},
-    #         {'role': 'user', 'content': 'What is your favorite type of cuisine?'},
-    #         {'role': 'user', 'content': 'What were the key metrics for the last quarter?'},
-    #         {'role': 'user', 'content': 'Who won the last football match?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What are the earnings per share reported in the last 10-Q?": False,
-    #         "What risks were discussed in the latest 10-K?": True,
-    #         "What are the operating cash flows for the last fiscal year?": True,
-    #         "What is the significance of a 10-Q?": False,
-    #         "How does inflation impact investments?": False,
-    #         "Can you explain the difference between a 10-K and a 10-Q?": False,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'Can you recommend a good book?'},
-    #         {'role': 'user', 'content': 'What were the earnings reported in the last 10-K?'},
-    #         {'role': 'user', 'content': 'What is your take on climate change?'},
-    #         {'role': 'user', 'content': 'Show me the trends in revenue from the last filing.'},
-    #         {'role': 'user', 'content': 'What is the latest news in technology?'},
-    #         {'role': 'user', 'content': 'What’s the total revenue reported in the last quarter?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What were the major expenses reported in the latest 10-K?": True,
-    #         "What is the company's debt-to-equity ratio according to the last filing?": True,
-    #         "How does the cash flow compare to last year?": True,
-    #         "What does a 10-K include?": False,
-    #         "Can you explain what an income statement is?": False,
-    #         "What are the types of disclosures required in SEC filings?": False,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What’s your opinion on space exploration?'},
-    #         {'role': 'user', 'content': 'Can you tell me about the latest cash flow statement?'},
-    #         {'role': 'user', 'content': 'What are some good travel destinations?'},
-    #         {'role': 'user', 'content': 'List the major financial figures from the last 10-Q.'},
-    #         {'role': 'user', 'content': 'What do you think about AI technology?'},
-    #         {'role': 'user', 'content': 'How did the company perform in terms of net income?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What were the cash flows from operations in the last 10-Q?": False,
-    #         "What were the investments listed in the last filing?": False,
-    #         "What is the significance of cash flow statements?": False,
-    #         "How do you calculate earnings per share?": False,
-    #         "What is the purpose of financial statements?": False,
-    #         "Explain the role of the SEC in financial reporting.": False,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What’s the latest blockbuster movie?'},
-    #         {'role': 'user', 'content': 'What were the total liabilities in the last 10-K?'},
-    #         {'role': 'user', 'content': 'How do you feel about virtual reality?'},
-    #         {'role': 'user', 'content': 'Summarize the revenue figures for the last quarter.'},
-    #         {'role': 'user', 'content': 'What is the weather forecast for next week?'},
-    #         {'role': 'user', 'content': 'Explain the concept of working capital.'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What is the total equity reported in the last filing?": True,
-    #         "What were the earnings reported in the last fiscal year?": True,
-    #         "Show me the key figures from the balance sheet.": True,
-    #         "What is the role of financial analysts?": False,
-    #         "Can you discuss the significance of quarterly reports?": False,
-    #         "What are some key factors in analyzing financial statements?": False,
-    #     }
-    # },
-    # {
-    #         'history': [
-    #         {'role': 'user', 'content': 'What is the best strategy for investing?'},
-    #         {'role': 'user', 'content': 'Can you tell me about AAPL’s revenue for 2023?'},
-    #         {'role': 'user', 'content': 'What do you think about the latest smartphone releases?'},
-    #         {'role': 'user', 'content': 'What were the operating expenses in the latest 10-K?'},
-    #         {'role': 'user', 'content': 'What’s your favorite sport?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "How much was AAPL's net income last year?": True,
-    #         "What trends do you see in tech investments?": False,
-    #         "What were the key financial ratios reported in the last 10-K?": True,
-    #         "Can you explain what an investment portfolio is?": False,
-    #         "What is a 10-K filing?": False,
-    #         "List some key performance indicators for AAPL.": True,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'Do you like cats or dogs?'},
-    #         {'role': 'user', 'content': 'Summarize the latest news about AAPL.'},
-    #         {'role': 'user', 'content': 'What’s your favorite season?'},
-    #         {'role': 'user', 'content': 'What were the cash flows reported in the last quarter?'},
-    #         {'role': 'user', 'content': 'How many countries have you visited?'},
-    #         {'role': 'user', 'content': 'What are the assets reported in the latest 10-K?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What was AAPL's total revenue in the latest filing?": True,
-    #         "What are the implications of the cash flow statement?": False,
-    #         "What are the liabilities listed in the last 10-K?": True,
-    #         "Can you explain the purpose of an income statement?": False,
-    #         "What’s the importance of asset management?": False,
-    #         "What are the current market trends for tech companies?": True,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What’s your favorite food?'},
-    #         {'role': 'user', 'content': 'How does AAPL handle its supply chain?'},
-    #         {'role': 'user', 'content': 'What do you think about electric vehicles?'},
-    #         {'role': 'user', 'content': 'Summarize the risks mentioned in the latest 10-K.'},
-    #         {'role': 'user', 'content': 'What’s the best way to learn a new language?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What were the major risks for AAPL in the latest report?": True,
-    #         "How does the economy impact stock performance?": False,
-    #         "What is AAPL's strategy for growth according to the 10-K?": True,
-    #         "What is an annual report?": False,
-    #         "What factors influence consumer behavior?": False,
-    #         "What financial metrics does AAPL focus on?": True,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What is your favorite vacation spot?'},
-    #         {'role': 'user', 'content': 'How did AAPL perform in the last fiscal year?'},
-    #         {'role': 'user', 'content': 'What are the benefits of yoga?'},
-    #         {'role': 'user', 'content': 'What is the company’s gross margin as per the latest filing?'},
-    #         {'role': 'user', 'content': 'Can you share a fun fact about space?'},
-    #         {'role': 'user', 'content': 'What’s the current market cap of AAPL?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "How does AAPL's gross margin compare to competitors?": True,
-    #         "What are the implications of gross margin for investors?": False,
-    #         "What was the total debt reported in the last 10-K?": True,
-    #         "What does market capitalization mean?": False,
-    #         "Can you explain the difference between profit and revenue?": False,
-    #         "What trends are currently influencing the tech sector?": True,
-    #     }
-    # },
-    # {
-    #     'history': [
-    #         {'role': 'user', 'content': 'What’s the most popular music genre now?'},
-    #         {'role': 'user', 'content': 'What was the total equity reported in AAPL’s latest 10-K?'},
-    #         {'role': 'user', 'content': 'Do you like art?'},
-    #         {'role': 'user', 'content': 'What are the key figures in AAPL’s cash flow statement?'},
-    #         {'role': 'user', 'content': 'How do you stay updated with world events?'},
-    #         {'role': 'user', 'content': 'What is AAPL’s approach to sustainability?'},
-    #     ],
-    #     'user_prompts_with_answers': {
-    #         "What were the significant investments reported in the last filing?": True,
-    #         "How is sustainability measured in financial reports?": False,
-    #         "What were the earnings reported in the last fiscal year?": True,
-    #         "What is the role of corporate social responsibility?": False,
-    #         "What are some challenges in the tech industry?": True,
-    #         "What is an ESG report?": False,
-    #     }
-    # },
+    # Case 1: Balance sheet reference followed by a non-financial question
     {
-        'history': [
-            {'role': 'user', 'content': 'give me balance sheet in a table form'},
-        ],
+        'history': ['show me balance sheet', 'banana monkey'],
         'user_prompts_with_answers': {
-            "show as a json now": True,
+            "what do you think about it",  # Likely referring to the balance sheet, relevant.
+            "what day is it today",        # Unrelated to financial documents, not relevant.
+            "show me balance sheet",       # Directly requesting a financial document, relevant.
         }
     },
+    
+    # Case 2: Mixed conversation about finance and other topics
+    {
+        'history': ['what are the top movies this week', 'show me the income statement'],
+        'user_prompts_with_answers': {
+            "what are the revenue figures", # Likely asking about income statement, relevant.
+            "who is the CEO of Apple",      # Unrelated to financial documents, not relevant.
+            "show me the income statement", # Direct request for financial document, relevant.
+        }
+    },
+    
+    # Case 3: Non-financial conversation with an abrupt shift to finance
+    {
+        'history': ['who won the soccer game yesterday', 'what is the weather forecast'],
+        'user_prompts_with_answers': {
+            "what do you think about earnings", # Abrupt shift to finance, relevant.
+            "what's the best recipe for pizza", # Unrelated to financial documents, not relevant.
+            "show me the cash flow statement",  # Direct request for financial document, relevant.
+        }
+    },
+    
+    # Case 4: Primarily finance-related, with a mix of prompts
+    {
+        'history': ['show me the annual report', 'do you like coffee'],
+        'user_prompts_with_answers': {
+            "can you analyze the report",   # Referring to financial report, relevant.
+            "how much cash do they have",   # Likely referring to balance sheet, relevant.
+            "what's your favorite movie",   # Unrelated to financial documents, not relevant.
+        }
+    },
+    
+    # Case 5: No financial references in history, with a sudden finance request
+    {
+        'history': ['tell me a joke', 'what time is it'],
+        'user_prompts_with_answers': {
+            "can you show me the balance sheet", # New request for financial document, relevant.
+            "who is the current president",      # Unrelated to financial documents, not relevant.
+            "what do you think about profits",   # Could refer to financial documents indirectly, relevant.
+        }
+    },
+    
+    # Case 6: Historical reference, then indirect finance query
+    {
+        'history': ['tell me about World War II', 'how do you bake a cake'],
+        'user_prompts_with_answers': {
+            "what do you think about the balance sheet", # Directly related to financial document, relevant.
+            "what is inflation",                        # Indirectly related to finance, could be relevant depending on context.
+            "show me the income statement",             # Direct request for financial document, relevant.
+        }
+    },
+    
+    # Case 7: Financial conversation, followed by casual questions
+    {
+        'history': ['show me the quarterly earnings', 'what is your favorite color'],
+        'user_prompts_with_answers': {
+            "how is their revenue growth", # Likely asking about earnings, relevant.
+            "what's the weather like",     # Unrelated to financial documents, not relevant.
+            "show me the earnings report", # Direct request for financial document, relevant.
+        }
+    }
 ]
+
 
 
 filing_id = "AAPL-2023-10K"
@@ -241,25 +168,25 @@ total_count = 0
 
 for chat in list_chats:
     history = chat['history']
-    user_prompts_with_answers = chat['user_prompts_with_answers']
+    user_prompts = chat['user_prompts_with_answers']
 
-    for prompt, expected_answer in user_prompts_with_answers.items():
-        reformulated_prompt = get_reformulated_prompt_from_history(prompt, history, filing_id)
-        bool_use_rag = get_decision(reformulated_prompt, filing_id)
+    for prompt in user_prompts:
+        # reformulated_prompt = get_reformulated_prompt_from_history(prompt, history, filing_id)
+        keywords, filing_table_selection = get_decision_v2(prompt, history, filing_id)
 
         # Print results for each prompt
-        print(f"Question: {prompt}\nReformulated Prompt: {reformulated_prompt}")
-        print(f"Expected: {expected_answer} | Model Response: {bool_use_rag} {'✅' if bool_use_rag == expected_answer else '❌'}\n")
+        print(f"History: {history}\nQuestion: {prompt}")
+        print(f"Keywords: {keywords}\nFiling Table Selection: {filing_table_selection}\n")
         
         # Update counters
-        total_count += 1
-        if bool_use_rag == expected_answer:
-            correct_count += 1
+        # total_count += 1
+        # if bool_use_rag == expected_answer:
+        #     correct_count += 1
 
 # Calculate accuracy
-if total_count > 0: accuracy = (correct_count / total_count) * 100
-else: accuracy = 0.0  # Handle case where no prompts were processed
-print(f"Accuracy: {accuracy:.2f}% ({correct_count}/{total_count})")
+# if total_count > 0: accuracy = (correct_count / total_count) * 100
+# else: accuracy = 0.0  # Handle case where no prompts were processed
+# print(f"Accuracy: {accuracy:.2f}% ({correct_count}/{total_count})")
 
 
 

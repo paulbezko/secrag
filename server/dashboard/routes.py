@@ -1,5 +1,8 @@
+from .utils.miscellaneous import save_message
+from .utils.vectorstore import vectorstore_manager
 from ..general.utils import encode_token, decode_token, execute_query, log
-from .utils import get_filing, get_vectorstore, get_assistant_response, vectorstore_manager
+from .utils.secedgar import get_filing
+from .utils.llm import get_assistant_response
 from flask import request, Blueprint, current_app
 from edgar import *
 from .. import socketio
@@ -8,7 +11,6 @@ import json
 
 # Routes initialization
 routes = Blueprint('routes', __name__)
-
 
 @routes.route('/get-chats', methods=['GET'])
 def get_chats_get():
@@ -45,14 +47,20 @@ def new_chat_post():
     token_cost_chat = 20
     if int(user_info['subscription_tokens_left']) < token_cost_chat: return {'error': 'Insufficient Tokens'}
 
+    socket_id = request.json.get('socketId')
+    socketio.emit('new_chat_started', to=socket_id)
+
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
     if user_info['email'] not in memory: memory[user_info['email']] = {}
     memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
     with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
     
+    socketio.emit('new_chat_initialized', to=socket_id)
     filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
-    #get_vectorstore(filing, new_chat=True)
+    socketio.emit('new_chat_downloaded', to=socket_id)
     vectorstore_manager.new_chat(filing)
+    socketio.emit('new_chat_vectorized', to=socket_id)
+
     log('debug', f'New chat created for {user_info["email"]}: {request.json.get("chat")}')
     query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
     execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
@@ -138,15 +146,12 @@ def new_message_user_post():
     if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
 
     message_history = (request.json.get('lastXMessages'))
-
-    with open("database/memory/chats.json", "r") as file: chat_memory = json.load(file)
-    chat_memory[user_info["email"]][request.json.get('chat')]["messages"].append({"role": "user", "content": request.json.get('message')})
-    with open("database/memory/chats.json", "w") as f: json.dump(chat_memory, f, indent=4)
+    # message_history_json = [message['content'] for message in message_history_json if 'content' in message]
+    save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'user', message = request.json.get('message'))
 
     get_assistant_response(
         user_prompt = request.json.get('message'),
         message_history = message_history,
-        user_email = user_info["email"],
         filing_id = request.json.get('chat'),
         socket_id = request.json.get('socketId'),
         filing_date = request.json.get('filingDate')
@@ -166,13 +171,7 @@ def new_message_assistant_post():
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
 
-    with open("database/memory/chats.json", "r") as file: chat_memory = json.load(file)
-    chat_memory[user_info["email"]][request.json.get('chat')]["messages"].append({"role": "assistant", "content": request.json.get('message')})
-    with open("database/memory/chats.json", "w") as f: json.dump(chat_memory, f, indent=4)
-
+    save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'assistant', message = request.json.get('message'))
     return {'success': True}
 
-# Handle a connection event
-@socketio.on('connect')
-def handle_connect():
-    log('info', f'Client connected: {request.sid}')
+
