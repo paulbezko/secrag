@@ -14,7 +14,7 @@ app.logger.setLevel(logging.DEBUG)
 app.logger.addHandler(handler)
 app.logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
 
-@app.before_first_request
+@app.before_request
 def init_send_logs():
     send_autoupdate_log()
 
