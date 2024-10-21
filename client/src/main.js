@@ -63,6 +63,7 @@ router.beforeEach(async (to, from, next) => {
 
     if (response.data.critical) {
       localStorage.removeItem('_u');
+      store.commit('setAuthentication', false)
       return next('/'); // Redirect to home if token is critical
     }
 
