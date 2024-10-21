@@ -27,6 +27,10 @@ ul {
   padding-left: 2rem;
 }
 
+a {
+  color: var(--color-black);
+}
+
 :root {
   --color-yellow-dark: #7c5d00;
   --color-yellow: #FFC107;
@@ -323,6 +327,10 @@ input[type="password"]
   background-color: var(--color-blue-highlight)
 }
 
+.input-disabled {
+  color: var(--color-grey);
+}
+
 .input-disabled:hover {
   border: 1px solid var(--color-grey) !important;
   background-color: var(--color-white);
@@ -358,9 +366,14 @@ textarea:focus,
 textarea:hover,
 textarea:active {
   outline: none;
-
   border: 1px solid var(--color-blue);
   background-color: var(--color-blue-highlight)
+}
+
+textarea:disabled {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-grey);
+  color: var(--color-grey);
 }
 
 select {
@@ -455,7 +468,7 @@ select {
   border-radius: 1rem;
   border: 1px solid var(--color-grey);
   max-width: 75%;
-  margin-block: 1rem;
+  margin-top: 1rem;
 }
 
 .chat-message-assistant {max-width: 75%;}
@@ -482,6 +495,10 @@ select {
 .chat-input.active,
 .chat-input:focus {
   outline: none;
+}
+
+.chat-input:disabled::placeholder {
+  color: var(--color-grey);
 }
 
 .chat-input::-webkit-scrollbar { display: none; }

@@ -15,3 +15,5 @@
 2024-10-21 13:36:48,222 - DEBUG - New chat created for planetchars@gmail.com: UNQL-2024-10K
 2024-10-21 14:37:49,825 - DEBUG - Updated Vectorstore for IMTH-2024-10-16, 10000, 3, 3
 2024-10-21 14:37:49,827 - DEBUG - New chat created for planetchars@gmail.com: IMTH-2024-10K
+2024-10-21 18:05:59,542 - DEBUG - Embedding already exists for IMTH-2024-10-16, 10000, 3, 3
+2024-10-21 18:05:59,546 - DEBUG - New chat created for planetchars@gmail.com: IMTH-2024-10K

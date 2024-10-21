@@ -162,17 +162,23 @@ def authenticate_post():
         log('info', f'New user joined through Google: {request.json.get('email').lower()}')
         query = f"INSERT INTO users_{current_app.config['MODE']} (email, name, auth_type, supabase_user_id) VALUES (%s, %s, %s, %s)"
         execute_query(query, (request.json.get('email').lower(), request.json.get('name'), request.json.get('auth_type'), request.json.get('id')))
-    elif user['auth_type'] != 'google': return {'error': 'authMethodIncorrect'}    
-    
-    user_info = {
-        'email': request.json.get('email').lower(),
-        'name': user['name'],
-        'auth_type': user['auth_type'],
-        'subscription': user['subscription'],
-        'subscription_tokens_left': user['subscription_tokens_left'],
-        'stripe_subscription_id': user['stripe_subscription_id'],
-        'stripe_user_id': user['stripe_user_id'],
-    }
+        user_info = {
+            'email': request.json.get('email').lower(),
+            'name': request.json.get('name'),
+            'auth_type': 'google',
+        }
+
+    elif user['auth_type'] == 'google': 
+        user_info = {
+            'email': request.json.get('email').lower(),
+            'name': user['name'],
+            'auth_type': user['auth_type'],
+            'subscription': user['subscription'],
+            'subscription_tokens_left': user['subscription_tokens_left'],
+            'stripe_subscription_id': user['stripe_subscription_id'],
+            'stripe_user_id': user['stripe_user_id'],
+        }
+    else: return {'error': 'authMethodIncorrect'}
 
     token = encode_token(user_info)
     return {'token': token}
