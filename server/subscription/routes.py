@@ -60,7 +60,7 @@ def subscribe_post():
                 }],
             mode='payment',
             allow_promotion_codes = True,
-            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
+            success_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
             cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
         )
         return {'sessionUrl': session['url']}
@@ -86,7 +86,6 @@ def webhook_post():
                 try: user = get_user_data_stripe(response['customer'])
                 except: return {'error': 'Error retrieving user data'}
                 
-
                 if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: 
                     tokens = 1200
                     product = 'basic'
