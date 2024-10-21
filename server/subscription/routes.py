@@ -86,7 +86,6 @@ def webhook_post():
                 try: user = get_user_data_stripe(response['customer'])
                 except: return {'error': 'Error retrieving user data'}
                 
-
                 if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: 
                     tokens = 1200
                     product = 'basic'
