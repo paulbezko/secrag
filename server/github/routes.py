@@ -54,5 +54,6 @@ def delayed_update():
     """Function to delay execution and run the shell script."""
     time.sleep(DELAY_BEFORE_UPDATE)
 
-    # Use os.execvp to run the shell script
-    os.execvp('bash', ['bash', AUTOUPDATE_SCRIPT])
+    with open("autoupdate.log", 'a') as log_file:
+        process = subprocess.Popen(['bash', AUTOUPDATE_SCRIPT], stdout=log_file, stderr=subprocess.STDOUT)
+        process.wait()  # Wait for the process to finish
