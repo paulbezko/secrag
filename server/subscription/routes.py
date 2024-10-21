@@ -69,7 +69,7 @@ def subscribe_post():
 @routes.route('/webhook', methods=['POST'])
 def webhook_post():
 
-    event = stripe.Webhook.construct_event(request.data, request.headers.get('stripe-signature'), current_app.config['STRIPE_WEBHOOK_KEY_TEST'])
+    event = stripe.Webhook.construct_event(request.data, request.headers.get('stripe-signature'), current_app.config['STRIPE_WEBHOOK_KEY'])
     response = event['data']['object']
 
     try:
