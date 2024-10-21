@@ -1,5 +1,5 @@
 <template>
-<div class="flex-column width-100" style="padding-inline: 2rem; height: 100vh; align-items: center">
+<div v-if="pageLoaded" class="flex-column width-100" style="padding-inline: 2rem; height: 100vh; align-items: center">
   <NavbarComp :authenticated="isAuthenticated" :subscribed="isSubscribed" />
   <div class="flex-column center gap-2 height-100" style="flex-grow: 1; width: 100%; overflow-y: auto;">
     <div class="no-scrollbar" style="background-color: var(--color-grey-light); width: 100%; height: 100%; overflow-y: auto; padding: 2rem;">
@@ -28,7 +28,7 @@ export default {
   mounted() {
     this.pageLoaded = false
     axios.get(`${config.apiUrl}/api/get-policy`, {params: { 'policy': this.policy }})
-      .then(response => {this.policy = marked(response.data)})
+      .then(response => {this.policy = marked(response.data); this.pageLoaded = true})
       .catch(error => {console.error('Error getting ticker info:', error);});
   },
   computed: {
