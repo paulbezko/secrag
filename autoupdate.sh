@@ -1,9 +1,11 @@
 #!/bin/bash
 sudo systemctl stop secrag
 
-sudo git pull origin main
+
 
 cd /home/ubuntu/secrag/Collab-Project-1
+
+sudo git pull origin prod
 cd client
 sudo npm run build
 cd ..
