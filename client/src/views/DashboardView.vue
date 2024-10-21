@@ -12,7 +12,7 @@
       <div class="fa-circle-check fa-solid text-1" style="color: var(--color-green)"></div>
     </div>
     <div v-if="showConfirm && confirmAction === 'deleteChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
-      <div class="text-1 text-bold">Delete Chat?</div>
+      <div class="text-2">Delete Chat?</div>
       <div class="button button-secondary" @click="deleteChat(currentChat)">Confirm</div>
     </div>
     <div v-if="showConfirm && confirmAction === 'insufficientTokens' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20" style="max-width: 32rem; padding: 2rem">
@@ -53,7 +53,10 @@
     </transition>
 
     <!-- New Chat Section -->
-    <SpinnerCompInside v-if="newChatLoading"></SpinnerCompInside>
+    <div class="flex-row gap-1 center" v-if="newChatLoading">
+      <div class="text-2" style="box-sizing: border-box; white-space: nowrap;">{{ newChatLoadingMessage }}</div>
+      <SpinnerCompInside></SpinnerCompInside>
+    </div>
     <div v-if="!newChatLoading && newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Created a new Chat</div>
       <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
@@ -109,11 +112,11 @@
     <!-- Chat Section -->
     <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
-        <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" ref="chatContainer">
+        <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" ref="chatContainer" style="padding-top: .5rem;">
           <SpinnerCompInside v-if="chatLoading"></SpinnerCompInside>
           <div v-else>
             <div v-for="(message, index) in currentMessages" :key="index" :class="{'text-chat': message.role === 'assistant', 'text-chat': message.role === 'user'}">
-              <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1">
+              <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1" style="margin-top: 1rem;">
                 <!-- v-if needed to only show emoji in the last message -->
                 <img
                   v-if="index === currentMessages.length - 1" 
@@ -217,6 +220,7 @@ export default {
       confirmSuccess: false,
       isSmallScreen: window.innerWidth <= 800, // Initial check for screen size
       createButtonDisabled: true,
+      newChatLoadingMessage: '',
 
       // Chat data
       chats: [],
@@ -275,8 +279,8 @@ export default {
     if (!this.isSmallScreen) {this.sidebarShown = true;}
     else (this.filingShown = false)
     window.addEventListener('resize', this.handleResize);
-    if (this.subscription === 'basic') {this.lastXMessagesLength = 5}
-    else {this.lastXMessagesLength = 10}
+    if (this.subscription === 'basic') {this.lastXMessagesLength = 8}
+    else {this.lastXMessagesLength = 16}
   },
   beforeUnmount() {window.removeEventListener('resize', this.handleResize);},
 
@@ -285,9 +289,14 @@ export default {
     // Initialize Socket
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {(this.socketId = socket.id)});
+      socket.emit("connect1")
+      socket.on("connect", () => {(this.socketId = socket.id); console.log("Connected to socket", socket.id);});
+      socket.on("new_chat_started", () => {this.newChatLoadingMessage = 'Creating chat';});
+      socket.on("new_chat_initialized", () => {this.newChatLoadingMessage = 'Downloading the filing';});
+      socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
+      socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {if (!this.responseStopped) {this.stopButtonShown = false, this.saveAssitantResponse()}});
+      socket.on("llm_response_complete", () => {if (!this.responseStopped) {this.saveAssitantResponse()}});
     },
 
     // Load List Tickers
@@ -360,7 +369,8 @@ export default {
           token: localStorage.getItem('_u'),
           chat: newChatName,
           filingDate: selectedDate,
-          ticker: selectedTicker
+          ticker: selectedTicker,
+          socketId: this.socketId
         });
 
         if (response.data.error) {
@@ -438,7 +448,7 @@ export default {
         this.newChat = false;
         
         this.$nextTick(() => {this.adjustTextareaHeight('textarea'); this.scrollToBottom("smooth")});
-        const lastXMessages = this.currentMessages.filter(msg => msg.role === 'user').slice(-this.lastXMessagesLength)
+        const lastXMessages = this.currentMessages.slice(-this.lastXMessagesLength)
 
         try {
           let response = await axios.post(`${config.apiUrl}/api/new-message-user`, {
@@ -470,7 +480,13 @@ export default {
       }
     },
 
-    stopResponse() {this.stopButtonShown = false; this.responseStopped = true; this.saveAssitantResponse(); this.assistantMessageLoading = false;},
+    stopResponse() {
+      socket.emit("stop_llm_stream");
+      this.responseStopped = true; 
+      this.assistantMessageLoading = false;
+      this.saveAssitantResponse(); 
+    },
+
     async saveAssitantResponse() {          
       try {
           let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
@@ -479,6 +495,8 @@ export default {
             message: this.llmResponseBuffer,
           });
           if (response.data.error) {console.log(response.data.error); return;}
+          this.stopButtonShown = false;
+          this.$nextTick(() => {this.$refs.textarea.focus()})
         } catch (error) {console.error('Error sending message:', error); return;}
     },
 
