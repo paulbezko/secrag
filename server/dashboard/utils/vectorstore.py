@@ -62,7 +62,7 @@ class VectorstoreManager:
             "date": filing.filing_date,
             "form": filing.filing_type,
             "year": filing.filing_year,
-            "chunk_description": "",
+            # "chunk_description": "",
             "chunk_size": chunk_size,
             "chunk_overlap": chunk_overlap,
             "table_prepend_k": table_prepend_k

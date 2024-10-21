@@ -468,7 +468,7 @@ select {
   border-radius: 1rem;
   border: 1px solid var(--color-grey);
   max-width: 75%;
-  margin-block: 1rem;
+  margin-top: 1rem;
 }
 
 .chat-message-assistant {max-width: 75%;}
@@ -496,8 +496,6 @@ select {
 .chat-input:focus {
   outline: none;
 }
-
-
 
 .chat-input:disabled::placeholder {
   color: var(--color-grey);
