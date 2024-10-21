@@ -4,7 +4,7 @@ sudo systemctl stop secrag
 
 cd /home/ubuntu/secrag/Collab-Project-1
 
-sudo git pull origin main
+sudo git pull origin prod
 
 sudo venv/bin/pip3 install -r requirements.txt
 
