@@ -3,7 +3,6 @@ from .utils.vectorstore import vectorstore_manager
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
 from .utils.llm import get_assistant_response
-from .shared import stop_signals
 from flask import request, Blueprint, current_app
 from edgar import *
 from .. import socketio
