@@ -272,6 +272,7 @@ export default {
   
   mounted() {
     this.initializeSocket();
+    this.loadUserData();
     this.loadFilingSelectionData();
     this.loadChats();
     this.windowLoaded = true;
@@ -297,6 +298,12 @@ export default {
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
       socket.on("llm_response_complete", () => {if (!this.responseStopped) {this.saveAssitantResponse()}});
+    },
+
+    loadUserData() {
+      axios.get(`${config.apiUrl}/api/get-user-data`, { params: { token: token } })
+        .then(response => {localStorage.setItem('_u', response.data.token);})
+        .catch(error => {console.log('Error retrieving user data:', error); localStorage.removeItem('_u'); this.$router.push('/')});
     },
 
     // Load List Tickers

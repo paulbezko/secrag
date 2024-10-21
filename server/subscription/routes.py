@@ -35,7 +35,7 @@ def subscribe_post():
                 }],
             mode='subscription',
             allow_promotion_codes = True,
-            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
+            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard?token={request.json.get('token')}",
             cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
         )
 
