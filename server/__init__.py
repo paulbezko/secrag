@@ -83,6 +83,8 @@ def create_app(mode):
 
     app.config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
 
+    app.config['INIT_LOGS_SENT'] = False
+
     stripe.api_key = os.environ.get('STRIPE_KEY')
     supabase = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
