@@ -1,7 +1,7 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 from captcha.image import ImageCaptcha
 from datetime import datetime, timezone, timedelta
-from .utils import get_user_data, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp
+from .utils import get_user_data, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp, log
 from flask import Blueprint, request, current_app, jsonify, render_template_string
 
 import random
@@ -59,7 +59,10 @@ def edit_user_post():
         query = f"UPDATE users_{current_app.config['MODE']} SET name = %s WHERE email = %s"
         execute_query(query, (request.json.get('name'), user_info['email']))
 
-        if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], name = request.json.get('name'))
+        if user['stripe_user_id']: 
+            try:
+                stripe.Customer.modify(user['stripe_user_id'], name = request.json.get('name'))
+            except Exception as error: log('error', error)
         user_info['name'] = request.json.get('name')
         token = encode_token(user_info)
 

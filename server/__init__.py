@@ -74,7 +74,7 @@ def create_app(mode):
     app.config['MAIL_SENDER_PASS'] = os.getenv('MAIL_SENDER_PASS')
     app.config['MAIL_CONTACT_USER'] = os.getenv('MAIL_CONTACT_USER')
 
-    app.config['STRIPE_WEBHOOK_KEY_TEST'] = os.getenv('STRIPE_WEBHOOK_KEY_TEST')
+    app.config['STRIPE_WEBHOOK_KEY'] = os.getenv('STRIPE_WEBHOOK_KEY')
     app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] = os.getenv('STRIPE_PRODUCT_BASIC_MONTHLY')
     app.config['STRIPE_PRODUCT_BASIC_YEARLY'] = os.getenv('STRIPE_PRODUCT_BASIC_YEARLY')
     app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_MONTHLY')
@@ -83,7 +83,7 @@ def create_app(mode):
 
     app.config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
 
-    stripe.api_key = os.environ.get('STRIPE_KEY_TEST')
+    stripe.api_key = os.environ.get('STRIPE_KEY')
     supabase = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
     # Registering routes
