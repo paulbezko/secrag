@@ -1,9 +1,13 @@
 #!/bin/bash
 sudo systemctl stop secrag
 
-sudo git pull origin main
 
 cd /home/ubuntu/secrag/Collab-Project-1
+
+sudo git pull origin main
+
+sudo venv/bin/pip3 install -r requirements.txt
+
 cd client
 sudo npm run build
 cd ..
