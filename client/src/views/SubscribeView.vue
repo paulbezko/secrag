@@ -7,11 +7,11 @@
       <div class="text-2 text-center">Get more from SEC filings with the plan that fits your workflow.</div>
       <div class="flex-column gap-2 width-100">
         <div class="flex-row card width-100 gap-4" style="padding: 1rem;">
-          <div class="card-nested width-100 flex-column center" :class="{ active: subscriptionIsYearly }" @click="selectSubscriptionYearly">
+          <div class="card-nested width-100 flex-column center" :class="{ active: subscriptionIsYearly }" @click="selectSubscriptionYearly" style="cursor: pointer">
             <b class="text-1">Yearly</b>
             <div class="text-2 text-center flex-row gap-05" style="align-items: baseline;"><div class="text-1">20%</div> Off</div>
           </div>
-          <div class="card-nested width-100 flex-column center" :class="{ active: !subscriptionIsYearly }" @click="selectSubscriptionMonthly">
+          <div class="card-nested width-100 flex-column center" :class="{ active: !subscriptionIsYearly }" @click="selectSubscriptionMonthly" style="cursor: pointer">
             <b class="text-1">Monthly</b>
           </div>
         </div>
