@@ -7,7 +7,8 @@ const dev = {
 
 // const prod = {
 //   apiUrl: 'http://localhost:5000',
-//   webUrl: 'http://localhost:5000'
+//   webUrl: 'http://localhost:5000',
+//   socketUrl: 'http://localhost:5000'
 // };
 
 const prod = {

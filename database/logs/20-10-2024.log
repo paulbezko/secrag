@@ -1,0 +1,1084 @@
+2024-10-20 13:30:02,898 - WARNING - Connection error [Attempt 1/3]: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2024-10-20 13:30:03,133 - DEBUG - Reconnected to database successfully.
+2024-10-20 13:57:11,550 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 13:58:19,875 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 13:58:33,713 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 13:58:56,038 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 14:00:58,918 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 14:02:50,255 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 14:02:59,625 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 14:03:07,193 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 14:03:16,117 - ERROR - Exception on /api/new-message-user [POST]
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 69, in map_httpcore_exceptions
+    yield
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 233, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 216, in handle_request
+    raise exc from None
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 196, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 99, in handle_request
+    raise exc
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 76, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 122, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 205, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 983, in _request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_client.py", line 1015, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 232, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\httpx\_transports\default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11002] Lookup timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\routes.py", line 146, in new_message_user_post
+    get_assistant_response(
+  File "c:\Users\paulb\Desktop\Algos\Collab-Project-1\server\dashboard\utils.py", line 179, in get_assistant_response
+    reformulated_prompt = llm.invoke(system_prompt).content
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 276, in invoke
+    self.generate_prompt(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 776, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 633, in generate
+    raise e
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 623, in generate
+    self._generate_with_cache(
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 845, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 635, in _generate
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_utils\_utils.py", line 274, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\resources\chat\completions.py", line 704, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1270, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 947, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1007, in _request
+    return self._retry_request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1085, in _retry_request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\paulb\Desktop\Algos\Collab-Project-1\.venv\Lib\site-packages\openai\_base_client.py", line 1017, in _request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2024-10-20 16:29:10,439 - DEBUG - Updated Vectorstore for WBA-2024-10-15, 10000, 3, 3
+2024-10-20 16:29:10,443 - DEBUG - New chat created for planetchars@gmail.com: WBA-2024-10K
+2024-10-20 20:56:11,205 - DEBUG - Updated Vectorstore for CMC-2024-10-17, 10000, 3, 3
+2024-10-20 20:56:11,207 - DEBUG - New chat created for planetchars@gmail.com: CMC-2024-10K
+2024-10-20 21:00:52,164 - DEBUG - Updated Vectorstore for CMC-2024-10-17, 10000, 3, 3
+2024-10-20 21:00:52,167 - DEBUG - New chat created for planetchars@gmail.com: CMC-2024-10K
+2024-10-20 21:04:22,701 - DEBUG - Updated Vectorstore for CMC-2024-10-17, 10000, 3, 3
+2024-10-20 21:04:22,705 - DEBUG - New chat created for planetchars@gmail.com: CMC-2024-10K

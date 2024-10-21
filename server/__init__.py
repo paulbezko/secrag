@@ -16,7 +16,6 @@ import os
 load_dotenv('.env', override=True)
 flask_key_secret = os.getenv('flask_key_secret')
 
-from flask_socketio import SocketIO, emit
 socketio = SocketIO(cors_allowed_origins="*", message_queue='redis://')
 llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS')
 
@@ -41,8 +40,8 @@ def create_app(mode):
 
     if mode == 'prod':
         app.config['MODE'] = 'prod'
-        # app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
-        app.config['REDIRECT_URL'] = 'http://localhost:5000'
+        app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
+        # app.config['REDIRECT_URL'] = 'http://localhost:5000'
 
          # Using client built static files in prod version
         @app.route('/')
