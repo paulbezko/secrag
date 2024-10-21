@@ -1,7 +1,7 @@
 from ...general.utils import log
 from .vectorstore import vectorstore_manager
 from .secedgar import get_filing
-from ..shared import stop_signals
+from ..globals import stop_signals
 from pydantic import BaseModel
 from typing import Literal, List
 from server import socketio, llm

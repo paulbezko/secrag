@@ -14,7 +14,7 @@ app.logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
 
 # Handle stop signal. Could not seem to make it work inside routes or init.
 from flask import request
-from server.dashboard.shared import stop_signals
+from server.dashboard.globals import stop_signals
 @socketio.on('stop_llm_stream')
 def handle_stop_signal():
     client_id = request.sid
