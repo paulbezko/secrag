@@ -1,5 +1,12 @@
 #!/bin/bash
-cd /home/ubuntu/secrag/Collab-Project-1
+sudo systemctl stop secrag
+
 sudo git pull origin main
-sudo kill -9 $(lsof -t -i:8000)
+
+cd /home/ubuntu/secrag/Collab-Project-1
+cd client
+sudo npm run build
+cd ..
+
+sudo systemctl start secrag
 # sudo systemctl restart secrag.service
