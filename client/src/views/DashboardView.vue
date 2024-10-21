@@ -301,7 +301,7 @@ export default {
     },
 
     loadUserData() {
-      axios.get(`${config.apiUrl}/api/get-user-data`, { params: { token: token } })
+      axios.get(`${config.apiUrl}/api/get-user-data`, { params: { token: localStorage.getItem('_u') } })
         .then(response => {localStorage.setItem('_u', response.data.token);})
         .catch(error => {console.log('Error retrieving user data:', error); localStorage.removeItem('_u'); this.$router.push('/')});
     },
