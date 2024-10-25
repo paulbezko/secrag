@@ -1,8 +1,8 @@
 <template>
-  <div class="flex-column center width-100 gap-8" style="min-height: 100vh; justify-content: start; padding-inline: 4rem; padding-bottom: 4rem;">
+  <div class="flex-column center width-100 gap-8" style="min-height: 100vh; justify-content: start; padding-bottom: 4rem;">
     <SpinnerComp v-if="showSpinner"></SpinnerComp>
     <NavbarComp :authenticated="true" :subscribed="false"/>
-      <div class="flex-column center gap-4" style="max-width: 70rem;">
+      <div class="flex-column center gap-4" style="max-width: 70rem; padding-inline: 4rem;">
       <div class="heading text-center">Start Your Journey to Smarter Filings</div>
       <div class="text-2 text-center">Get more from SEC filings with the plan that fits your workflow.</div>
       <div class="flex-column gap-2 width-100">
@@ -150,7 +150,8 @@ export default {
         periodType: this.periodType
       })
 
-      stripe.redirectToCheckout({sessionId: response.data.sessionId})
+      if (response.data.sessionId) {stripe.redirectToCheckout({sessionId: response.data.sessionId})} // Redirect to Stripe subscription page if no customer exists
+      else if (response.data.sessionUrl) {window.location.href = response.data.sessionUrl} // Redirect to billing portal if customer exists
     },
 
     selectSubscriptionYearly() {this.subscriptionIsYearly = true; this.periodType = 'yearly'},

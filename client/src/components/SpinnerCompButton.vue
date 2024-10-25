@@ -1,7 +1,7 @@
 <template>
   <div class="overlay">
     <div class="spinner">
-      <div class="fa-solid fa-arrows-rotate text-2"></div>
+      <div class="fa-solid fa-arrows-rotate text-3"></div>
     </div>
   </div>
 </template>

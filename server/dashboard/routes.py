@@ -123,6 +123,19 @@ def get_filing_get():
             return {'error': 'Error getting filing: ' + str(error)}
 
 
+@routes.route('/reset-chat', methods=['POST'])
+def reset_chat_post():
+
+    try: user_info = decode_token(request.json.get('token'))
+    except: return {'error': 'Error decoding token'}
+
+    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    memory[user_info['email']][request.json.get('chat')]['messages'] = [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]
+    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    return {'success': True}
+
+
 @routes.route('/delete-chat', methods=['POST'])
 def delete_chat_post():
 

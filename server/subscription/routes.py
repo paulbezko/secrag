@@ -1,4 +1,4 @@
-from ..general.utils import get_user_data, decode_token, execute_query, log
+from ..general.utils import get_user_data, decode_token, execute_query, log, send_email_from_template
 from .utils import get_user_data_stripe
 from flask import request, Blueprint, current_app
 
@@ -35,15 +35,17 @@ def subscribe_post():
                 }],
             mode='subscription',
             allow_promotion_codes = True,
-            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
+            success_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
             cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
         )
-
         return {'sessionId': session['id']}
 
     elif request.json.get('operation') == 'manageSubscription':
 
-        session = stripe.billing_portal.Session.create(customer = user_info['stripe_user_id'], return_url = f"{current_app.config['REDIRECT_URL']}/dashboard",)
+        session = stripe.billing_portal.Session.create(
+            customer = user_info['stripe_user_id'], 
+            return_url = f"{current_app.config['REDIRECT_URL']}/dashboard?after-billing=true",
+        )
         return {'sessionUrl': session['url']}
 
     elif request.json.get('operation') == 'replenishTokens':
@@ -60,8 +62,9 @@ def subscribe_post():
                 }],
             mode='payment',
             allow_promotion_codes = True,
-            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
+            success_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
             cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
+            metadata = {"replenishTokens": "True"}
         )
         return {'sessionUrl': session['url']}
     
@@ -71,40 +74,50 @@ def webhook_post():
 
     event = stripe.Webhook.construct_event(request.data, request.headers.get('stripe-signature'), current_app.config['STRIPE_WEBHOOK_KEY'])
     response = event['data']['object']
-
     try:
         if 'type' in event:
-            if event['type'] == 'checkout.session.completed': 
 
+            if event['type'] == 'invoice.payment_succeeded': # User paid invoice for subscription
                 user = get_user_data_stripe(response['customer'])
-                log('debug', f'User completed checkout session: {user["email"]}')
-                query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE stripe_user_id = %s"
-                execute_query(query, (int(user['subscription_tokens_left']) + 1200, response['customer']))
+                log('debug', f'User paid invoice: {user["email"]}')
 
-            elif event['type'] == 'customer.subscription.created' or event['type'] == 'customer.subscription.updated':
+                price_id = response['lines']['data'][-1]['price']['id']
+                amount = response['amount_paid']
 
-                try: user = get_user_data_stripe(response['customer'])
-                except: return {'error': 'Error retrieving user data'}
-                
-                if response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: 
-                    tokens = 1200
-                    product = 'basic'
-                elif response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] or response['plan']['id'] == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: 
-                    tokens = 2400
-                    product = 'premium'
-                    
-                if user['subscription_tokens_left'] != None:
-                    tokens += int(user['subscription_tokens_left'])
+                if price_id == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: subscription = 'premium'
+                elif price_id == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY']: subscription = 'premium'
+                elif price_id == current_app.config['STRIPE_PRODUCT_BASIC_YEARLY']: subscription = 'basic'
+                elif price_id == current_app.config['STRIPE_PRODUCT_BASIC_MONTHLY']: subscription = 'basic'
 
-                log('debug', f'User completed checkout session: {user["email"]}')
-                query = f"UPDATE users_{current_app.config['MODE']} SET subscription = %s, subscription_tokens_left = %s, stripe_subscription_id = %s WHERE stripe_user_id = %s"
-                execute_query(query, (product, tokens, response['id'], response['customer']))
+                tokens = 0
+                if amount > 0: tokens += round(amount * 1.2) # Add tokens if user spent money
+                if int(user['subscription_tokens_left']) != 0: tokens += int(user['subscription_tokens_left'])
 
-            elif event['type'] == 'customer.subscription.deleted':
+                query = f"UPDATE users_{current_app.config['MODE']} SET subscription = %s, subscription_tokens_left = %s WHERE stripe_user_id = %s"
+                execute_query(query, (subscription, tokens, response['customer']))
+                send_email_from_template(user['email'], 'subscribe', None)
 
-                log('debug', f'User canceled subscription: {response["customer"]}')
-                query = f"UPDATE users_{current_app.config['MODE']} SET subscription = 'none', subscription_tokens_left = 0, stripe_subscription_id = NULL WHERE stripe_user_id = %s"
+            elif event['type'] == 'customer.subscription.deleted': # User cancelled subscription
+                user = get_user_data_stripe(response['customer'])
+                log('debug', f'User cancelled subscription: {user["email"]}')
+
+                query = f"UPDATE users_{current_app.config['MODE']} SET subscription = 'none', stripe_subscription_id = NULL WHERE stripe_user_id = %s" # Do not clear tokens when subscription cancels
                 execute_query(query, (response['customer'],))
+                send_email_from_template(user['email'], 'unsubscribe', None)
+
+            elif event['type'] == 'checkout.session.completed': # User paid invoice for token renewal
+                if 'replenishTokens' in response['metadata']:
+
+                    user = get_user_data_stripe(response['customer'])
+                    log('debug', f'User bought tokens: {user["email"]}')
+
+                    tokens = 1200
+                    if user['subscription_tokens_left'] != 0: tokens += int(user['subscription_tokens_left'])
+
+                    query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE stripe_user_id = %s"
+                    execute_query(query, (tokens, response['customer']))
+                    send_email_from_template(user['email'], 'purchase', None)
+
 
     except Exception as error: log('error', f'Error in webhook: {error}')
     return {}

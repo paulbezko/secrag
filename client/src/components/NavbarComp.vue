@@ -1,27 +1,28 @@
 <template>
-  <div class="flex-row width-100" style="padding-block: 2rem; max-width: 112rem;">
-    <div class="flex-row width-100" style="justify-content: space-between;">
-      <div class="flex-row center gap-2">
-        <router-link class="text-3 text-bold text-link" to="/">{{projectName}}</router-link>
-        <div class="text-3" style="color: transparent" v-if="authenticated && !subscribed">Dashboard</div>
-        <router-link class="text-3 show-on-large text-link" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
+  <div class="navbar flex-row width-100 center">
+    <div class="flex-row width-100" style="padding-block: 2rem; max-width: 112rem; padding-inline: 2rem;">
+      <div class="flex-row width-100" style="justify-content: space-between;">
+        <div class="flex-row center gap-2">
+          <router-link class="text-3 text-bold text-link" to="/">{{projectName}}</router-link>
+          <div class="text-3" style="color: transparent" v-if="authenticated && !subscribed">Dashboard</div>
+          <router-link class="text-3 show-on-large text-link" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
+        </div>
+        <div class="flex-row center gap-2 show-on-large">
+          <router-link class="text-3 text-link" to="/#about">About</router-link>
+          <router-link class="text-3 text-link" to="/#faq">FAQ</router-link>
+          <router-link class="text-3 text-link" to="/#contact">Contact</router-link>
+        </div>
+        <div class="flex-row gap-2 show-on-large">
+          <router-link class="button button-secondary" v-if="!authenticated" to="/login">Sign In</router-link>
+          <router-link class="text-3 text-link" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
+          <div class="text-3" style="color: transparent" v-if="authenticated && subscribed">Subscribe</div>
+          <div class="text-3 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>
+        </div>
+        <div class="flex-row gap-2 show-on-small">
+          <div class="fa-solid fa-ellipsis-vertical text-1 text-link" @click="toggleDropdown()"></div>
+        </div>
       </div>
-      <div class="flex-row center gap-2 show-on-large">
-        <router-link class="text-3 text-link" to="/#about">About</router-link>
-        <router-link class="text-3 text-link" to="/#faq">FAQ</router-link>
-        <router-link class="text-3 text-link" to="/#contact">Contact</router-link>
-      </div>
-      <div class="flex-row gap-2 show-on-large">
-        <router-link class="button button-secondary" v-if="!authenticated" to="/login">Sign In</router-link>
-        <router-link class="text-3 text-link" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
-        <div class="text-3" style="color: transparent" v-if="authenticated && subscribed">Subscribe</div>
-        <div class="text-3 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>
-      </div>
-      <div class="flex-row gap-2 show-on-small">
-        <div class="fa-solid fa-ellipsis-vertical text-1 text-link" @click="toggleDropdown()"></div>
-      </div>
-    </div>
-
+      
     <component :is="profileComp"></component>
 
     <transition>
@@ -43,7 +44,7 @@
       <!-- Modal Backdrop -->
       <div v-if="showProfile" class="backdrop z-10" @click="toggleProfile"></div>
       <div v-if="showDropdown" class="backdrop z-10" @click="toggleDropdown"></div>
-
+    </div>
   </div>
 </template>
 
@@ -59,6 +60,12 @@ export default {
     authenticated: Boolean, 
     subscribed: Boolean
   },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  unmounted() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
   data() {return {
     showProfile: false,
     showDropdown: false,
@@ -70,7 +77,19 @@ export default {
   },
   methods: {
     toggleProfile() {this.showProfile = !this.showProfile; this.showDropdown = false},
-    toggleDropdown() {this.showDropdown = !this.showDropdown}
+    toggleDropdown() {this.showDropdown = !this.showDropdown},
+    handleScroll() {
+      const navbar = document.querySelector('.navbar');
+      const container = this.$refs.container;
+      if (container) {
+        if (container.scrollY > 0) {console.log('scrolled'); navbar.classList.add('shadow');}
+        else {navbar.classList.remove('shadow');}
+      }
+      else {
+        if (window.scrollY > 0) {console.log('scrolled'); navbar.classList.add('shadow');} 
+        else {navbar.classList.remove('shadow');}
+      }
+    },
   }
 }
 </script>

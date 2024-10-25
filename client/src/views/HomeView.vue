@@ -1,7 +1,7 @@
 <template>
-  <div class="flex-column center width-100" style="padding-inline: 2rem;">
+  <div class="flex-column center width-100">
     <NavbarComp :authenticated=isAuthenticated :subscribed=isSubscribed />
-    <div class="flex-row width-100 gap-8 center" style="padding-inline: 0rem; height: calc(100vh - 6rem)">
+    <div class="flex-row width-100 gap-8 center" style="padding-inline: 2rem; height: calc(100vh - 6rem)">
       <div class="flex-column gap-4 center" style="max-width: 52rem;">
         <div class="heading fade-in delay-1">{{ heroHeading }}</div>
         <div class="text-1 fade-in delay-2">{{ heroSubheading }}</div>
@@ -10,7 +10,7 @@
           <div class="fade-in delay-4 flex-column center"><a href="#about" class="button button-secondary">Learn More</a></div>
         </div>
       </div>
-      <div class="flex-column center width-100 show-on-large" style="max-width: 52rem">
+      <div class="flex-column center width-100 show-on-large" style="max-width: 52rem; padding-inline: 2rem;">
         <div class="relative width-100" style="height: 60rem" >
           <img src="../assets/home/hero 1.png" class="absolute shadow fade-in delay-4" style="top: 42.5%; left: 42.5%; max-width: 70%; z-index: 4; transform: translate(-50%, -50%)">
           <img src="../assets/home/hero 2.png" class="absolute shadow fade-in delay-3" style="top: 47.5%; left: 47.5%; max-width: 70%; z-index: 3; transform: translate(-50%, -50%)">
@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <div id="about" class="flex-column width-100 center gap-4" style="padding-inline: 0rem;">
+    <div id="about" class="flex-column width-100 center gap-4" style="padding-inline: 2rem;">
       <div class="heading text-center fade-in">The SEC Filing Problem</div>
       <div class="flex-row gap-4 center fade-in">
         <div class="text-2 text-center" style="max-width: 50rem;">For investors, analysts, and legal professionals, deciphering complex SEC filings can be <b style="color: var(--color-red);">overwhelming</b>.</div>
@@ -34,7 +34,7 @@
         <img src="../assets/home/money_with_wings_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
       </div>
     </div>
-    <div class="flex-column width-100 center gap-8" style="max-width: 88rem; padding-top: 20rem; padding-inline: 0rem;">
+    <div class="flex-column width-100 center gap-8" style="max-width: 88rem; padding-top: 20rem; padding-inline: 2rem;">
       <div class="heading text-center fade-in">Our Simple, Two-Step Solution</div>
       <div class="flex-row switch-row-to-column gap-4 center width-100 fade-in">
         <div class="flex-column vertical-line gap-2 width-100">
@@ -62,7 +62,7 @@
         <img src="../assets/home/stopwatch_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
       </div>
     </div>
-    <div class="flex-column center gap-4 fade-in" style="padding-top: 20rem; padding-inline: 0rem;">
+    <div class="flex-column center gap-4 fade-in" style="padding-top: 20rem; padding-inline: 2rem;">
       <div class="text-2 text-center">~ We provide access to filings for any public company. No matter which one you're looking for, we have it. ~</div>
       <div class="flex-row width-100 show-on-large">
         <div class="flex-row width-100 space-between">
@@ -93,7 +93,7 @@
         </div>
       </div>
     </div>
-    <div class="flex-column center gap-4" style="max-width: 70rem; padding-top: 20rem; padding-inline: 0rem;">
+    <div class="flex-column center gap-4" style="max-width: 70rem; padding-top: 20rem; padding-inline: 2rem;">
       <div class="heading text-center fade-in">Start Your Journey to Smarter Filings</div>
       <div class="text-1 text-center fade-in">Get more from SEC filings with the plan that fits your workflow.</div>
       <div class="flex-column gap-2 width-100">
@@ -180,7 +180,7 @@
         </div>
       </div>
     </div>
-    <div id="faq" class="flex-column gap-4" style="max-width: 112rem; padding-top: 20rem; padding-inline: 0rem;">
+    <div id="faq" class="flex-column gap-4" style="max-width: 112rem; padding-top: 20rem; padding-inline: 2rem;">
       <div class="heading text-center fade-in">Frequently Asked Questions</div>
       <div class="width-100 vertical-line flex-column fade-in">
         <div v-for="(faq, index) in faqItems" :key="index">
@@ -194,7 +194,7 @@
         </div>
       </div>
     </div>
-    <div id="contact" class="flex-column gap-4 text-left width-100" style="max-width: 112rem; padding-top: 20rem; padding-inline: 0rem;">
+    <div id="contact" class="flex-column gap-4 text-left width-100" style="max-width: 112rem; padding-top: 20rem; padding-inline: 2rem;">
       <div class="flex-column gap-2">
         <div class="heading fade-in">Contact Us</div>
         <div class="text-1 fade-in">Got a question or a remark? <a href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C" class="text-link text-bold">Send us a message!</a></div>
@@ -245,9 +245,6 @@ export default {
     }
   },
   mounted() {
-    // this.pageLoaded = false
-    // getNavbarInfo().then(data => {this.subscription = data.subscription; this.pageLoaded = true;})
-
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -271,10 +268,7 @@ export default {
     });
   },
   methods: {
-    // isAuthenticated() {return localStorage.getItem('_u') !== null},
-    // isSubscribed() {return this.subscription},
     toggleFAQAnswer(index) {
-      // Logic for FAQ handling
       this.faqItems.forEach((faq, i) => {if (i !== index) {faq.open = false; faq.height = '0';}});
       const faq = this.faqItems[index];
       faq.open = !faq.open;
