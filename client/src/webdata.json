@@ -80,6 +80,7 @@
     ],
     "supabaseURL": "https://qjgjqswlonxuhmiiwddj.supabase.co",
     "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZ2pxc3dsb254dWhtaWl3ZGRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjUwMzMxOTUsImV4cCI6MjA0MDYwOTE5NX0.UtkJnnQsOHUEcrvXzpzJ9nCQOhh-RypSYvQBvVMiyUw",
-    "stripeKeyLive": "pk_live_51PtWwQGjSxKJrDncdtw5Y1qUCsvvTIOCpx20ZRm4oM0M46xLc4ApJtd09GO3Naqoc8hZpJCQL9canTQIgA6MMDrn00iOHlnnGB",
-    "stripeKey": "pk_test_51PtWwQGjSxKJrDncatm1lbb4MnM0umSDHU41hWh12HuIlkNwyl29qKdisowDY7UZazwI4HUnIDhLh9j17upYBTsA002jNz2GUG"
+    "stripeKey": "pk_live_51PtWwQGjSxKJrDncdtw5Y1qUCsvvTIOCpx20ZRm4oM0M46xLc4ApJtd09GO3Naqoc8hZpJCQL9canTQIgA6MMDrn00iOHlnnGB",
+    "stripeKeyTest":  "pk_test_51PtWwQGjSxKJrDncatm1lbb4MnM0umSDHU41hWh12HuIlkNwyl29qKdisowDY7UZazwI4HUnIDhLh9j17upYBTsA002jNz2GUG",
+    "stripeKeyLive":  "pk_live_51PtWwQGjSxKJrDncdtw5Y1qUCsvvTIOCpx20ZRm4oM0M46xLc4ApJtd09GO3Naqoc8hZpJCQL9canTQIgA6MMDrn00iOHlnnGB"
 }
