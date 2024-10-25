@@ -1,0 +1,8 @@
+2024-10-25 18:33:09,027 - DEBUG - User paid invoice: paul.bezko@hotmail.com
+2024-10-25 18:34:43,191 - DEBUG - User paid invoice: paul.bezko@hotmail.com
+2024-10-25 18:35:14,984 - DEBUG - User paid invoice: paul.bezko@hotmail.com
+2024-10-25 18:36:31,970 - DEBUG - User bought tokens: paul.bezko@hotmail.com
+2024-10-25 20:10:57,268 - DEBUG - User paid invoice: paul.bezko@hotmail.com
+2024-10-25 20:10:58,748 - DEBUG - Email of type "subscribe" sent successfully to paul.bezko@hotmail.com
+2024-10-25 20:14:45,061 - DEBUG - Embedding already exists for LDDD-2024-10-15, 10000, 3, 3
+2024-10-25 20:14:45,064 - DEBUG - New chat created for paul.bezko@hotmail.com: LDDD-2024-10K

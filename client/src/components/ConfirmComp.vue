@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="showComponent">
-      <div class="z-40 width-100 flex-row center absolute card-component-center" style="padding-inline: 4rem;">
+      <div class="z-40 width-100 flex-row center fixed card-component-center" style="padding-inline: 4rem;">
         <div class="card-component flex-column center gap-2 card-size-confirm" ref="ConfirmCard">
           <div class="text-1 text-bold text-center">{{ actions[action].heading }}</div>
           <div class="text-3 text-center">{{ actions[action].text }}</div>
