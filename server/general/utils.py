@@ -344,3 +344,13 @@ def try_except(func, default=None, expected_exc=(Exception,)):
     """
     try: return func()
     except expected_exc: return default
+
+
+def send_autoupdate_log():
+    with open("autoupdate.log", "r") as f:
+
+        autoupdate_log = f.read()
+        with current_app.app_context():
+            log("info", "Server booted up...")
+            log("debug", "Latest autoupdate log:")
+            log("debug", autoupdate_log)
