@@ -13,7 +13,6 @@ SECRET = os.getenv('GITHUB_WEBHOOK_SECRET').encode('utf-8')
 
 # Specify the branch you want to listen for
 TARGET_BRANCH = 'prod'  # Change this to your target branch
-AUTOUPDATE_SCRIPT = 'autoupdate.sh'
 DELAY_BEFORE_UPDATE = 0.8 # Delay in seconds
 
 # Routes initialization
@@ -54,5 +53,4 @@ def delayed_update():
     """Function to delay execution and run the shell script."""
     time.sleep(DELAY_BEFORE_UPDATE)
 
-    # Use os.execvp to run the shell script
-    os.execvp('bash', ['bash', AUTOUPDATE_SCRIPT])
+    result = subprocess.run(['sudo', 'systemctl', 'start', 'secrag-autoupdate'], check=True, text=True)
