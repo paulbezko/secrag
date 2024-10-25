@@ -68,7 +68,7 @@ class VectorstoreManager:
             "table_prepend_k": table_prepend_k
         }
 
-        check_for_existing_embeddings = self.vectorstore.similarity_search("", k=3, filter=chunk_metadata_model)
+        check_for_existing_embeddings = self.vectorstore.similarity_search("", k=3, filter=chunk_metadata_model, fetch_k=100000)
 
         # Case when embedding does not exist
         if len(check_for_existing_embeddings) == 0:
