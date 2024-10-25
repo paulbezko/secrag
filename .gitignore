@@ -45,3 +45,4 @@ cython_debug/
 client/dist
 database/memory/chats.json
 database/filings/*
+database/logs/*
