@@ -4,7 +4,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { config } from '@/config';
 import axios from 'axios';
 import App from './App.vue';
-import * as MathfieldElement from 'mathlive'
 
 // Define Vuex store
 const store = createStore({
@@ -148,7 +147,6 @@ function getNavbarInfo() {
 }
 
 const app = createApp(App);
-app.use(MathfieldElement)
 app.use(store);
 app.use(router);
 app.mount('#app');
