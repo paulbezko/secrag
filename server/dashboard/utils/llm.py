@@ -61,9 +61,6 @@ class Keywords(BaseModel):
 # Getting assistant response
 def get_assistant_response(user_prompt, message_history, filing_id, socket_id, filing_date):
 
-    print(f"Prompt: {user_prompt}")
-    print(f"Message history: {message_history}")
-
     chunk_size = 10000
     k = 3
     chunk_overlap = 3

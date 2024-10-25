@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-column width-100" style="padding-inline: 4rem; height: 100vh; align-items: center">
+  <div class="flex-column width-100" style="padding-inline: 2rem; height: 100vh; align-items: center">
     <NavbarComp :authenticated=isAuthenticated :subscribed=isSubscribed />
     <div class="flex-column center gap-2 height-100">
       <div class="heading">Uh Oh, 404</div>
