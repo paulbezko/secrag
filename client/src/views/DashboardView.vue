@@ -6,15 +6,33 @@
     <div v-if="showProfile" class="backdrop z-17" @click="toggleProfile"></div>
     <div v-if="showConfirm" class="backdrop z-17" @click="toggleConfirm"></div>
     <div v-if="showConfirm && confirmLoading" class="card-component absolute z-20">
-      <SpinnerCompInside></SpinnerCompInside>
+      <SpinnerCompInside :customClass="'text-2'"></SpinnerCompInside>
     </div>
-    <div v-if="showConfirm && confirmSuccess" class="card-component absolute z-20 flex-row center text-2 gap-1">Chat Deleted
+
+    <div v-if="showConfirm && confirmSuccess && confirmAction === 'deleteChat'" class="card-component absolute z-20 flex-row center text-2 gap-1">Chat Deleted
       <div class="fa-circle-check fa-solid text-1" style="color: var(--color-green)"></div>
     </div>
-    <div v-if="showConfirm && confirmAction === 'deleteChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
+    <div v-if="showConfirm && !confirmSuccess && confirmAction === 'deleteChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
       <div class="text-2">Delete Chat?</div>
       <div class="button button-secondary" @click="deleteChat(currentChat)">Confirm</div>
     </div>
+
+    <div v-if="showConfirm && confirmSuccess && confirmAction === 'resetChat'" class="card-component absolute z-20 flex-row center text-2 gap-1">Chat Reset
+      <div class="fa-circle-check fa-solid text-1" style="color: var(--color-green)"></div>
+    </div>
+    <div v-if="showConfirm && !confirmSuccess && confirmAction === 'resetChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
+      <div class="text-2">Reset Chat?</div>
+      <div class="button button-secondary" @click="resetChat(currentChat)">Confirm</div>
+    </div>
+
+    <div v-if="showConfirm && confirmAction === 'afterBilling'" class="card-component flex-column absolute z-20 gap-1 center text-center gap-2" style="max-width: 30rem">
+      <div :class="isSmallScreen ? 'text-3' : 'text-4'">If you have submitted any adjustments, please note that it might take a few minutes for them to apply.</div>
+      <div :class="isSmallScreen ? 'text-3' : 'text-4'">You will receive an email confirmation after the payment is processed.</div>
+      <div :class="isSmallScreen ? 'text-3' : 'text-4'">Additionally, you can track the status of your payment on the Stripe billing portal.</div>
+      <div :class="isSmallScreen ? 'text-3' : 'text-4'">In case the changes were not applied, feel free to contact support.</div>
+      <div class="button button-secondary" @click="toggleConfirm()">OK</div>
+    </div>
+
     <div v-if="showConfirm && confirmAction === 'insufficientTokens' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20" style="max-width: 32rem; padding: 2rem">
       <div class="text-1 text-bold text-center">Token Balance Low</div>
       <div class="text-3 text-center">Your account doesn't have enough tokens to proceed with this action.</div>
@@ -26,26 +44,40 @@
     <!-- Sidebar Section -->
     <transition name="slide">
       <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
-        <div class="flex-column space-between height-100">
+        <div class="flex-column height-100">
           <div class="flex-column gap-05">
-            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
             <div class="flex-column gap-05" :class="isSmallScreen ? 'text-3' : 'text-4'">
+              <router-link to="/" class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
+                <div class="fa-solid fa-house text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Homepage</div>
+              </router-link>
               <div @click="toggleProfile" class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
-                <div class="fa-solid fa-user" style="min-width: 1.6rem;"></div>
-                Profile
+                <div class="fa-solid fa-user text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Profile</div>
               </div>
               <div @click="toggleNewChat" class="flex-row gap-05 sidebar-element menu" style="align-items: center;" :class="{ active: newChat }">
-                <div class="fa-solid fa-file-pen" style="min-width: 1.6rem;"></div>
-                New Chat
+                <div class="fa-solid fa-file-pen text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+                <div :class="isSmallScreen ? 'text-3' : 'text-4'">New Chat</div>
               </div>
             </div>
-            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
-                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">{{ chat }}<div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active"></div></div>
+                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">
+                    {{ chat }}
+                    <div class="flex-row gap-05">
+                      <div v-if="hoveredChat === chat" @click="toggleConfirm('resetChat')" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
+                      <div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
+                    </div>
+                  </div>
                 </li>
               </ul>
+            </div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
+              <div class="fa-solid fa-file text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+              <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share your feedback</a>
             </div>
           </div>
         </div>
@@ -53,12 +85,18 @@
     </transition>
 
     <!-- New Chat Section -->
-    <div class="flex-row gap-1 center" v-if="newChatLoading">
-      <div class="text-2" style="box-sizing: border-box; white-space: nowrap;">{{ newChatLoadingMessage }}</div>
-      <SpinnerCompInside></SpinnerCompInside>
+    <div class="absolute" v-if="newChatLoading">
+      <div class="z-20 flex-column center gap-1 card relative">
+        <div class="text-2 text-bold" style="box-sizing: border-box; white-space: nowrap;">Creating the Chat</div>
+        <div class="flex-row center gap-1">
+          <div class="text-3" style="box-sizing: border-box; white-space: nowrap;">{{ newChatLoadingMessage }}</div>
+          <SpinnerCompInside :customClass="'text-3'"></SpinnerCompInside>
+        </div>
+      </div>
+      <div class="backdrop z-10"></div>
     </div>
-    <div v-if="!newChatLoading && newChat" class="flex-column center gap-2" style="padding: 2rem">
-      <div class="subheading">Created a new Chat</div>
+    <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
+      <div class="subheading">Create a new Chat</div>
       <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
       <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-row switch-row-to-column gap-1 width-100">
@@ -112,32 +150,34 @@
     <!-- Chat Section -->
     <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
-        <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" ref="chatContainer" style="padding-top: .5rem;">
-          <SpinnerCompInside v-if="chatLoading"></SpinnerCompInside>
-          <div v-else>
+        <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" id="chat-container">
+          <SpinnerCompInside v-if="chatLoading" :customClass="'text-3'"></SpinnerCompInside>
+          <div v-else class="chat-container-scroll" ref="chatContainer">
             <div v-for="(message, index) in currentMessages" :key="index" :class="{'text-chat': message.role === 'assistant', 'text-chat': message.role === 'user'}">
-              <div v-if="message.role === 'assistant'" class="width-100 flex-row gap-1" style="margin-top: 1rem;">
-                <!-- v-if needed to only show emoji in the last message -->
-                <img
-                  v-if="index === currentMessages.length - 1" 
-                  :src="newMessage !== '' 
-                    ? require('@/assets/dashboard/face_with_monocle_3d.png')
-                    : (assistantMessageIndex === index && assistantMessageLoading
-                      ? require('@/assets/dashboard/thinking_face_3d.png')
-                      : require('@/assets/dashboard/slightly_smiling_face_3d.png'))"
+              <div v-if="message.role === 'assistant'" class="width-100 flex-row switch-row-to-column gap-1" style="margin-bottom: 1rem;">
+                <div class="flex-row gap-1" :style="isSmallScreen ? 'align-items: center' : ''">
+                  <!-- v-if needed to only show emoji in the last message -->
+                  <img
+                    v-if="index === currentMessages.length - 1" 
+                    :src="newMessage !== '' 
+                      ? require('@/assets/dashboard/face_with_monocle_3d.png')
+                      : (assistantMessageIndex === index && assistantMessageLoading
+                        ? require('@/assets/dashboard/thinking_face_3d.png')
+                        : require('@/assets/dashboard/slightly_smiling_face_3d.png'))"
+                    class="bot-image"
+                  >
+                  <img
+                  v-if="index !== currentMessages.length - 1" 
+                  :src="require('@/assets/dashboard/relieved_face_3d.png')" 
                   class="bot-image"
-                >
-                <img
-                v-if="index !== currentMessages.length - 1" 
-                :src="require('@/assets/dashboard/relieved_face_3d.png')" 
-                class="bot-image"
-                >
-                <div class="loading-dots" v-if="assistantMessageLoading && index === assistantMessageIndex">
-                  <span class="loading-dot"></span>
-                  <span class="loading-dot"></span>
-                  <span class="loading-dot"></span>
+                  >
+                  <div class="loading-dots" v-if="assistantMessageLoading && index === assistantMessageIndex">
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                  </div>
                 </div>
-                <div class="text-chat chat-message-assistant" v-html="renderMarkdown(message.content)" v-if="!assistantMessageLoading || index !== assistantMessageIndex"></div>
+              <div style="text-wrap: break-word" class="text-chat chat-message-assistant" v-html="renderMarkdown(message.content)" v-if="!assistantMessageLoading || index !== assistantMessageIndex"></div>
               </div>
               <div v-else class="flex-row width-100" style="justify-content: flex-end;">
                 <div class="chat-message-user text-chat">{{ message.content }}</div>
@@ -146,7 +186,7 @@
           </div>
         </div>
         <!-- Filing Container Small -->
-        <div class="filing-container flex-column center" ref="filingContainer" @scroll="handleScroll" v-if="filingShown && isSmallScreen" >
+        <div class="filing-container flex-column center" ref="filingContainer" v-if="filingShown && isSmallScreen" >
           <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
           <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
         </div>
@@ -161,7 +201,6 @@
             @input="adjustTextareaHeight('textarea')" 
             style="resize: none;" 
             ref="textarea"
-            :disabled="assistantMessageLoading"
             >
           </textarea>
           <!-- Input Buttons Large -->
@@ -178,7 +217,7 @@
         </div>
       </div>
       <!-- Filing Container Large -->
-      <div class="filing-container flex-column center" ref="filingContainer" @scroll="handleScroll" v-if="filingShown && !isSmallScreen" >
+      <div class="filing-container flex-column center" ref="filingContainer" v-if="filingShown && !isSmallScreen" >
         <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
         <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
       </div>
@@ -200,6 +239,7 @@ import { socket } from "@/socket";
 import { mapState } from 'vuex';
 import { ref } from 'vue';
 import axios from 'axios';
+const katex = require('katex');
 
 export default {
   components: {ProfileComp, SpinnerCompInside, SpinnerCompButton, SpinnerComp},
@@ -225,7 +265,8 @@ export default {
       // Chat data
       chats: [],
       hoveredChat: null,
-      currentChat: '',
+      currentChat: null,
+      activeChat: null,
       currentMessages: [],
       newChat: true,
       newMessage: '',
@@ -271,6 +312,8 @@ export default {
   },
   
   mounted() {
+    const afterBilling = new URLSearchParams(window.location.search).get('after-billing');
+    if (afterBilling === 'true') {this.confirmAction = 'afterBilling'; this.showConfirm = true;}
     this.initializeSocket();
     this.loadUserData();
     this.loadFilingSelectionData();
@@ -283,26 +326,36 @@ export default {
     if (this.subscription === 'basic') {this.lastXMessagesLength = 8}
     else {this.lastXMessagesLength = 16}
   },
-  beforeUnmount() {window.removeEventListener('resize', this.handleResize);},
+  unmounted() {
+    window.removeEventListener('resize', this.handleResize);
+    socket.off("llm_response_complete");
+    socket.off("llm_response");
+    socket.disconnect();
+  },
 
   methods: {
 
     // Initialize Socket
     initializeSocket() {
       socket.connect();
-      socket.emit("connect1")
-      socket.on("connect", () => {(this.socketId = socket.id); console.log("Connected to socket", socket.id);});
+      socket.on("connect", () => {(this.socketId = socket.id)}); // console.log("Connected to socket", socket.id);
       socket.on("new_chat_started", () => {this.newChatLoadingMessage = 'Creating chat';});
       socket.on("new_chat_initialized", () => {this.newChatLoadingMessage = 'Downloading the filing';});
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {if (!this.responseStopped) {this.saveAssitantResponse()}});
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
     },
 
     loadUserData() {
       axios.get(`${config.apiUrl}/api/get-user-data`, { params: { token: localStorage.getItem('_u') } })
-        .then(response => {localStorage.setItem('_u', response.data.token);})
+        .then(response => {
+          if (response.data.critical) {
+            localStorage.removeItem('_u'); 
+            this.$router.push('/')
+          }
+          localStorage.setItem('_u', response.data.token);
+        })
         .catch(error => {console.log('Error retrieving user data:', error); localStorage.removeItem('_u'); this.$router.push('/')});
     },
 
@@ -323,8 +376,8 @@ export default {
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 110; 
-      if (this.isSmallScreen) {heightAdjustment = 6;}
+      const headerHeight = 175; 
+      if (this.isSmallScreen) {heightAdjustment = 0;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
     },
@@ -349,7 +402,7 @@ export default {
     // Create chat
     async createChat() {
 
-      if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
+      if ((!this.selectedTicker || !this.selectedYear || (!this.selectedFiling && this.subscription !== 'basic')) && !this.selectedNewFiling) {return}
 
       let selectedTicker, selectedYear, selectedDate, selectedFilingType
 
@@ -357,6 +410,13 @@ export default {
         [selectedTicker, selectedFilingType, selectedDate] = this.selectedNewFiling.split(" ");
         selectedFilingType = selectedFilingType.replace('-', '')
         selectedYear = selectedDate.split('-')[0]
+      }
+
+      else if (this.subscription == 'basic') {
+        selectedTicker = this.selectedTicker
+        selectedYear = this.selectedYear
+        selectedFilingType = '10K'
+        selectedDate = this.tickerInfo[this.selectedYear].find(entry => entry.includes("10-K")).split(' ')[1]
       }
 
       else {
@@ -372,6 +432,10 @@ export default {
       try {
 
         this.newChatLoading = true;
+        this.selectedTicker = '';
+        this.selectedYear = '';
+        this.selectedFiling = '';
+        this.selectedNewFiling = '';
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
           chat: newChatName,
@@ -399,22 +463,43 @@ export default {
     },
 
     // Select Chat
-    selectChat(chat) {
+    async selectChat(chat) {
+      
+      if (this.llmResponseBuffer !== '') {this.stopResponse()}
+      
       this.newChat = false;
       this.currentChat = chat;
       this.chatLoading = true;
 
-      axios.get(`${config.apiUrl}/api/get-messages`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
-      .then(response => {this.currentMessages = response.data.messages; this.filingDate = response.data.filing_date})
+      await axios.get(`${config.apiUrl}/api/get-messages`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
+      .then(response => {this.currentMessages = response.data.messages; this.filingDate = response.data.filing_date;})
       .catch(error => {console.error('Error getting messages:', error);})
-      .finally(() => {this.chatLoading = false; this.$nextTick(() => {this.scrollToBottom("instant")});});
+      .finally(() => {this.chatLoading = false;});
 
       this.filingLoading = true
 
-      axios.get(`${config.apiUrl}/api/get-filing`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
+      await axios.get(`${config.apiUrl}/api/get-filing`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
       .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
       .catch(error => {console.error('Error getting filing:', error);});
-      if (this.isSmallScreen) {this.toggleSidebar();}
+
+      this.scrollToBottom('instant')
+      this.$refs.textarea.focus()
+    },
+
+    // Delete Chat
+    async resetChat(chat) {
+      this.confirmLoading = true
+      let response = await axios.post(`${config.apiUrl}/api/reset-chat`, {
+        token: localStorage.getItem('_u'),
+        chat: chat
+      });
+
+      if (response.data.error) {console.log(response.data.error); return;}
+      this.confirmAction = 'resetChat'
+      this.confirmLoading = false
+      this.confirmSuccess = true
+      this.loadChats()
+      this.selectChat(chat)
     },
 
     // Delete Chat
@@ -426,7 +511,7 @@ export default {
       });
 
       if (response.data.error) {console.log(response.data.error); return;}
-      this.confirmAction = ''
+      this.confirmAction = 'deleteChat'
       this.confirmLoading = false
       this.confirmSuccess = true
       this.loadChats()
@@ -435,16 +520,22 @@ export default {
   
     // Send Message
     async sendMessage() {
+      this.stopButtonShown = true
+      // If there's an ongoing response, stop it and save it first
+      if (this.llmResponseBuffer !== '') {
+        await this.stopResponse();
+      }
 
-      if (this.isSmallScreen && this.filingShown) {this.toggleFilingView();}
+      if (this.isSmallScreen && this.filingShown) {
+        this.toggleFilingView();
+      }
 
-      const textarea = this.$refs['textarea']
-      textarea.style.height = '40px'
+      const textarea = this.$refs['textarea'];
+      textarea.style.height = '40px';
 
       if (this.newMessage.trim() !== '') {
 
         this.responseStopped = false
-        this.stopButtonShown = true
         this.currentMessages.push({role: 'user', content: this.newMessage});
         this.assistantMessageIndex = this.currentMessages.length;
         this.assistantMessageLoading = true;
@@ -453,6 +544,7 @@ export default {
         let payloadMessage = this.newMessage
         this.newMessage = '';
         this.newChat = false;
+        this.activeChat = this.currentChat;
         
         this.$nextTick(() => {this.adjustTextareaHeight('textarea'); this.scrollToBottom("smooth")});
         const lastXMessages = this.currentMessages.slice(-this.lastXMessagesLength)
@@ -460,7 +552,7 @@ export default {
         try {
           let response = await axios.post(`${config.apiUrl}/api/new-message-user`, {
             token: localStorage.getItem('_u'),
-            chat: this.currentChat,
+            chat: this.activeChat,
             message: payloadMessage,
             lastXMessages: lastXMessages,
             socketId: this.socketId,
@@ -481,34 +573,53 @@ export default {
       if (this.assistantMessageIndex !== null) {
         if (this.llmResponseBuffer.trim()) {
           this.assistantMessageLoading = false;
-          this.currentMessages[this.assistantMessageIndex].content = marked(this.llmResponseBuffer);
-          this.$nextTick(() => {this.scrollToBottom("instant")});
+          this.currentMessages[this.assistantMessageIndex].content = this.renderMarkdown(this.llmResponseBuffer);
+          // console.log(this.$refs.chatContainer)
+          try {this.$nextTick(() => {this.scrollToBottom("smooth")})}
+          catch (error) {console.log(error)}
         }
       }
     },
 
-    stopResponse() {
-      socket.emit("stop_llm_stream");
-      this.responseStopped = true; 
-      this.assistantMessageLoading = false;
-      this.saveAssitantResponse(); 
+    async stopResponse() {
+      return new Promise((resolve) => {
+        socket.emit("stop_llm_stream");
+        this.responseStopped = true; 
+        this.assistantMessageLoading = false;
+        setTimeout(() => {resolve()}, 100);
+      });
     },
 
-    async saveAssitantResponse() {          
+    async saveAssitantResponse() {
+      console.log('Saving assistant response');
       try {
-          let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
-            token: localStorage.getItem('_u'),
-            chat: this.currentChat,
-            message: this.llmResponseBuffer,
-          });
-          if (response.data.error) {console.log(response.data.error); return;}
-          this.stopButtonShown = false;
-          this.$nextTick(() => {this.$refs.textarea.focus()})
-        } catch (error) {console.error('Error sending message:', error); return;}
+        this.assistantMessageLoading = false;
+        let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
+          token: localStorage.getItem('_u'),
+          chat: this.activeChat,
+          message: this.llmResponseBuffer,
+        });
+        
+        if (response.data.error) {
+          console.log(response.data.error);
+          return;
+        }
+        
+        this.stopButtonShown = false;
+        this.llmResponseBuffer = '';
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     },
 
     // Render Markdown
-    renderMarkdown(content) {if (!content) {return '';} return marked(content)},
+    renderMarkdown(content) {
+      if (!content) {return '';}
+      const latexConverted = content
+        .replace(/\\\[(.*?)\\\]/gs, (_, latex) => {return katex.renderToString(latex, { displayMode: true });})
+        .replace(/\\\((.*?)\\\)/gs, (_, latex) => {return katex.renderToString(latex, { displayMode: false });});
+      return marked(latexConverted);
+    },
 
     // Toggle Filing View
     toggleFilingView() {
@@ -521,14 +632,35 @@ export default {
     adjustTextareaHeight(refName) {this.$refs[refName].style.height = 'auto'; this.$refs[refName].style.height = (Math.min(this.$refs[refName].scrollHeight, 160) + 2) + 'px';},
     checkScreenWidth() {this.isSmallScreen = window.innerWidth <= 800;},
     handleResize() {this.checkScreenWidth(); this.updateChatHistoryHeight()},
-    handleScroll(event) {this.filingScrollPosition = event.target.scrollTop;},
-    scrollToBottom(type) {this.$refs.chatContainer.scrollTo({top: this.$refs.chatContainer.scrollHeight, behavior: type})},
+    scrollToBottom(type) {
+      try {
+        if (this.$refs.chatContainer) {
+          this.$refs.chatContainer.scrollTo({
+            top: this.$refs.chatContainer.scrollHeight,
+            behavior: type,
+          });
+        } else {
+          console.warn('chatContainer is not yet available');
+        }
+      } catch (error) {
+        console.error('Error in scrollToBottom:', error);
+      }
+    },
 
     // Toggle Sidebar, Profile, New Chat, Confirm
     toggleProfile() {this.showProfile = !this.showProfile; if (this.isSmallScreen) {this.sidebarShown = false}},
     toggleSidebar() {this.sidebarShown = !this.sidebarShown;},
     toggleNewChat() {this.currentChat='', this.newChat = true; this.currentMessages = []; if (this.isSmallScreen) {this.sidebarShown = false}},
-    toggleConfirm(action) {this.confirmAction = action; this.confirmSuccess = false; this.showConfirm = !this.showConfirm},
+    toggleConfirm(action) {
+        // Clear URL parameters by updating the URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        // Toggle the confirmation state as per your original function
+        this.confirmAction = action;
+        this.confirmSuccess = false;
+        this.showConfirm = !this.showConfirm;
+    },
 
     // Replenish Tokens
     async replenishTokens() {
