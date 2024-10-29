@@ -46,3 +46,4 @@ client/dist
 database/memory/chats.json
 database/filings/*
 database/logs/*
+autoupdate.log

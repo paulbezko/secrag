@@ -280,8 +280,8 @@ code {
   border-radius: 1rem;
   border: 1px solid var(--color-grey);
   background-color: var(--color-white);
-  min-width: 4.6rem !important;
-  height: 4.6rem !important;
+  min-width: 4.2rem !important;
+  height: 4.2rem !important;
   transition: all 0.2s ease;
 }
 
