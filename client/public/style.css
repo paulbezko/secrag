@@ -98,12 +98,12 @@ hr {
 
     --text-1: 2.0rem;
     --text-2: 1.6rem;
-    --text-3: 1.2rem;
-    --text-4: 1.0rem;
+    --text-3: 1.4rem;
+    --text-4: 1.2rem;
 
-    --text-button: 1.4rem;
-    --text-error: 1.2rem;
-    --text-chat: 1.2rem;
+    --text-button: 1.6rem;
+    --text-error: 1.4rem;
+    --text-chat: 1.6rem;
   }
 }
 
@@ -280,8 +280,8 @@ code {
   border-radius: 1rem;
   border: 1px solid var(--color-grey);
   background-color: var(--color-white);
-  min-width: 4.2rem !important;
-  height: 4.2rem !important;
+  min-width: 4.6rem !important;
+  height: 4.6rem !important;
   transition: all 0.2s ease;
 }
 
@@ -665,6 +665,9 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
     border: 1px solid var(--color-grey);
     border-radius: 1rem;
   }
+  .chat-input {
+    font-size: var(--text-chat);
+  }
   .chat-message-user {
     background-color: var(--color-grey-light);
   }
@@ -679,6 +682,9 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
     border-left: 1px solid var(--color-grey);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.2);
   }
+  .sidebar-element {
+    padding: 1rem;
+  }
   .chat-container {
     background-color: var(--color-white);
     border-bottom: 1px solid var(--color-grey);
@@ -692,6 +698,9 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
   .filing-container {border-bottom: 1px solid var(--color-grey);}
   .filing-html {scrollbar-width: none;}
   .filing-html::-webkit-scrollbar {display: none;}
+  .chat-input {
+    font-size: var(--text-2);
+  }
   .chat-message-user {
     background-color: var(--color-grey-light);
   }
