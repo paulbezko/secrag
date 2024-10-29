@@ -204,16 +204,16 @@
             >
           </textarea>
           <!-- Input Buttons Large -->
-          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" style="width: 4.6rem !important; height: 4.6rem !important" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
           <div v-if="!isSmallScreen && !stopButtonShown" class="button-icon" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
           
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
           <!-- Input Buttons Small -->
-          <div class="button-icon show-on-small" v-if="newMessage == '' && isSmallScreen && !stopButtonShown" @click="toggleFilingView">
-            <div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div>
+          <div class="button-icon show-on-small" style="min-width: 4.6rem !important; min-height: 4.6rem !important" v-if="newMessage == '' && isSmallScreen && !stopButtonShown" @click="toggleFilingView">
+            <div class="fa-solid fa-file-lines text-1" style="color: var(--color-grey-black);"></div>
           </div>
-          <div class="button-icon" v-if="newMessage == '' && isSmallScreen && stopButtonShown" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
-          <div class="button-icon" v-if="!newMessage == '' && isSmallScreen && !stopButtonShown" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
+          <div class="button-icon" v-if="newMessage == '' && isSmallScreen && stopButtonShown" style="min-width: 4.6rem !important; min-height: 4.6rem !important"  @click="stopResponse()"><div class="fa-solid fa-stop text-1" style="color: var(--color-grey-black)"></div></div>
+          <div class="button-icon" v-if="!newMessage == '' && isSmallScreen && !stopButtonShown" style="min-width: 4.6rem !important; min-height: 4.6rem !important"  @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up text-1" style="color: var(--color-grey-black)"></div></div>
         </div>
       </div>
       <!-- Filing Container Large -->
