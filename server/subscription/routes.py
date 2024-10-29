@@ -94,7 +94,8 @@ def webhook_post():
 
                 tokens = 0
                 if amount > 0: tokens += round(amount * 1.2) # Add tokens if user spent money
-                if int(user['subscription_tokens_left']) != 0: tokens += int(user['subscription_tokens_left'])
+                user_tokens = int(user['subscription_tokens_left']) if user['subscription_tokens_left'] is not None else 0
+                if user_tokens != 0: tokens += int(user['subscription_tokens_left'])
 
                 query = f"UPDATE users_{current_app.config['MODE']} SET subscription = %s, subscription_tokens_left = %s WHERE stripe_user_id = %s"
                 execute_query(query, (subscription, tokens, response['customer']))
