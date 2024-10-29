@@ -52,7 +52,7 @@
                 <div :class="isSmallScreen ? 'text-3' : 'text-4'">Homepage</div>
               </router-link>
               <div @click="toggleProfile" class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
-                <div class="fa-solid fa-user text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+                <div class="fa-solid fa-user text-center sidebar-element-icon" style="min-width: 2rem; min-height: 2rem;"></div>
                 <div :class="isSmallScreen ? 'text-3' : 'text-4'">Profile</div>
               </div>
               <div @click="toggleNewChat" class="flex-row gap-05 sidebar-element menu" style="align-items: center;" :class="{ active: newChat }">
@@ -64,8 +64,8 @@
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
-                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center;">
-                    {{ chat }}
+                  <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
+                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
                     <div class="flex-row gap-05">
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('resetChat')" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
@@ -77,7 +77,7 @@
             <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
             <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
               <div class="fa-solid fa-file text-center sidebar-element-icon" style="min-width: 2rem;"></div>
-              <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share your feedback</a>
+              <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share Feedback</a>
             </div>
           </div>
         </div>
@@ -377,7 +377,7 @@ export default {
     updateChatHistoryHeight() {
       let heightAdjustment = 0
       const headerHeight = 175; 
-      if (this.isSmallScreen) {heightAdjustment = 0;}
+      if (this.isSmallScreen) {heightAdjustment = -52;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
     },
