@@ -27,7 +27,7 @@
             <div class="fa-solid fa-envelope text-1 text-center" style="min-width: 3rem;"></div>
             <div class="flex-column width-100">
               <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-bold">Email</div>
-              <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-overflow" style="max-width: 19rem;">{{ email }}</div>
+              <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-overflow" style="max-width: 19rem; line-height: 1.5rem">{{ email }}</div>
             </div>
           </div>
           <div v-if="!limitSettings" class="flex-row center gap-1 text-link encouraged" :style="isSmallScreen ? 'height: 3.0rem;' : 'height: 3.6rem;'" @click="changePassword">
@@ -40,13 +40,13 @@
           </div>
         </div>
         <hr v-if="subscribed" class="width-100" style="border-top: 1px solid var(--color-grey)">
-        <div v-if="subscribed" class="flex-column gap-1">
+        <div v-if="subscribed" class="flex-column gap-2">
           <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-bold">Subscription</div>
           <div class="flex-row center gap-1 text-link encouraged" @click="manageSubscription" :style="isSmallScreen ? 'height: 3.0rem;' : 'height: 3.6rem;'">
             <div class="fa-solid fa-money-check-dollar text-1 text-center" style="min-width: 3rem;"></div>   
             <div style="flex: 1">
               <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-bold">Manage Subscription</div>
-              <div :class="isSmallScreen ? 'text-3' : 'text-4'" >{{ subscription }}</div>
+              <div :class="isSmallScreen ? 'text-3' : 'text-4'" :style="isSmallScreen ? 'line-height: 1.5rem' : ''">{{ subscription }}</div>
             </div>
           </div>
           <!-- tokensLeft -->
@@ -54,7 +54,7 @@
             <div class="fa-solid fa-chart-simple text-1 text-center" style="min-width: 3rem;"></div>   
             <div style="flex: 1">
               <div :class="isSmallScreen ? 'text-3' : 'text-4'" class="text-bold">Replenish Tokens</div>
-              <div :class="isSmallScreen ? 'text-3' : 'text-4'">{{ tokensLeft }} tokens left</div>
+              <div :class="isSmallScreen ? 'text-3' : 'text-4'" :style="isSmallScreen ? 'line-height: 1.5rem' : ''">{{ tokensLeft }} tokens left</div>
             </div>
           </div>
         </div>
