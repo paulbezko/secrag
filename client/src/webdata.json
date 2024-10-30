@@ -67,13 +67,13 @@
         },
         {
           "question": "Can I cancel my subscription at any time?",
-          "answer": "Yes, you can cancel your subscription at any time through your account settings, and you will continue to have access until the end of the billing cycle.",
+          "answer": "Yes, you can cancel your subscription at any time through your account settings.",
           "open": false,
           "height": null
         },
         {
           "question": "How do I get support if I encounter any issues?",
-          "answer": "You can reach out to us through email with any questions or issues you encounter.",
+          "answer": "You can reach out to us through email with any questions or issues you encounter, or send us a direct message through LinkedIn.",
           "open": false,
           "height": null
         }
