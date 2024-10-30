@@ -22,8 +22,6 @@ def generate_filing_digest(filing_object : FilingObject):
     token_count = count_tokens(filing_md)
     print("Filing tokens: ", token_count)
 
-    from langchain_core.prompts import ChatPromptTemplate
-
     model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(f"You are given a SEC filing. Return overview of the filing as well as List of buy and sell indicators in a markdown format.\nFiling: {filing_md}")
 
