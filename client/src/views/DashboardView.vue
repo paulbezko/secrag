@@ -188,7 +188,7 @@
         </div>
         <!-- Filing Container Small -->
         <div class="filing-container flex-column center" ref="filingContainer" v-if="filingShown && isSmallScreen" >
-          <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
+          <SpinnerCompInside v-if="filingLoading" :customClass="'text-3'"></SpinnerCompInside>
           <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
         </div>
         <div class="flex-row width-100 gap-1" :style="isSmallScreen ? 'padding-inline: 1rem' : ''" style="max-width: 75rem;">
@@ -219,7 +219,7 @@
       </div>
       <!-- Filing Container Large -->
       <div class="filing-container flex-column center" ref="filingContainer" v-if="filingShown && !isSmallScreen" >
-        <SpinnerCompInside v-if="filingLoading"></SpinnerCompInside>
+        <SpinnerCompInside v-if="filingLoading" :customClass="'text-3'"></SpinnerCompInside>
         <div class="filing-html" v-if="!filingLoading" style="padding: 2rem;" v-html="filingContent"></div>
       </div>
     </div>
@@ -357,7 +357,7 @@ export default {
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse()}, this.$nextTick(() => {this.scrollToBottom("smooth")}));
     },
 
     loadUserData() {
@@ -433,7 +433,7 @@ export default {
       }
 
       else {
-        selectedTicker = this.selectedTicker
+        selectedTicker = this.selectedTicker.split(" | ")[0]
         selectedYear = this.selectedYear
         selectedFilingType = this.selectedFiling.split(' ')[0].replace('-', '')
         selectedDate = this.selectedFiling.split(' ')[1]
@@ -497,6 +497,7 @@ export default {
 
       this.scrollToBottom('instant')
       this.$refs.textarea.focus()
+      this.adjustTextareaHeight('textarea')
 
       if (this.$refs.chatContainer) {
         this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll);
@@ -504,7 +505,7 @@ export default {
       }
     },
 
-    // Delete Chat
+    // Reset Chat
     async resetChat(chat) {
       this.confirmLoading = true
       let response = await axios.post(`${config.apiUrl}/api/reset-chat`, {
@@ -667,7 +668,12 @@ export default {
     },
 
     // Various UI Helpers
-    adjustTextareaHeight(refName) {this.$refs[refName].style.height = 'auto'; this.$refs[refName].style.height = (Math.min(this.$refs[refName].scrollHeight, 160) + 2) + 'px';},
+    adjustTextareaHeight(refName) {
+      this.$refs[refName].style.height = 'auto';
+      let adjustment = 0
+      if (this.isSmallScreen) {adjustment = 1}
+      this.$refs[refName].style.height = (Math.min(this.$refs[refName].scrollHeight, 160) + 1 + adjustment) + 'px';
+    },
     checkScreenWidth() {this.isSmallScreen = window.innerWidth <= 800;},
     handleResize() {this.checkScreenWidth(); this.updateChatHistoryHeight()},
     scrollToBottom(type) {
