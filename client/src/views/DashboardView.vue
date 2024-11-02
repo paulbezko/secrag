@@ -99,13 +99,15 @@
       <div class="subheading">Create a new Chat</div>
       <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
       <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
-      <div class="flex-row switch-row-to-column gap-1 width-100">
-        <select class="input" @change="selectTicker($event.target.value)" v-model="selectedTicker" :class="{ 'selected-option': selectedTicker !== '' }">
-          <option value="" disabled hidden selected class="placeholder-option">Ticker</option>
-          <option v-for="option in tickerOptions" :key="option" class="text-inter text-4" :value="option">
-            {{ option }}
-          </option>
-        </select>
+      <div class="flex-column switch-row-to-column gap-1 width-100">
+        <div class="relative width-100">
+          <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
+          <div v-if="showSuggestions && filteredTickers.length > 0" class="suggestions-container">
+            <div v-for="ticker in filteredTickers.slice(0, 10)" :key="ticker" class="suggestion-item" @mousedown="selectTickerFromSuggestion(ticker)">
+              {{ ticker }}
+            </div>
+          </div>
+        </div>
         <select class="input" @change="selectYear($event.target.value)" v-model="selectedYear" :class="{ 'input-disabled': selectedTicker === '' , 'selected-option': selectedYear !== '' }" :disabled="selectedTicker === ''">
           <option value="" disabled hidden selected>Year</option>
           <option v-for="option in yearOptions" :key="option" class="text-inter text-4" :value="option">
@@ -131,10 +133,9 @@
       <div class="text-3">Or choose one of the Recent Filings</div>
       <div class="flex-row gap-1">
         <select class="input" style="width: 24rem" @change="selectNewFiling($event.target.value)" v-model="selectedNewFiling" :class="{ 'selected-option': selectedNewFiling !== '' }">
-          <option value="" disabled hidden selected>Select a Filing</option>
-          <option v-for="option in newFilings" :key="option" class="text-inter text-4" :value="option">
-            {{ option }}
-          </option>
+          <option value="" disabled selected v-if="newFilings.length === 0">No new filings available</option>
+          <option value="" disabled hidden selected v-else>Select a Filing</option>
+          <option v-for="option in newFilings" :key="option" class="text-inter text-4" :value="option">{{ option }}</option>
         </select>
       </div>
       <div 
@@ -261,6 +262,9 @@ export default {
       isSmallScreen: window.innerWidth <= 800, // Initial check for screen size
       createButtonDisabled: true,
       newChatLoadingMessage: '',
+      scrollTimeout: null,
+      lastScrollTime: 0,
+      userHasScrolled: false,
 
       // Chat data
       chats: [],
@@ -272,6 +276,7 @@ export default {
       newMessage: '',
       assistantMessageIndex: null, // Index for assistant message
       assistantMessageLoading: false,
+      assistantMessageBeingRendered: false,
       llmResponseBuffer: '', // Buffer for LLM incoming words
       chatLoading: false,
       newChatLoading: false,
@@ -300,6 +305,10 @@ export default {
       selectedFiling: '',
       selectedFilingType: '',
       selectedNewFiling: '',
+
+      tickerInput: '',
+      filteredTickers: [],
+      showSuggestions: false,
 
       // Socket
       socketId: '',
@@ -331,6 +340,10 @@ export default {
     socket.off("llm_response_complete");
     socket.off("llm_response");
     socket.disconnect();
+    if (this.$refs.chatContainer) {
+      this.$refs.chatContainer.removeEventListener('wheel', this.handleUserScroll);
+      this.$refs.chatContainer.removeEventListener('touchmove', this.handleUserScroll);
+    }
   },
 
   methods: {
@@ -369,7 +382,7 @@ export default {
     // Load Chats
     loadChats() {
       axios.get(`${config.apiUrl}/api/get-chats`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.chats = response.data.chats;})
+      .then(response => {this.chats = response.data.chats; if (this.chats.length > 0) {this.selectChat(this.chats[0])}})
       .catch(error => {console.error('Error getting chats:', error);});
     },
 
@@ -413,7 +426,7 @@ export default {
       }
 
       else if (this.subscription == 'basic') {
-        selectedTicker = this.selectedTicker
+        selectedTicker = this.selectedTicker.split(" | ")[0]
         selectedYear = this.selectedYear
         selectedFilingType = '10K'
         selectedDate = this.tickerInfo[this.selectedYear].find(entry => entry.includes("10-K")).split(' ')[1]
@@ -484,6 +497,11 @@ export default {
 
       this.scrollToBottom('instant')
       this.$refs.textarea.focus()
+
+      if (this.$refs.chatContainer) {
+        this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll);
+        this.$refs.chatContainer.addEventListener('touchmove', this.handleUserScroll);
+      }
     },
 
     // Delete Chat
@@ -520,6 +538,7 @@ export default {
   
     // Send Message
     async sendMessage() {
+      this.userHasScrolled = false;
       this.stopButtonShown = true
       // If there's an ongoing response, stop it and save it first
       if (this.llmResponseBuffer !== '') {
@@ -573,10 +592,18 @@ export default {
       if (this.assistantMessageIndex !== null) {
         if (this.llmResponseBuffer.trim()) {
           this.assistantMessageLoading = false;
+          this.assistantMessageBeingRendered = true;
           this.currentMessages[this.assistantMessageIndex].content = this.renderMarkdown(this.llmResponseBuffer);
-          // console.log(this.$refs.chatContainer)
-          try {this.$nextTick(() => {this.scrollToBottom("smooth")})}
-          catch (error) {console.log(error)}
+          
+          // Only auto-scroll if user hasn't manually scrolled
+          if (!this.userHasScrolled) {
+            const currentTime = Date.now();
+            if (currentTime - this.lastScrollTime >= 1000) {
+              this.lastScrollTime = currentTime;
+              try {this.$nextTick(() => {this.scrollToBottom("smooth")})} 
+              catch (error) {console.log(error)}
+            }
+          }
         }
       }
     },
@@ -591,9 +618,10 @@ export default {
     },
 
     async saveAssitantResponse() {
-      console.log('Saving assistant response');
       try {
         this.assistantMessageLoading = false;
+        this.assistantMessageBeingRendered = false;
+        this.userHasScrolled = false;
         let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
           token: localStorage.getItem('_u'),
           chat: this.activeChat,
@@ -612,12 +640,22 @@ export default {
       }
     },
 
-    // Render Markdown
     renderMarkdown(content) {
       if (!content) {return '';}
-      const latexConverted = content
-        .replace(/\\\[(.*?)\\\]/gs, (_, latex) => {return katex.renderToString(latex, { displayMode: true });})
-        .replace(/\\\((.*?)\\\)/gs, (_, latex) => {return katex.renderToString(latex, { displayMode: false });});
+      
+      // Format numbers before converting to markdown
+      const numberFormatted = content.replace(/\b(\d{1,3}(,\d{3})*)\b/g, (match) => {
+        const num = match.replace(/,/g, '');
+        if (/000000$/.test(num)) {return (parseInt(num) / 1000000) + 'M'}
+        else if (/000$/.test(num)) {return (parseInt(num) / 1000) + 'K'}
+        return match;
+      });
+
+      // Convert the latex expressions
+      const latexConverted = numberFormatted
+        .replace(/\\\[(.*?)\\\]/gs, (_, latex) => {return katex.renderToString(latex, { displayMode: true })})
+        .replace(/\\\((.*?)\\\)/gs, (_, latex) => {return katex.renderToString(latex, { displayMode: false })})
+        
       return marked(latexConverted);
     },
 
@@ -668,6 +706,38 @@ export default {
       const response = await axios.post(`${config.apiUrl}/api/subscribe`, {token: localStorage.getItem('_u'), operation: 'replenishTokens'});
       window.location.href = response.data.sessionUrl;
     },
+
+    filterTickers() {
+    this.selectedTicker = '';
+    this.showSuggestions = true;
+    if (this.tickerInput) {
+      this.filteredTickers = this.tickerOptions.filter(ticker =>
+        ticker.toLowerCase().includes(this.tickerInput.toLowerCase())
+      );
+    } else {
+      this.filteredTickers = [];
+    }
+  },
+
+  selectTickerFromSuggestion(ticker) {
+    this.tickerInput = ticker;
+    this.selectedTicker = ticker;
+    this.showSuggestions = false;
+    this.selectTicker(ticker);
+  },
+
+  handleBlur() {
+    // Delay hiding suggestions to allow for mousedown event on suggestion
+    setTimeout(() => {
+      this.showSuggestions = false;
+      // If input doesn't match any valid ticker, clear it
+      if (!this.tickerOptions.includes(this.tickerInput)) {
+        this.tickerInput = '';
+        this.selectedTicker = '';
+      }
+    }, 200);
+  },
+  handleUserScroll() {if (this.assistantMessageBeingRendered) {this.userHasScrolled = true}},
   }
 };
 
@@ -724,5 +794,7 @@ export default {
   50% { background-color: var(--color-yellow);}
   100% { background-color: var(--color-yellow-dark);}
 }
+
+
 </style>
 
