@@ -16,10 +16,10 @@ import os
 def log(level, message):
     if level == 'debug': 
         current_app.logger.debug(message)
-        log_telebot("DEBUG\n\n" + message)
+        # log_telebot("DEBUG\n\n" + message)
     elif level == 'info': 
         current_app.logger.info(message)
-        log_telebot("INFO\n\n" + message)
+        # log_telebot("INFO\n\n" + message)
     elif level == 'warning': 
         current_app.logger.warning(message)
         # log_telebot("WARNING\n\n" + message)
