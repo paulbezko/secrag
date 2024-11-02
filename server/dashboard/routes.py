@@ -71,8 +71,23 @@ def new_chat_post():
     return {'token': token}
 
 
+@routes.route('/new-chat-preview', methods=['POST'])
+def new_chat_preview_post():
+
+    socket_id = request.json.get('socketId')
+    socketio.emit('new_chat_started', to=socket_id)
+    
+    socketio.emit('new_chat_initialized', to=socket_id)
+    filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
+    socketio.emit('new_chat_downloaded', to=socket_id)
+    vectorstore_manager.new_chat(filing)
+    socketio.emit('new_chat_vectorized', to=socket_id)
+
+    return {'success': True}
+
+
 @routes.route('/get-filing-selection-data', methods=['GET'])
-def get_list_tickers():
+def get_list_tickers_get():
 
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
@@ -85,13 +100,20 @@ def get_list_tickers():
 
 
 @routes.route('/get-info-by-ticker', methods=['GET'])
-def get_info_by_ticker():
+def get_info_by_ticker_get():
 
     try: user_info = decode_token(request.args.get('token'))
     except: return {'error': 'Error decoding token'}
 
     with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
 
+    return {'info': filings_available[request.args.get('ticker')]}
+
+
+@routes.route('/get-info-by-ticker-preview', methods=['GET'])
+def get_info_by_ticker_preview_get():
+
+    with open('database/memory/filings_preview.json', 'r') as f: filings_available = json.load(f)
     return {'info': filings_available[request.args.get('ticker')]}
 
 
@@ -105,6 +127,29 @@ def get_filing_get():
 
     ticker, year, form_raw = request.args.get('chat').split('-')
     filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
+    if form_raw == '10K': form = '10-K'
+    elif '10Q' in form_raw: form = '10-Q'
+
+    try: 
+        with open(f'database/filings/{ticker.upper()}-{year}-{form_raw}.html', 'r') as f: html = f.read()
+        return {'html': html}
+    
+    except:
+        try:
+            html = Company(ticker).get_filings(form=form, date=filing_date)[0].html()
+
+            with open(f'database/filings/{ticker.upper()}-{year}-{form_raw}.html', 'w') as f: f.write(html)
+            return {'html': html}
+        
+        except Exception as error:
+            return {'error': 'Error getting filing: ' + str(error)}
+
+
+@routes.route('/get-filing-preview', methods=['GET'])
+def get_filing_preview_get():
+
+    ticker, year, form_raw = request.args.get('chat').split('-')
+    filing_date = request.args.get('filingDate')
     if form_raw == '10K': form = '10-K'
     elif '10Q' in form_raw: form = '10-Q'
 
@@ -176,6 +221,22 @@ def new_message_user_post():
     user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_message
     token = encode_token(user_info)
     return {'token': token}
+
+
+@routes.route('/new-message-user-preview', methods=['POST'])
+def new_message_user_preview_post():
+
+    message_history = (request.json.get('lastXMessages'))
+
+    get_assistant_response(
+        user_prompt = request.json.get('message'),
+        message_history = message_history,
+        filing_id = request.json.get('chat'),
+        socket_id = request.json.get('socketId'),
+        filing_date = request.json.get('filingDate')
+    )
+
+    return {'success': True}
 
 
 @routes.route('/new-message-assistant', methods=['POST'])
