@@ -729,3 +729,30 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
 }
+
+.suggestions-container {
+  font-family: Inter, sans-serif;
+  font-size: var(--text-3);
+  font-weight: 300;
+  position: absolute;
+  top: 120%;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid var(--color-grey);
+  border-top: none;
+  border-radius: 1rem;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.suggestion-item {
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background-color: var(--color-grey-light);
+}
