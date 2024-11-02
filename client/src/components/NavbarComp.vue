@@ -82,11 +82,11 @@ export default {
       const navbar = document.querySelector('.navbar');
       const container = this.$refs.container;
       if (container) {
-        if (container.scrollY > 0) {console.log('scrolled'); navbar.classList.add('shadow');}
+        if (container.scrollY > 0) {navbar.classList.add('shadow');}
         else {navbar.classList.remove('shadow');}
       }
       else {
-        if (window.scrollY > 0) {console.log('scrolled'); navbar.classList.add('shadow');} 
+        if (window.scrollY > 0) {navbar.classList.add('shadow');} 
         else {navbar.classList.remove('shadow');}
       }
     },
