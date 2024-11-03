@@ -35,6 +35,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: () => import('./views/HomeView.vue') },
+    { path: '/home', component: () => import('./views/HomeView.vue') },
+    { path: '/preview', component: () => import('./views/PreviewView.vue') },
     { path: '/terms-and-conditions', component: () => import('./views/TermsAndConditionsView.vue') },
     { path: '/login', component: () => import('./views/LoginView.vue') },
     { path: '/signup', component: () => import('./views/SignupView.vue') },

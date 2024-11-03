@@ -2,27 +2,10 @@
   <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
-    <component :is="profileComp"></component>
     <div v-if="showProfile" class="backdrop z-17" @click="toggleProfile"></div>
     <div v-if="showConfirm" class="backdrop z-17" @click="toggleConfirm"></div>
     <div v-if="showConfirm && confirmLoading" class="card-component absolute z-20">
       <SpinnerCompInside :customClass="'text-2'"></SpinnerCompInside>
-    </div>
-
-    <div v-if="showConfirm && confirmSuccess && confirmAction === 'deleteChat'" class="card-component absolute z-20 flex-row center text-2 gap-1">Chat Deleted
-      <div class="fa-circle-check fa-solid text-1" style="color: var(--color-green)"></div>
-    </div>
-    <div v-if="showConfirm && !confirmSuccess && confirmAction === 'deleteChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
-      <div class="text-2">Delete Chat?</div>
-      <div class="button button-secondary" @click="deleteChat(currentChat)">Confirm</div>
-    </div>
-
-    <div v-if="showConfirm && confirmSuccess && confirmAction === 'resetChat'" class="card-component absolute z-20 flex-row center text-2 gap-1">Chat Reset
-      <div class="fa-circle-check fa-solid text-1" style="color: var(--color-green)"></div>
-    </div>
-    <div v-if="showConfirm && !confirmSuccess && confirmAction === 'resetChat' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20">
-      <div class="text-2">Reset Chat?</div>
-      <div class="button button-secondary" @click="resetChat(currentChat)">Confirm</div>
     </div>
 
     <div v-if="showConfirm && confirmAction === 'afterBilling'" class="card-component flex-column absolute z-20 gap-1 center text-center gap-2" style="max-width: 30rem">
@@ -34,9 +17,9 @@
     </div>
 
     <div v-if="showConfirm && confirmAction === 'insufficientTokens' && !confirmLoading" class="card-component flex-column center gap-1 absolute z-20" style="max-width: 32rem; padding: 2rem">
-      <div class="text-1 text-bold text-center">Token Balance Low</div>
-      <div class="text-3 text-center">Your account doesn't have enough tokens to proceed with this action.</div>
-      <div class="button button-primary" @click="replenishTokens()">Add Tokens</div>
+      <div class="text-1 text-bold text-center">Thank You for checking SECRAG out!</div>
+      <div class="text-3 text-center">We would really value your feedback. Send it simply by clicking the button below.</div>
+      <div class="button button-primary"><a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C">Share Feedback</a></div>
     </div>
     <div v-if="sidebarShown && isSmallScreen" class="backdrop z-10" @click="toggleSidebar"></div>
     <div class="absolute" v-if="isSmallScreen" style="top: 0; right: 0; padding: 2rem;" @click="toggleSidebar"><div class="fa-solid fa-ellipsis-vertical text-1"></div></div>
@@ -51,9 +34,9 @@
                 <div class="fa-solid fa-house text-center sidebar-element-icon" style="min-width: 2rem;"></div>
                 <div :class="isSmallScreen ? 'text-3' : 'text-4'">Homepage</div>
               </router-link>
-              <div @click="toggleProfile" class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
-                <div class="fa-solid fa-user text-center sidebar-element-icon" style="min-width: 2rem; min-height: 2rem;"></div>
-                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Profile</div>
+              <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
+                <div class="fa-solid fa-coins text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Tokens: {{ subscriptionTokensLeft }}</div>
               </div>
               <div @click="toggleNewChat" class="flex-row gap-05 sidebar-element menu" style="align-items: center;" :class="{ active: newChat }">
                 <div class="fa-solid fa-file-pen text-center sidebar-element-icon" style="min-width: 2rem;"></div>
@@ -67,8 +50,8 @@
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
                     <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
                     <div class="flex-row gap-05">
-                      <div v-if="hoveredChat === chat" @click="toggleConfirm('resetChat')" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
-                      <div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
+                      <div v-if="hoveredChat === chat" @click="resetChat()" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
+                      <div v-if="hoveredChat === chat" @click="deleteChat()" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
                     </div>
                   </div>
                 </li>
@@ -129,23 +112,6 @@
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
-      <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-      <div class="text-3">Or choose one of the Recent Filings</div>
-      <div class="flex-row gap-1">
-        <select class="input" style="width: 24rem" @change="selectNewFiling($event.target.value)" v-model="selectedNewFiling" :class="{ 'selected-option': selectedNewFiling !== '' }">
-          <option value="" disabled selected v-if="newFilings.length === 0">No new filings available</option>
-          <option value="" disabled hidden selected v-else>Select a Filing</option>
-          <option v-for="option in newFilings" :key="option" class="text-inter text-4" :value="option">{{ option }}</option>
-        </select>
-      </div>
-      <div 
-        class="button button-primary flex-row gap-1 width-100" 
-        :class="{ 'button-disabled': !selectedNewFiling }"
-        @click="createChat()"
-        :disabled="!selectedNewFiling">
-        Create Chat
-      </div>
-      <div v-if="error && selectedNewFiling !== ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
     </div>
 
     <!-- Chat Section -->
@@ -205,7 +171,7 @@
             >
           </textarea>
           <!-- Input Buttons Large -->
-          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" style="width: 4.6rem !important; height: 4.6rem !important" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
           <div v-if="!isSmallScreen && !stopButtonShown" class="button-icon" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
           
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
@@ -230,24 +196,16 @@
 </template>
 
 <script>
-import ProfileComp from '../components/ProfileComp.vue';
 import SpinnerCompInside from '../components/SpinnerCompInside.vue';
-import SpinnerCompButton from '../components/SpinnerCompButton.vue';
-import SpinnerComp from '@/components/SpinnerComp.vue';
 import { config } from '@/config';
 import { marked } from 'marked';
 import { socket } from "@/socket";
-import { mapState } from 'vuex';
 import { ref } from 'vue';
 import axios from 'axios';
 const katex = require('katex');
 
 export default {
-  components: {ProfileComp, SpinnerCompInside, SpinnerCompButton, SpinnerComp},
-  computed: {
-    profileComp() {return this.showProfile ? 'ProfileComp' : null},
-    ...mapState(['subscription', 'subscriptionTokensLeft']),
-  },
+  components: {SpinnerCompInside},
   data() {
     return {
       // UI states
@@ -265,6 +223,9 @@ export default {
       scrollTimeout: null,
       lastScrollTime: 0,
       userHasScrolled: false,
+
+      subscription: 'premium',
+      subscriptionTokensLeft: 100,
 
       // Chat data
       chats: [],
@@ -297,7 +258,7 @@ export default {
 
       // Ticker selection
       tickerInfo: {},
-      tickerOptions: [],
+      tickerOptions: ["AAPL | Apple Inc.", "TSLA | Tesla, Inc.", "NVDA | NVIDIA CORP", "MSFT | MICROSOFT CORP"],
       yearOptions: [],
       selectedTicker: '', // Initialize selected ticker
       selectedYear: '', // Initialize selected year
@@ -324,9 +285,6 @@ export default {
     const afterBilling = new URLSearchParams(window.location.search).get('after-billing');
     if (afterBilling === 'true') {this.confirmAction = 'afterBilling'; this.showConfirm = true;}
     this.initializeSocket();
-    this.loadUserData();
-    this.loadFilingSelectionData();
-    this.loadChats();
     this.windowLoaded = true;
     this.updateChatHistoryHeight();
     if (!this.isSmallScreen) {this.sidebarShown = true;}
@@ -357,33 +315,7 @@ export default {
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {this.saveAssitantResponse()}, this.$nextTick(() => {this.scrollToBottom("smooth")}));
-    },
-
-    loadUserData() {
-      axios.get(`${config.apiUrl}/api/get-user-data`, { params: { token: localStorage.getItem('_u') } })
-        .then(response => {
-          if (response.data.critical) {
-            localStorage.removeItem('_u'); 
-            this.$router.push('/')
-          }
-          localStorage.setItem('_u', response.data.token);
-        })
-        .catch(error => {console.log('Error retrieving user data:', error); localStorage.removeItem('_u'); this.$router.push('/')});
-    },
-
-    // Load List Tickers
-    loadFilingSelectionData() {
-      axios.get(`${config.apiUrl}/api/get-filing-selection-data`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.newFilings = response.data.newFilings; this.tickerOptions = response.data.tickers;})
-      .catch(error => {console.error('Error getting filing selection data:', error)});
-    },
-
-    // Load Chats
-    loadChats() {
-      axios.get(`${config.apiUrl}/api/get-chats`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.chats = response.data.chats; if (this.chats.length > 0) {this.selectChat(this.chats[0])}})
-      .catch(error => {console.error('Error getting chats:', error);});
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse(); this.$nextTick(() => {this.scrollToBottom("smooth")})});
     },
 
     // Update Chat History Height
@@ -402,7 +334,7 @@ export default {
       this.selectedYear = '';
       this.selectedFiling = '';
       this.selectedNewFiling = '';
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: option }})
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker-preview`, {params: { ticker: option }})
       .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
       .catch(error => {console.error('Error getting ticker info:', error)});
     },
@@ -416,6 +348,7 @@ export default {
     async createChat() {
 
       if ((!this.selectedTicker || !this.selectedYear || (!this.selectedFiling && this.subscription !== 'basic')) && !this.selectedNewFiling) {return}
+      if (this.chats.length === 1) {this.error = 'You can only have one chat in preview mode.'; return}
 
       let selectedTicker, selectedYear, selectedDate, selectedFilingType
 
@@ -425,18 +358,12 @@ export default {
         selectedYear = selectedDate.split('-')[0]
       }
 
-      else if (this.subscription == 'basic') {
-        selectedTicker = this.selectedTicker.split(" | ")[0]
-        selectedYear = this.selectedYear
-        selectedFilingType = '10K'
-        selectedDate = this.tickerInfo[this.selectedYear].find(entry => entry.includes("10-K")).split(' ')[1]
-      }
-
       else {
         selectedTicker = this.selectedTicker.split(" | ")[0]
         selectedYear = this.selectedYear
         selectedFilingType = this.selectedFiling.split(' ')[0].replace('-', '')
         selectedDate = this.selectedFiling.split(' ')[1]
+        this.filingDate = selectedDate
       }
 
       let newChatName = `${selectedTicker}-${selectedYear}-${selectedFilingType}`
@@ -445,12 +372,12 @@ export default {
       try {
 
         this.newChatLoading = true;
+        this.tickerInput = '';
         this.selectedTicker = '';
         this.selectedYear = '';
         this.selectedFiling = '';
         this.selectedNewFiling = '';
-        let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
-          token: localStorage.getItem('_u'),
+        let response = await axios.post(`${config.apiUrl}/api/new-chat-preview`, {
           chat: newChatName,
           filingDate: selectedDate,
           ticker: selectedTicker,
@@ -463,6 +390,7 @@ export default {
           return;
         }
 
+        this.subscriptionTokensLeft += -20
         this.chats.unshift(newChatName);
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
@@ -482,16 +410,10 @@ export default {
       
       this.newChat = false;
       this.currentChat = chat;
-      this.chatLoading = true;
-
-      await axios.get(`${config.apiUrl}/api/get-messages`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
-      .then(response => {this.currentMessages = response.data.messages; this.filingDate = response.data.filing_date;})
-      .catch(error => {console.error('Error getting messages:', error);})
-      .finally(() => {this.chatLoading = false;});
-
+      this.currentMessages = [{role: 'assistant', content: 'Hello! How can I help you today?'}]
       this.filingLoading = true
 
-      await axios.get(`${config.apiUrl}/api/get-filing`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
+      await axios.get(`${config.apiUrl}/api/get-filing-preview`, {params: { 'filingDate': this.filingDate, 'chat': chat }})
       .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
       .catch(error => {console.error('Error getting filing:', error);});
 
@@ -506,39 +428,21 @@ export default {
     },
 
     // Reset Chat
-    async resetChat(chat) {
-      this.confirmLoading = true
-      let response = await axios.post(`${config.apiUrl}/api/reset-chat`, {
-        token: localStorage.getItem('_u'),
-        chat: chat
-      });
-
-      if (response.data.error) {console.log(response.data.error); return;}
-      this.confirmAction = 'resetChat'
-      this.confirmLoading = false
-      this.confirmSuccess = true
-      this.loadChats()
-      this.selectChat(chat)
+    async resetChat() {
+      this.currentMessages = [{role: 'assistant', content: 'Hello! How can I help you today?'}]
     },
 
     // Delete Chat
-    async deleteChat(chat) {
-      this.confirmLoading = true
-      let response = await axios.post(`${config.apiUrl}/api/delete-chat`, {
-        token: localStorage.getItem('_u'),
-        chat: chat
-      });
-
-      if (response.data.error) {console.log(response.data.error); return;}
-      this.confirmAction = 'deleteChat'
-      this.confirmLoading = false
-      this.confirmSuccess = true
-      this.loadChats()
+    async deleteChat() {
+      this.chats = []
       this.newChat = true
     },
   
     // Send Message
     async sendMessage() {
+      if (this.subscriptionTokensLeft < 4) {this.confirmAction = 'insufficientTokens', this.showConfirm = true; return}
+
+      this.subscriptionTokensLeft += -4
       this.userHasScrolled = false;
       this.stopButtonShown = true
       // If there's an ongoing response, stop it and save it first
@@ -570,8 +474,7 @@ export default {
         const lastXMessages = this.currentMessages.slice(-this.lastXMessagesLength)
 
         try {
-          let response = await axios.post(`${config.apiUrl}/api/new-message-user`, {
-            token: localStorage.getItem('_u'),
+          let response = await axios.post(`${config.apiUrl}/api/new-message-user-preview`, {
             chat: this.activeChat,
             message: payloadMessage,
             lastXMessages: lastXMessages,
@@ -580,8 +483,7 @@ export default {
           });
 
           if (response.data.error) {
-            if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
-            else (console.log(response.data.error))
+            console.log(response.data.error)
             return;
           }
         } catch (error) {console.error('Error sending message:', error); return;}
@@ -623,17 +525,6 @@ export default {
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
         this.userHasScrolled = false;
-        let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
-          token: localStorage.getItem('_u'),
-          chat: this.activeChat,
-          message: this.llmResponseBuffer,
-        });
-        
-        if (response.data.error) {
-          console.log(response.data.error);
-          return;
-        }
-        
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
       } catch (error) {
@@ -704,13 +595,6 @@ export default {
         this.confirmAction = action;
         this.confirmSuccess = false;
         this.showConfirm = !this.showConfirm;
-    },
-
-    // Replenish Tokens
-    async replenishTokens() {
-      this.showSpinner = true
-      const response = await axios.post(`${config.apiUrl}/api/subscribe`, {token: localStorage.getItem('_u'), operation: 'replenishTokens'});
-      window.location.href = response.data.sessionUrl;
     },
 
     filterTickers() {
