@@ -1,4 +1,7 @@
-from ..general.utils import reconnect_to_db, log
+import os
+import psycopg2
+from ..general.utils import log
+from psycopg2.extras import RealDictCursor
 from psycopg2 import OperationalError, InterfaceError
 from flask import current_app
 import time
@@ -8,7 +11,14 @@ def get_user_data_stripe(stripe_user_id, retries=3):
     attempt = 0
     while attempt < retries:
         try:
-            connection = current_app.config['DB_CONNECTION']
+            connection = psycopg2.connect(
+                host        = os.getenv('DB_HOST'),
+                port        = os.getenv('DB_PORT'),
+                database    = os.getenv('DB_NAME'),
+                user        = os.getenv('DB_USER'),
+                password    = os.getenv('DB_PASS'),
+                cursor_factory = RealDictCursor
+            )
             with connection.cursor() as cursor:
                 query = f"SELECT * FROM users_{current_app.config['MODE']} WHERE stripe_user_id = %s"
                 cursor.execute(query, (stripe_user_id,))
@@ -17,12 +27,14 @@ def get_user_data_stripe(stripe_user_id, retries=3):
         except (OperationalError, InterfaceError) as conn_error:
             log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
             attempt += 1
-            reconnect_to_db()
             time.sleep(2)  # Optional delay before retrying
         
         except Exception as error:
             log('error', f'Error [Get User Data]: {error}')
             break
+
+        finally:
+            connection.close()
     
     log('fatal', 'Failed to retrieve user data after multiple attempts.')
     return None
