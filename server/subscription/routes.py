@@ -19,7 +19,7 @@ def subscribe_post():
 
         if not user['stripe_user_id']:
             response = stripe.Customer.create(name = user['name'], email = user['email'])
-            log('debug', f'Stripe user created: {response}')
+            log('debug', f'Stripe user created: {user['email']}')
             query = f"UPDATE users_{current_app.config['MODE']} SET stripe_user_id = %s WHERE email = %s"
             execute_query(query, (response['id'], user_info['email']))
             customer = response['id']
@@ -85,7 +85,9 @@ def webhook_post():
                 amount = response['amount_paid']
 
                 if response['discount']['coupon']['name'] == "ZERO": # Handle ZERO coupon
-                    amount = response['lines']['data'][-1]['plan']['amount']
+                    if len(response['lines']['data']) == 1: # Only add tokens if user has one subscription
+                        amount = response['lines']['data'][-1]['plan']['amount']
+                    else: amount = 0
 
                 if price_id == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: subscription = 'premium'
                 elif price_id == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY']: subscription = 'premium'
