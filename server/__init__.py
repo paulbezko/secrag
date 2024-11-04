@@ -55,17 +55,6 @@ def create_app(mode):
     elif mode == 'dev':
         app.config['MODE'] = 'dev'
         app.config['REDIRECT_URL'] = 'http://localhost:8080'
-        
-    # Initializing database
-    connection = psycopg2.connect(
-        host        = os.getenv('DB_HOST'),
-        port        = os.getenv('DB_PORT'),
-        database    = os.getenv('DB_NAME'),
-        user        = os.getenv('DB_USER'),
-        password    = os.getenv('DB_PASS'),
-        cursor_factory = RealDictCursor
-    )
-    app.config['DB_CONNECTION'] = connection
 
     # Initializing environment variables
     app.config['FLASK_KEY_SECRET'] = os.getenv('FLASK_KEY_SECRET')
