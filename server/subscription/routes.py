@@ -85,7 +85,9 @@ def webhook_post():
                 amount = response['amount_paid']
 
                 if response['discount']['coupon']['name'] == "ZERO": # Handle ZERO coupon
-                    amount = response['lines']['data'][-1]['plan']['amount']
+                    if len(response['lines']['data']) == 1: # Only add tokens if user has one subscription
+                        amount = response['lines']['data'][-1]['plan']['amount']
+                    else: amount = 0
 
                 if price_id == current_app.config['STRIPE_PRODUCT_PREMIUM_YEARLY']: subscription = 'premium'
                 elif price_id == current_app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY']: subscription = 'premium'
