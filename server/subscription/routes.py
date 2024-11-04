@@ -35,7 +35,7 @@ def subscribe_post():
                 }],
             mode='subscription',
             allow_promotion_codes = True,
-            success_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
+            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
             cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
         )
         return {'sessionId': session['id']}
@@ -62,8 +62,8 @@ def subscribe_post():
                 }],
             mode='payment',
             allow_promotion_codes = True,
-            success_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
-            cancel_url = f"{current_app.config['REDIRECT_URL']}/subscribe",
+            success_url = f"{current_app.config['REDIRECT_URL']}/dashboard?after-billing=true",
+            cancel_url = f"{current_app.config['REDIRECT_URL']}/dashboard",
             metadata = {"replenishTokens": "True"}
         )
         return {'sessionUrl': session['url']}
