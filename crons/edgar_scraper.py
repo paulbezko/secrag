@@ -92,7 +92,7 @@ def sort_jsons():
 
 
 if __name__ == '__main__':
-
+    configure_logger(current_dir+"/logs/filing_scraper.log")
     log("info", "Starting edgar scraper")
     full_scrape = False # Controls whether a full scrape is run or a regular scrape is run
 
