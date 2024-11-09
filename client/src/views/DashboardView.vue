@@ -495,9 +495,13 @@ export default {
       .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
       .catch(error => {console.error('Error getting filing:', error);});
 
-      this.scrollToBottom('instant')
-      this.$refs.textarea.focus()
-      this.adjustTextareaHeight('textarea')
+      if (this.$refs.textarea) {
+        this.scrollToBottom('instant');
+        this.$refs.textarea.focus();
+        this.adjustTextareaHeight('textarea');
+      } else {
+        console.warn("Textarea not found - focus skipped");
+      }
 
       if (this.$refs.chatContainer) {
         this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll);
