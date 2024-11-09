@@ -1,7 +1,7 @@
 from edgar.entities import Company
 from edgar.core import set_identity
 
-set_identity("{} {}".format("SECRag", "secrag.info@gmail.com"))
+set_identity("{} {}".format("SECRAG", "secrag.info@gmail.com"))
 
 ticker = "COIN"
 
