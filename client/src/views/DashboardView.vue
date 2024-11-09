@@ -382,7 +382,7 @@ export default {
     // Load Chats
     loadChats() {
       axios.get(`${config.apiUrl}/api/get-chats`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.chats = response.data.chats; if (this.chats.length > 0) {this.selectChat(this.chats[0])}})
+      .then(response => {this.chats = response.data.chats})
       .catch(error => {console.error('Error getting chats:', error);});
     },
 
