@@ -63,7 +63,15 @@
             <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
-                <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
+                <li 
+                  class="text-4 sidebar-element text-link" 
+                  v-for="chat in chats" 
+                  :key="chat" 
+                  :class="{ active: currentChat === chat }" 
+                  @click="selectChat(chat)" 
+                  @mouseover="hoveredChat = chat" 
+                  @mouseleave="hoveredChat = null"
+                  >
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
                     <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
                     <div class="flex-row gap-05">
@@ -97,7 +105,7 @@
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
-      <div class="text-3">Select a Ticker, Year of interest, and a Filing Type</div>
+      <div class="text-3 text-center" style="max-width: 24rem;">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-column switch-row-to-column gap-1 width-100">
         <div class="relative width-100">
           <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
@@ -355,7 +363,7 @@ export default {
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {this.saveAssitantResponse()}, this.$nextTick(() => {this.scrollToBottom("smooth")}));
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
     },
 
     loadUserData() {
@@ -625,6 +633,7 @@ export default {
         
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
+        this.$nextTick(() => {this.scrollToBottom("smooth")})
       } catch (error) {
         console.error('Error sending message:', error);
       }

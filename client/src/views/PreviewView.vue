@@ -80,7 +80,7 @@
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
-      <div class="text-3">Select a Ticker, Year of interest, and a Filing Type</div>
+      <div class="text-3 text-center" style="max-width: 24rem;">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-column switch-row-to-column gap-1 width-100">
         <div class="relative width-100">
           <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
@@ -312,7 +312,7 @@ export default {
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {this.saveAssitantResponse(); this.$nextTick(() => {this.scrollToBottom("smooth")})});
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
     },
 
     // Update Chat History Height
@@ -523,6 +523,7 @@ export default {
         this.userHasScrolled = false;
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
+        this.$nextTick(() => {this.scrollToBottom("smooth")})
       } catch (error) {
         console.error('Error sending message:', error);
       }
