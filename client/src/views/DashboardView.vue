@@ -1,5 +1,5 @@
 <template>
-  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
+  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100dvh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
     <component :is="profileComp"></component>
@@ -63,7 +63,15 @@
             <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
-                <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
+                <li 
+                  class="text-4 sidebar-element text-link" 
+                  v-for="chat in chats" 
+                  :key="chat" 
+                  :class="{ active: currentChat === chat }" 
+                  @click="selectChat(chat)" 
+                  @mouseover="hoveredChat = chat" 
+                  @mouseleave="hoveredChat = null"
+                  >
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
                     <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
                     <div class="flex-row gap-05">
@@ -93,12 +101,11 @@
           <SpinnerCompInside :customClass="'text-3'"></SpinnerCompInside>
         </div>
       </div>
-      <div class="backdrop z-10"></div>
+      <div class="backdrop z-17"></div>
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
-      <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
-      <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
+      <div class="text-3 text-center" style="max-width: 24rem;">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-column switch-row-to-column gap-1 width-100">
         <div class="relative width-100">
           <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
@@ -114,7 +121,7 @@
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
+        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''">
           <option value="" disabled hidden selected>Filing</option>
           <option v-for="option in filingOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
@@ -123,9 +130,9 @@
       </div>
       <div
         class="button button-primary flex-row gap-1 width-100" 
-        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))}" 
+        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || !selectedFiling)}" 
         @click="createChat()"
-        :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))">
+        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)">
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
@@ -149,7 +156,7 @@
     </div>
 
     <!-- Chat Section -->
-    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
+    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100dvh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
         <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" id="chat-container">
           <SpinnerCompInside v-if="chatLoading" :customClass="'text-3'"></SpinnerCompInside>
@@ -205,7 +212,7 @@
             >
           </textarea>
           <!-- Input Buttons Large -->
-          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" style="width: 4.6rem !important; height: 4.6rem !important" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
           <div v-if="!isSmallScreen && !stopButtonShown" class="button-icon" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
           
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
@@ -280,7 +287,7 @@ export default {
       llmResponseBuffer: '', // Buffer for LLM incoming words
       chatLoading: false,
       newChatLoading: false,
-      lastXMessagesLength: 0, // Adjusted based on subscription
+      lastXMessagesLength: 0,
       chatScrollPosition: 0, // To store chat scroll position
       chatHistoryHeight: '0px', // Adjusted dynamically based on screen size
       stopButtonShown: false,
@@ -332,8 +339,7 @@ export default {
     if (!this.isSmallScreen) {this.sidebarShown = true;}
     else (this.filingShown = false)
     window.addEventListener('resize', this.handleResize);
-    if (this.subscription === 'basic') {this.lastXMessagesLength = 8}
-    else {this.lastXMessagesLength = 16}
+    this.lastXMessagesLength = 16
   },
   unmounted() {
     window.removeEventListener('resize', this.handleResize);
@@ -357,7 +363,7 @@ export default {
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {this.saveAssitantResponse()}, this.$nextTick(() => {this.scrollToBottom("smooth")}));
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
     },
 
     loadUserData() {
@@ -382,7 +388,7 @@ export default {
     // Load Chats
     loadChats() {
       axios.get(`${config.apiUrl}/api/get-chats`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.chats = response.data.chats; if (this.chats.length > 0) {this.selectChat(this.chats[0])}})
+      .then(response => {this.chats = response.data.chats})
       .catch(error => {console.error('Error getting chats:', error);});
     },
 
@@ -415,7 +421,7 @@ export default {
     // Create chat
     async createChat() {
 
-      if ((!this.selectedTicker || !this.selectedYear || (!this.selectedFiling && this.subscription !== 'basic')) && !this.selectedNewFiling) {return}
+      if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
 
       let selectedTicker, selectedYear, selectedDate, selectedFilingType
 
@@ -423,13 +429,6 @@ export default {
         [selectedTicker, selectedFilingType, selectedDate] = this.selectedNewFiling.split(" ");
         selectedFilingType = selectedFilingType.replace('-', '')
         selectedYear = selectedDate.split('-')[0]
-      }
-
-      else if (this.subscription == 'basic') {
-        selectedTicker = this.selectedTicker.split(" | ")[0]
-        selectedYear = this.selectedYear
-        selectedFilingType = '10K'
-        selectedDate = this.tickerInfo[this.selectedYear].find(entry => entry.includes("10-K")).split(' ')[1]
       }
 
       else {
@@ -489,15 +488,13 @@ export default {
       .catch(error => {console.error('Error getting messages:', error);})
       .finally(() => {this.chatLoading = false;});
 
+      try {this.scrollToBottom('instant')} 
+      catch (error) {console.warning('Error in scrollToBottom:', error)}
       this.filingLoading = true
 
       await axios.get(`${config.apiUrl}/api/get-filing`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
       .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
       .catch(error => {console.error('Error getting filing:', error);});
-
-      this.scrollToBottom('instant')
-      this.$refs.textarea.focus()
-      this.adjustTextareaHeight('textarea')
 
       if (this.$refs.chatContainer) {
         this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll);
@@ -636,6 +633,7 @@ export default {
         
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
+        this.$nextTick(() => {this.scrollToBottom("smooth")})
       } catch (error) {
         console.error('Error sending message:', error);
       }
