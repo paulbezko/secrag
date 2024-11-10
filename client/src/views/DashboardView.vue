@@ -1,5 +1,5 @@
 <template>
-  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100svh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
+  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100dvh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
     <component :is="profileComp"></component>
@@ -148,7 +148,7 @@
     </div>
 
     <!-- Chat Section -->
-    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100svh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
+    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100dvh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
         <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" id="chat-container">
           <SpinnerCompInside v-if="chatLoading" :customClass="'text-3'"></SpinnerCompInside>
@@ -204,7 +204,7 @@
             >
           </textarea>
           <!-- Input Buttons Large -->
-          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" style="width: 4.6rem !important; height: 4.6rem !important" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
+          <div v-if="!isSmallScreen && stopButtonShown" class="button-icon" @click="stopResponse()"><div class="fa-solid fa-stop" style="color: var(--color-grey-black)"></div></div>
           <div v-if="!isSmallScreen && !stopButtonShown" class="button-icon" @click="sendMessage('textarea')"><div class="fa-solid fa-arrow-up" style="color: var(--color-grey-black)"></div></div>
           
           <div class="button-icon" v-if="!isSmallScreen" @click="toggleFilingView"><div class="fa-solid fa-file-lines" style="color: var(--color-grey-black)"></div></div>
