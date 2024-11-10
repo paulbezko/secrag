@@ -80,8 +80,7 @@
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
-      <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
-      <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
+      <div class="text-3">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-column switch-row-to-column gap-1 width-100">
         <div class="relative width-100">
           <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
@@ -97,7 +96,7 @@
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
+        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''">
           <option value="" disabled hidden selected>Filing</option>
           <option v-for="option in filingOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
@@ -106,9 +105,9 @@
       </div>
       <div
         class="button button-primary flex-row gap-1 width-100" 
-        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))}" 
+        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || !selectedFiling)}" 
         @click="createChat()"
-        :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))">
+        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)">
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
@@ -224,7 +223,6 @@ export default {
       lastScrollTime: 0,
       userHasScrolled: false,
 
-      subscription: 'premium',
       subscriptionTokensLeft: 100,
 
       // Chat data
@@ -241,7 +239,7 @@ export default {
       llmResponseBuffer: '', // Buffer for LLM incoming words
       chatLoading: false,
       newChatLoading: false,
-      lastXMessagesLength: 0, // Adjusted based on subscription
+      lastXMessagesLength: 0,
       chatScrollPosition: 0, // To store chat scroll position
       chatHistoryHeight: '0px', // Adjusted dynamically based on screen size
       stopButtonShown: false,
@@ -290,8 +288,7 @@ export default {
     if (!this.isSmallScreen) {this.sidebarShown = true;}
     else (this.filingShown = false)
     window.addEventListener('resize', this.handleResize);
-    if (this.subscription === 'basic') {this.lastXMessagesLength = 8}
-    else {this.lastXMessagesLength = 16}
+    this.lastXMessagesLength = 16
   },
   unmounted() {
     window.removeEventListener('resize', this.handleResize);
@@ -347,7 +344,7 @@ export default {
     // Create chat
     async createChat() {
 
-      if ((!this.selectedTicker || !this.selectedYear || (!this.selectedFiling && this.subscription !== 'basic')) && !this.selectedNewFiling) {return}
+      if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
       if (this.chats.length === 1) {this.error = 'You can only have one chat in preview mode.'; return}
 
       let selectedTicker, selectedYear, selectedDate, selectedFilingType
