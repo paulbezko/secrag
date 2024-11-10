@@ -108,7 +108,7 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
                     "chunk_description": table,
                 }
 
-                list_retrieved_chunks = vectorstore.similarity_search("", k=1, fetch_k=1000, filter=chunk_metadata_model)
+                list_retrieved_chunks = vectorstore.similarity_search("", k=1, fetch_k=100000, filter=chunk_metadata_model)
                 for chunk in list_retrieved_chunks:
                     list_context_chunks += chunk.page_content + "\n"
         
@@ -125,7 +125,7 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
         }
 
         keywords = " ".join(prompt_keywords.keywords)
-        list_retrieved_chunks = vectorstore.similarity_search_with_score(keywords, k=k, filter=chunk_metadata_model, fetch_k=1000)
+        list_retrieved_chunks = vectorstore.similarity_search_with_score(keywords, k=k, filter=chunk_metadata_model, fetch_k=100000)
         for chunk in list_retrieved_chunks:
             if chunk[0].page_content not in list_context_chunks:
                 list_context_chunks += chunk[0].page_content + "\n"
