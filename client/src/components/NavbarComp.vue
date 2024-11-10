@@ -27,10 +27,9 @@
     <component :is="profileComp"></component>
 
     <transition>
-      <div v-if="showDropdown" class="card-component card-component-navbar flex-column gap-1 show-on-small z-30 width-100" style="max-width: 16rem; top:2rem; right:2rem;">
+      <div v-if="showDropdown" class="card-component card-component-navbar flex-column gap-1 show-on-small z-30 width-100" style="max-width: 16rem; top:1rem; right:1rem;">
         <router-link class="text-2" v-if="authenticated && subscribed"  to="/dashboard">Dashboard</router-link>
         <hr class="width-100" v-if="authenticated && subscribed" style="border-top: 1px solid var(--color-grey)">
-        <div v-if="authenticated && subscribed" ></div>
         <router-link class="text-2" @click="toggleDropdown()" to="/#about">About</router-link>
         <router-link class="text-2" @click="toggleDropdown()" to="/#faq">FAQ</router-link>
         <router-link class="text-2" @click="toggleDropdown()" to="/#contact">Contact</router-link>

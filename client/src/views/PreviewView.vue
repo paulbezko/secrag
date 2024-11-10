@@ -1,5 +1,5 @@
 <template>
-  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
+  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100svh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
     <div v-if="showProfile" class="backdrop z-17" @click="toggleProfile"></div>
@@ -114,7 +114,7 @@
     </div>
 
     <!-- Chat Section -->
-    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
+    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100svh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
         <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" id="chat-container">
           <SpinnerCompInside v-if="chatLoading" :customClass="'text-3'"></SpinnerCompInside>
@@ -408,19 +408,14 @@ export default {
       this.newChat = false;
       this.currentChat = chat;
       this.currentMessages = [{role: 'assistant', content: 'Hello! How can I help you today?'}]
+
+      try {this.scrollToBottom('instant')} 
+      catch (error) {console.warning('Error in scrollToBottom:', error)}
       this.filingLoading = true
 
       await axios.get(`${config.apiUrl}/api/get-filing-preview`, {params: { 'filingDate': this.filingDate, 'chat': chat }})
       .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
       .catch(error => {console.error('Error getting filing:', error);});
-
-      if (this.$refs.textarea) {
-        this.scrollToBottom('instant');
-        this.$refs.textarea.focus();
-        this.adjustTextareaHeight('textarea');
-      } else {
-        console.warn("Textarea not found - focus skipped");
-      }
 
       if (this.$refs.chatContainer) {
         this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll);
