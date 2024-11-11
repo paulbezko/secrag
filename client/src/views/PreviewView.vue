@@ -76,7 +76,7 @@
           <SpinnerCompInside :customClass="'text-3'"></SpinnerCompInside>
         </div>
       </div>
-      <div class="backdrop z-10"></div>
+      <div class="backdrop z-17"></div>
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
