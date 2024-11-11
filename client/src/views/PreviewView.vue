@@ -76,7 +76,7 @@
           <SpinnerCompInside :customClass="'text-3'"></SpinnerCompInside>
         </div>
       </div>
-      <div class="backdrop z-10"></div>
+      <div class="backdrop z-17"></div>
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
@@ -223,7 +223,7 @@ export default {
       lastScrollTime: 0,
       userHasScrolled: false,
 
-      subscriptionTokensLeft: 100,
+      subscriptionTokensLeft: 60,
 
       // Chat data
       chats: [],
@@ -392,9 +392,6 @@ export default {
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
         this.newChat = false;
-        this.selectedTicker = '';
-        this.selectedYear = '';
-        this.selectedFiling = '';
         this.newChatLoading = false;
       } 
       catch (error) {console.error('Error creating chat:', error);}
@@ -407,6 +404,12 @@ export default {
       
       this.newChat = false;
       this.currentChat = chat;
+
+      this.tickerInput = '';
+      this.selectedTicker = '';
+      this.selectedYear = '';
+      this.selectedFiling = '';
+
       this.currentMessages = [{role: 'assistant', content: 'Hello! How can I help you today?'}]
 
       try {this.scrollToBottom('instant')} 
@@ -520,10 +523,10 @@ export default {
       try {
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
+        if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
         this.userHasScrolled = false;
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
-        this.$nextTick(() => {this.scrollToBottom("smooth")})
       } catch (error) {
         console.error('Error sending message:', error);
       }

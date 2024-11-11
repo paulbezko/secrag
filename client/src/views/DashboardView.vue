@@ -466,9 +466,6 @@ export default {
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
         this.newChat = false;
-        this.selectedTicker = '';
-        this.selectedYear = '';
-        this.selectedFiling = '';
         this.newChatLoading = false;
       } 
       catch (error) {console.error('Error creating chat:', error);}
@@ -482,6 +479,11 @@ export default {
       this.newChat = false;
       this.currentChat = chat;
       this.chatLoading = true;
+
+      this.tickerInput = '';
+      this.selectedTicker = '';
+      this.selectedYear = '';
+      this.selectedFiling = '';
 
       await axios.get(`${config.apiUrl}/api/get-messages`, {params: { token: localStorage.getItem('_u'), 'chat': chat }})
       .then(response => {this.currentMessages = response.data.messages; this.filingDate = response.data.filing_date;})
@@ -619,6 +621,7 @@ export default {
       try {
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
+        if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
         this.userHasScrolled = false;
         let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
           token: localStorage.getItem('_u'),
@@ -633,7 +636,7 @@ export default {
         
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
-        this.$nextTick(() => {this.scrollToBottom("smooth")})
+        
       } catch (error) {
         console.error('Error sending message:', error);
       }
