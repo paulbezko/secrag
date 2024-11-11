@@ -392,9 +392,6 @@ export default {
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
         this.newChat = false;
-        this.selectedTicker = '';
-        this.selectedYear = '';
-        this.selectedFiling = '';
         this.newChatLoading = false;
       } 
       catch (error) {console.error('Error creating chat:', error);}
@@ -407,6 +404,12 @@ export default {
       
       this.newChat = false;
       this.currentChat = chat;
+
+      this.tickerInput = '';
+      this.selectedTicker = '';
+      this.selectedYear = '';
+      this.selectedFiling = '';
+
       this.currentMessages = [{role: 'assistant', content: 'Hello! How can I help you today?'}]
 
       try {this.scrollToBottom('instant')} 
