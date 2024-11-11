@@ -520,10 +520,10 @@ export default {
       try {
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
+        if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
         this.userHasScrolled = false;
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
-        this.$nextTick(() => {this.scrollToBottom("smooth")})
       } catch (error) {
         console.error('Error sending message:', error);
       }
