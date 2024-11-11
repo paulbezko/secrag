@@ -223,7 +223,7 @@ export default {
       lastScrollTime: 0,
       userHasScrolled: false,
 
-      subscriptionTokensLeft: 100,
+      subscriptionTokensLeft: 60,
 
       // Chat data
       chats: [],
