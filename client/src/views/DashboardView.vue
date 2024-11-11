@@ -621,6 +621,7 @@ export default {
       try {
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
+        if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
         this.userHasScrolled = false;
         let response = await axios.post(`${config.apiUrl}/api/new-message-assistant`, {
           token: localStorage.getItem('_u'),
@@ -635,7 +636,7 @@ export default {
         
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
-        this.$nextTick(() => {this.scrollToBottom("smooth")})
+        
       } catch (error) {
         console.error('Error sending message:', error);
       }
