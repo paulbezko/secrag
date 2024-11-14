@@ -363,6 +363,7 @@ export default {
         this.filingDate = selectedDate
       }
 
+      if (selectedFilingType === '10Q') {selectedFilingType = '10Q' + selectedDate.split('-')[1].padStart(2, '0')}
       let newChatName = `${selectedTicker}-${selectedYear}-${selectedFilingType}`
       if (this.chats.includes(newChatName)) {this.error = 'Chat already exists'; return}
 
