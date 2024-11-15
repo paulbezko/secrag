@@ -77,7 +77,7 @@ class FinancialsRAGTool(BaseTool):
 
 
 class FilingRAGQuery(BaseModel):
-    query: str = Field("In case if abbreviation is the keyword, pass it and its expanded version")
+    query: str = Field("Query to non-financial data filing retriever")
 
 class FilingRAGTool(BaseTool):
     name: str = "non-financial_data_filing_retriever"
