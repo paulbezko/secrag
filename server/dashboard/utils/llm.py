@@ -87,10 +87,7 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
 
 async def stream_response(agent_executor, prompt_settings, socket_id):
     buffer = ""
-    async for event in agent_executor.astream_events(
-    prompt_settings,
-    version="v1",
-):
+    async for event in agent_executor.astream_events(prompt_settings, version="v1"):
         if stop_signals.get(socket_id): break
 
         kind = event["event"]
