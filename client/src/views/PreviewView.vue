@@ -1,5 +1,5 @@
 <template>
-  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100vh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
+  <div v-if="windowLoaded" class="flex-column width-100 center gap-1 padding-sidebar-dashboard height-100" style="height: 100dvh; padding-bottom: 1rem; max-width: 140rem; overflow: hidden;">
   
     <!-- Component Section -->
     <div v-if="showProfile" class="backdrop z-17" @click="toggleProfile"></div>
@@ -76,12 +76,11 @@
           <SpinnerCompInside :customClass="'text-3'"></SpinnerCompInside>
         </div>
       </div>
-      <div class="backdrop z-10"></div>
+      <div class="backdrop z-17"></div>
     </div>
     <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
       <div class="subheading">Create a new Chat</div>
-      <div class="text-3" v-if="this.subscription === 'basic'">Select a Ticker and a Year of interest</div>
-      <div class="text-3" v-if="this.subscription === 'premium'">Select a Ticker, Year of interest, and a Filing Type</div>
+      <div class="text-3 text-center" style="max-width: 24rem;">Select a Ticker, Year of interest, and a Filing Type</div>
       <div class="flex-column switch-row-to-column gap-1 width-100">
         <div class="relative width-100">
           <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
@@ -97,7 +96,7 @@
             {{ option }}
           </option>
         </select>
-        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''" v-if="this.subscription === 'premium'">
+        <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''">
           <option value="" disabled hidden selected>Filing</option>
           <option v-for="option in filingOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
@@ -106,16 +105,16 @@
       </div>
       <div
         class="button button-primary flex-row gap-1 width-100" 
-        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))}" 
+        :class="{ 'button-disabled': (!selectedTicker || !selectedYear || !selectedFiling)}" 
         @click="createChat()"
-        :disabled="(!selectedTicker || !selectedYear || (!selectedFiling && subscription !== 'basic'))">
+        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)">
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
     </div>
 
     <!-- Chat Section -->
-    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100vh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
+    <div class="flex-row width-100 gap-1 height-100" style="justify-content: center; max-height: calc(100dvh - 4rem);" :style="isSmallScreen ? '' : 'padding: 1rem 1rem 0rem 1rem;'" v-if="!newChat">
       <div class="flex-column width-100 gap-1 center" style="max-width: 75rem; background-color: transparent;">
         <div v-if="!filingShown || !isSmallScreen" class="chat-container text-inter height-100" id="chat-container">
           <SpinnerCompInside v-if="chatLoading" :customClass="'text-3'"></SpinnerCompInside>
@@ -224,8 +223,7 @@ export default {
       lastScrollTime: 0,
       userHasScrolled: false,
 
-      subscription: 'premium',
-      subscriptionTokensLeft: 100,
+      subscriptionTokensLeft: 60,
 
       // Chat data
       chats: [],
@@ -241,7 +239,7 @@ export default {
       llmResponseBuffer: '', // Buffer for LLM incoming words
       chatLoading: false,
       newChatLoading: false,
-      lastXMessagesLength: 0, // Adjusted based on subscription
+      lastXMessagesLength: 0,
       chatScrollPosition: 0, // To store chat scroll position
       chatHistoryHeight: '0px', // Adjusted dynamically based on screen size
       stopButtonShown: false,
@@ -290,8 +288,7 @@ export default {
     if (!this.isSmallScreen) {this.sidebarShown = true;}
     else (this.filingShown = false)
     window.addEventListener('resize', this.handleResize);
-    if (this.subscription === 'basic') {this.lastXMessagesLength = 8}
-    else {this.lastXMessagesLength = 16}
+    this.lastXMessagesLength = 16
   },
   unmounted() {
     window.removeEventListener('resize', this.handleResize);
@@ -315,7 +312,7 @@ export default {
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
-      socket.on("llm_response_complete", () => {this.saveAssitantResponse(); this.$nextTick(() => {this.scrollToBottom("smooth")})});
+      socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
     },
 
     // Update Chat History Height
@@ -347,7 +344,7 @@ export default {
     // Create chat
     async createChat() {
 
-      if ((!this.selectedTicker || !this.selectedYear || (!this.selectedFiling && this.subscription !== 'basic')) && !this.selectedNewFiling) {return}
+      if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
       if (this.chats.length === 1) {this.error = 'You can only have one chat in preview mode.'; return}
 
       let selectedTicker, selectedYear, selectedDate, selectedFilingType
@@ -366,6 +363,7 @@ export default {
         this.filingDate = selectedDate
       }
 
+      if (selectedFilingType === '10Q') {selectedFilingType = '10Q' + selectedDate.split('-')[1].padStart(2, '0')}
       let newChatName = `${selectedTicker}-${selectedYear}-${selectedFilingType}`
       if (this.chats.includes(newChatName)) {this.error = 'Chat already exists'; return}
 
@@ -395,9 +393,6 @@ export default {
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
         this.newChat = false;
-        this.selectedTicker = '';
-        this.selectedYear = '';
-        this.selectedFiling = '';
         this.newChatLoading = false;
       } 
       catch (error) {console.error('Error creating chat:', error);}
@@ -410,16 +405,21 @@ export default {
       
       this.newChat = false;
       this.currentChat = chat;
+
+      this.tickerInput = '';
+      this.selectedTicker = '';
+      this.selectedYear = '';
+      this.selectedFiling = '';
+
       this.currentMessages = [{role: 'assistant', content: 'Hello! How can I help you today?'}]
+
+      try {this.scrollToBottom('instant')} 
+      catch (error) {console.warning('Error in scrollToBottom:', error)}
       this.filingLoading = true
 
       await axios.get(`${config.apiUrl}/api/get-filing-preview`, {params: { 'filingDate': this.filingDate, 'chat': chat }})
       .then(response => {this.filingContent = response.data.html; this.filingLoading = false})
       .catch(error => {console.error('Error getting filing:', error);});
-
-      this.scrollToBottom('instant')
-      this.$refs.textarea.focus()
-      this.adjustTextareaHeight('textarea')
 
       if (this.$refs.chatContainer) {
         this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll);
@@ -524,6 +524,7 @@ export default {
       try {
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
+        if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
         this.userHasScrolled = false;
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';

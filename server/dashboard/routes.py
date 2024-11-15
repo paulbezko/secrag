@@ -94,7 +94,6 @@ def get_list_tickers_get():
 
     with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
     with open('database/memory/filings_new.json', 'r') as f: filings_new = json.load(f)
-    if user_info['subscription'] == 'basic': filings_new = [filing for filing in filings_new if '10-Q' not in filing]
 
     return {'tickers': list(filings_available.keys()), 'newFilings': filings_new}
 
