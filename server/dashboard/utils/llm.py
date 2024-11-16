@@ -17,6 +17,10 @@ system_prompt_agent = """
     Your goal is to provide relevant financial data related to the user's prompt. \
     The context provided is from the SEC filing for {ticker} (ticker: {ticker}, filing date: {filing_date}). \
     
+    you are given two tools: financial_data_filing_retriever, non-financial_data_filing_retriever
+
+    If you use financial_data_filing_retriever and the output has no data, try using non-financial_data_filing_retriever because it includes both financial and non-financial data.
+    
     While using non-financial_data_filing_retriever in case if abbreviation is in the query, modify the query pass its expanded version.
     """
 
