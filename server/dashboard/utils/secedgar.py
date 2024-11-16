@@ -233,8 +233,8 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
 
     # Generate intro and outro chunks (outro chunks are not used)
     intro_chunks = [] # Intro chunks list
-    intro_chunk_buffer = "" 
-    outro_chunks = ""
+    outro_chunks = [] 
+    chunk_buffer = "" 
     intro_complete = False
     rows = []
 
@@ -252,28 +252,43 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
             # Flag is not raised meaning we are currently processing Intro part
             if not intro_complete:
                 # Add to buffer if it is shorter than set chunk size
-                if len(intro_chunk_buffer) < chunk_size:
-                    intro_chunk_buffer += row["Text"] + "\n"
+                if len(chunk_buffer) < chunk_size:
+                    chunk_buffer += row["Text"] + "\n"
                 # Buffer is full
                 else:
                     # Add to intro chunks list
-                    intro_chunks.append(intro_chunk_buffer)
+                    intro_chunks.append(chunk_buffer)
                     # Empty the buffer
-                    intro_chunk_buffer = ""
+                    chunk_buffer = ""
                     # Prepend certain number of last EDGARTOOLS chunk of the created intro chunk
                     # to the buffer for creating an overlap between chunks 
                     for prep in range(chunk_overlap):
                         if i - (chunk_overlap - prep) > 0:
-                            intro_chunk_buffer += rows[i - (chunk_overlap - prep)]["Text"]+"\n"
+                            chunk_buffer += rows[i - (chunk_overlap - prep)]["Text"]+"\n"
             # Flag is raised, therfore we are processing outro
             else:    
-                outro_chunks += row["Text"] + "\n"
+                if len(chunk_buffer) < chunk_size:
+                    chunk_buffer += row["Text"] + "\n"
+                # Buffer is full
+                else:
+                    # Add to outro chunks list
+                    outro_chunks.append(chunk_buffer)
+                    # Empty the buffer
+                    chunk_buffer = ""
+                    # Prepend certain number of last EDGARTOOLS chunk of the created outro chunk
+                    # to the buffer for creating an overlap between chunks 
+                    for prep in range(chunk_overlap):
+                        if i - (chunk_overlap - prep) > 0:
+                            outro_chunk_buffer += rows[i - (chunk_overlap - prep)]["Text"]+"\n"
+                if i == len(rows) - 1:
+                    outro_chunks.append(chunk_buffer)
+
         # We got to the first chunk that was identified to be a part of a filing's item
         else: 
             # Append the intro chunk buffer for the last time
             if not intro_complete: 
-                intro_chunks.append(intro_chunk_buffer)
-                intro_chunk_buffer = ""   
+                intro_chunks.append(chunk_buffer)
+                chunk_buffer = ""   
                 intro_complete = True
 
     # Initialize metadata model
@@ -422,5 +437,15 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
         # Ended processing EDGARTOOLS chunks for Item 
         # Reset buffer 
         data = []
+
+    # Process outro chunks
+    for outro in outro_chunks:
+        chunk_metadata_model["chunk_description"] = "Miscellaneous"
+        outro_chunk = {
+                "metadata": dict(chunk_metadata_model),
+                "length": len(outro),
+                "text": outro
+            }
+        final_chunks.append(outro_chunk)
 
     return final_chunks
