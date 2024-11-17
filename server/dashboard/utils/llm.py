@@ -62,7 +62,7 @@ class Keywords(BaseModel):
     ]] = []
 
 # Getting assistant response
-def get_assistant_response(user_prompt, message_history, filing_id, socket_id, filing_date):
+async def get_assistant_response(user_prompt, message_history, filing_id, socket_id, filing_date):
 
     chunk_size = 10000
     k = 3
@@ -99,26 +99,8 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
         "filing_date": filing.filing_date, 
         "ticker": filing.ticker
     }
-    # Check if async loop exists and if it does, add task to existing loop
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:  # 'RuntimeError: There is no current event loop...'
-        loop = None
-    if loop and loop.is_running():
-                # Create an asyncio Future object to block and wait for the task completion
-        future = asyncio.Future()
-        
-        # Define a wrapper for stream_response that sets the future result when complete
-        async def wrapper():
-            result = await stream_response(agent_executor, prompt_settings, socket_id)
-            future.set_result(result)
 
-        # Schedule the wrapper function to run in the background
-        loop.create_task(wrapper())
-        loop.run_until_complete(future)
-    else:
-        # Token streaming for agents can only be done asynchronously
-        asyncio.run(stream_response(agent_executor, prompt_settings, socket_id))
+    await stream_response(agent_executor, prompt_settings, socket_id)
 
     # Finishing the response
     socketio.emit('llm_response_complete', to=socket_id)
