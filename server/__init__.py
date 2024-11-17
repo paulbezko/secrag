@@ -1,3 +1,4 @@
+import asyncio
 from langchain_openai import ChatOpenAI
 from logging.handlers import TimedRotatingFileHandler
 from psycopg2.extras import RealDictCursor
@@ -35,6 +36,12 @@ def create_app(mode):
 
     app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist')
 
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:  # No event loop, create one
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
     # Allowing CORS
     CORS(app)
 
