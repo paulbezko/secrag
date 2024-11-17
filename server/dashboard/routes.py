@@ -207,8 +207,12 @@ def new_message_user_post():
     # message_history_json = [message['content'] for message in message_history_json if 'content' in message]
     save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'user', message = request.json.get('message'))
 
-    # Get the current event loop
-    loop = asyncio.get_event_loop()
+    # Check if an event loop exists; if not, create one
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:  # No event loop, create one
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
     loop.create_task(get_assistant_response(
         user_prompt = request.json.get('message'),
@@ -231,8 +235,12 @@ def new_message_user_preview_post():
 
     message_history = (request.json.get('lastXMessages'))
 
-    # Get the current event loop
-    loop = asyncio.get_event_loop()
+    # Check if an event loop exists; if not, create one
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:  # No event loop, create one
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
     loop.create_task(get_assistant_response(
         user_prompt = request.json.get('message'),
