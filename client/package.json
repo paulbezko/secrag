@@ -20,6 +20,7 @@
     "marked": "^14.1.2",
     "mathjax": "^3.2.2",
     "mathlive": "^0.101.1",
+    "sitemap": "^8.0.0",
     "socket.io-client": "^4.7.5",
     "stripe": "^15.6.0",
     "vue": "^3.2.13",
