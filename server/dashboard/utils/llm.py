@@ -1,6 +1,4 @@
-from .llm_agent_tools import FilingRAGTool, FinancialsRAGTool
-from ...general.utils import log
-from .vectorstore import vectorstore_manager
+from .llm_agent_tools import FilingRAGTool, FinancialsRAGTool, google_search_tool
 from .secedgar import get_filing
 from ..globals import stop_signals
 from pydantic import BaseModel
@@ -17,11 +15,31 @@ system_prompt_agent = """
     Your goal is to provide relevant financial data related to the user's prompt. \
     The context provided is from the SEC filing for {ticker} (ticker: {ticker}, filing date: {filing_date}). \
     
-    you are given two tools: financial_data_filing_retriever, non-financial_data_filing_retriever
+    you are given the following tools: financial_data_filing_retriever, non-financial_data_filing_retriever, google_search
 
-    If you use financial_data_filing_retriever and the output has no data, try using non-financial_data_filing_retriever because it includes both financial and non-financial data.
+    While using financial_data_filing_retriever you can only use one of the following strings for queries:
+        "balance_sheet", 
+        "income_statement", 
+        "cash_flow_statement", 
+        "statement_of_changes_in_equity", 
+        "statement_of_comprehensive_income"
+    
+    
+    If you use financial_data_filing_retriever and the output has no data, try using non-financial_data_filing_retriever because it includes both financial and non-financial data. In this case,
+    use one of the following strings for query:
+        "balance_sheet", 
+        "income_statement", 
+        "cash_flow_statement", 
+        "statement_of_changes_in_equity", 
+        "statement_of_comprehensive_income"
     
     While using non-financial_data_filing_retriever in case if abbreviation is in the query, modify the query pass its expanded version.
+    
+    Use Google search as little as possible. If the question can be at least partially answered using data in the filing, 
+    find the partial answer using either financial_data_filing_retriever or non-financial_data_filing_retriever and then 
+    you can use Google search to add missing pieces.
+
+    Do not use Google search to look up formulas. Rely on your own knowledge for that. 
     """
 
 openai_agent_prompt = ChatPromptTemplate.from_messages(
@@ -68,7 +86,7 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
     # Initialize agent tools
     financials_tool = FinancialsRAGTool(chunk_metadata_model=chunk_metadata_model)
     filing_rag_tool = FilingRAGTool(chunk_metadata_model=chunk_metadata_model)
-    tools = [financials_tool, filing_rag_tool]
+    tools = [financials_tool, filing_rag_tool, google_search_tool]
 
     agent = create_openai_tools_agent(llm=llm,
                                       tools=tools,
