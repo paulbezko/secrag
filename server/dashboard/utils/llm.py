@@ -105,7 +105,7 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
     except RuntimeError:  # 'RuntimeError: There is no current event loop...'
         loop = None
     if loop and loop.is_running():
-        loop.create_task(stream_response(agent_executor, prompt_settings, socket_id))
+        loop.run_until_complete(stream_response(agent_executor, prompt_settings, socket_id))
     else:
         # Token streaming for agents can only be done asynchronously
         asyncio.run(stream_response(agent_executor, prompt_settings, socket_id))
