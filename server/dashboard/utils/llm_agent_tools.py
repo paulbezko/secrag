@@ -1,6 +1,5 @@
-
 from .vectorstore import vectorstore_manager
-
+from .google_search import google_search
 
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional, Type
@@ -117,9 +116,35 @@ class FilingRAGTool(BaseTool):
         
         return list_context_chunks
 
+class GoogleSearchQuery(BaseModel):
+    query: str = Field("Query to google search")
+
+class GoogleSearchTool(BaseTool):
+    name: str = "google_search"
+    description: str = "Search up-to-date data"
+    args_schema: Type[BaseModel] = GoogleSearchQuery
+    return_direct: bool = False
+    
+    def _run(
+        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return google_search(query=query)
+
+
+    async def _arun(
+        self,
+        query: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        """Use the tool asynchronously."""
+        return google_search(query=query)
+
 
 def remove_special_characters(input_string):
     # Keep only alphanumeric characters and underscores
     cleaned_string = ''.join(char for char in input_string if char.isalnum() or char == '_')
     return cleaned_string
 
+# Initialize google_search tool globally since it does not need extra initialization
+google_search_tool = GoogleSearchTool()
