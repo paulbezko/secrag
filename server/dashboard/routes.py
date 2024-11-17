@@ -195,7 +195,7 @@ def delete_chat_post():
 
 
 @routes.route('/new-message-user', methods=['POST'])
-def new_message_user_post():
+async def new_message_user_post():
 
     try: user_info = decode_token(request.json.get('token'))
     except: return {'error': 'Error decoding token'}
@@ -207,20 +207,13 @@ def new_message_user_post():
     # message_history_json = [message['content'] for message in message_history_json if 'content' in message]
     save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'user', message = request.json.get('message'))
 
-    # Check if an event loop exists; if not, create one
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:  # No event loop, create one
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    loop.create_task(get_assistant_response(
+    await get_assistant_response(
         user_prompt = request.json.get('message'),
         message_history = message_history,
         filing_id = request.json.get('chat'),
         socket_id = request.json.get('socketId'),
         filing_date = request.json.get('filingDate')
-    ))
+    )
 
     query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
     execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
@@ -231,24 +224,17 @@ def new_message_user_post():
 
 
 @routes.route('/new-message-user-preview', methods=['POST'])
-def new_message_user_preview_post():
+async def new_message_user_preview_post():
 
     message_history = (request.json.get('lastXMessages'))
 
-    # Check if an event loop exists; if not, create one
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:  # No event loop, create one
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    loop.create_task(get_assistant_response(
+    await get_assistant_response(
         user_prompt = request.json.get('message'),
         message_history = message_history,
         filing_id = request.json.get('chat'),
         socket_id = request.json.get('socketId'),
         filing_date = request.json.get('filingDate')
-    ))
+    )
 
     return {'success': True}
 
