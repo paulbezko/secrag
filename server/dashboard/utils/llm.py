@@ -99,9 +99,16 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
         "filing_date": filing.filing_date, 
         "ticker": filing.ticker
     }
-    
-    # Token streaming for agents can only be done asynchronously
-    asyncio.run(stream_response(agent_executor, prompt_settings, socket_id))
+    # Check if async loop exists and if it does, add task to existing loop
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:  # 'RuntimeError: There is no current event loop...'
+        loop = None
+    if loop and loop.is_running():
+        loop.create_task(stream_response(agent_executor, prompt_settings, socket_id))
+    else:
+        # Token streaming for agents can only be done asynchronously
+        asyncio.run(stream_response(agent_executor, prompt_settings, socket_id))
 
     # Finishing the response
     socketio.emit('llm_response_complete', to=socket_id)
