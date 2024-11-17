@@ -92,7 +92,7 @@ def get_assistant_response(user_prompt, message_history, filing_id, socket_id, f
                                       tools=tools,
                                       prompt=openai_agent_prompt
                                       )
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
     prompt_settings =  {
         "input": user_prompt, 
         "chat_history": message_history, 
