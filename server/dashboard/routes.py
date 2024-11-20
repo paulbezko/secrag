@@ -4,7 +4,7 @@ from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
 from .utils.llm import get_assistant_response
 from ..lib_secrag.edgar.entities import get_entity
-
+from ..globals import config
 import json
 
 from fastapi import APIRouter, Request
@@ -49,7 +49,7 @@ async def new_chat_post(request: Request):
     filing_date = data.get("filingDate")
     
 
-    from app import socketio, config
+    from app import socketio
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
@@ -228,7 +228,7 @@ async def new_message_user_post(request: Request):
     filing_date = data.get("filingDate")
     token = data.get("token")
 
-    from app import socketio, config
+    from app import socketio
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
