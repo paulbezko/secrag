@@ -9,4 +9,4 @@ cd /home/ubuntu/secrag/Collab-Project-1
 source ./venv/bin/activate
 
 # Run Gunicorn with the desired settings
-gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:8000 wsgi:app -c config.py
+uvicorn app:app --port 8000
