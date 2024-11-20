@@ -1,15 +1,9 @@
-import asyncio
 from pathlib import Path
 from fastapi.responses import FileResponse, HTMLResponse
-from langchain_openai import ChatOpenAI
 from logging.handlers import TimedRotatingFileHandler
-from psycopg2.extras import RealDictCursor
-from flask_socketio import SocketIO
-from flask_cors import CORS
 from datetime import datetime
 from supabase import create_client
 from dotenv import load_dotenv
-from flask import Flask, send_from_directory, render_template
 from fastapi import FastAPI, Request
 from fastapi_socketio import SocketManager
 from fastapi.templating import Jinja2Templates
@@ -17,8 +11,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.logger import logger
 from server.globals import config as dashboard_config
+from logtail import LogtailHandler
 
-import psycopg2
 import logging
 import stripe
 import os
@@ -103,7 +97,8 @@ def create_app(mode: str):
 
     #######################################################################
     ###                         MISCELLANEOUS                           ###
-    stripe.api_key = os.getenv('STRIPE_KEY')
+    stripe.api_key = os.environ.get('STRIPE_KEY')
+    supabase = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
     app.add_middleware(
         CORSMiddleware,
@@ -113,6 +108,11 @@ def create_app(mode: str):
         allow_headers=["*"], 
     )
     
+
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+    logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
+
     # Return the FastAPI app and SocketIO instance for use
-    return app, socketio, config
+    return app, socketio
 
