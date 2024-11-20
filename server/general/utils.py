@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime, timezone
 from psycopg2 import OperationalError, InterfaceError
 from ..globals import config
-from logging import Logger
+from fastapi import logger
 import traceback
 
 import psycopg2
@@ -14,7 +14,6 @@ import time
 import jwt
 import os
 
-logger = Logger("logger")
 
 def log(level, message):
     if level == 'debug': 
