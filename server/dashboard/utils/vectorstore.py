@@ -83,8 +83,6 @@ class VectorstoreManager:
     async def _perform_embedding(self, filing_data, chunk_size, chunk_overlap, table_prepend_k):
         filing = FilingObject.from_dict(filing_data)
         sec_filing_object = await get_sec_filing_object(filing)
-        with open(filing_data["ticker"]+"_debub.md", "w") as file:
-            file.write(sec_filing_object.markdown)
         chunks = await sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
         await self.vectorstore.aadd_documents(chunks)
 
