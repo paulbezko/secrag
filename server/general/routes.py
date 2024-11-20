@@ -1,33 +1,38 @@
+from fastapi.responses import JSONResponse
+from jinja2 import Template
 from werkzeug.security import check_password_hash, generate_password_hash
 from captcha.image import ImageCaptcha
 from datetime import datetime, timezone, timedelta
 from .utils import get_user_data, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp, log
-from flask import Blueprint, request, current_app, jsonify, render_template_string
+from ..globals import config
+import traceback
 
 import random
 import stripe
 import base64
 import io
 
-# Routes initialization
-routes = Blueprint('routes', __name__)
+from fastapi import APIRouter, Request
 
-@routes.route('/router', methods=['GET'])
-def router_get():
+routes = APIRouter()
+
+
+@routes.get('/router')
+def router_get(token: str):
 
     try: 
-        user_info = decode_token(request.args.get('token'))
-        return {'authenticated': True, 'subscription': user_info.get('subscription', False), 'onboarding': user_info.get('onboarding', False)}
+        user_info = decode_token(token)
+        return JSONResponse(content={'authenticated': True, 'subscription': user_info.get('subscription', False), 'onboarding': user_info.get('onboarding', False)})
     except Exception as error: 
-        return {'critical': 'Error decoding token: ' + str(error)}
+        return JSONResponse(content={'critical': 'Error decoding token: ' + str(error)})
     
 
 
-@routes.route('/get-user-data', methods=['GET'])
-def get_user_data_get():
+@routes.get('/get-user-data')
+def get_user_data_get(token: str):
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'critical': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'critical': 'Error decoding token'})
 
     try:
         user = get_user_data(user_info['email'])
@@ -53,87 +58,96 @@ def get_user_data_get():
     
     except Exception as error:
         log('critical', 'Error retrieving user data: ' + str(error))
-        return {'critical': 'Error retrieving user data: ' + str(error)}
+        return JSONResponse(content={'critical': 'Error retrieving user data: ' + str(error)})
 
 
-@routes.route('/edit-user', methods=['POST'])
-def edit_user_post():
+@routes.post('/edit-user')
+async def edit_user_post(request: Request):
+    data = await request.json()
+    name = data.get("name")
+    token = data.get("token")
+    action = data.get("action")
+    password = data.get("password")
+    email_new = data.get("emailNew")
+    password_new = data.get("passwordNew")
+    captcha = data.get("captcha")
 
-    try: user_info = decode_token(request.json.get('token'))
-    except: return {'critical': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'critical': 'Error decoding token'})
 
     try:
         user = get_user_data(user_info['email'])
 
-        if request.json.get('action') == 'changeName':
-            query = f"UPDATE users_{current_app.config['MODE']} SET name = %s WHERE email = %s"
-            execute_query(query, (request.json.get('name'), user_info['email']))
+        if action == 'changeName':
+            query = f"UPDATE users_{config.get('MODE')} SET name = %s WHERE email = %s"
+            execute_query(query, (name, user_info['email']))
             
-            if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], name = request.json.get('name'))
-            user_info['name'] = request.json.get('name')
+            if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], name = name)
+            user_info['name'] = name
             token = encode_token(user_info)
 
-            return {'token': token, 'message': 'Name change successful'}
+            return JSONResponse(content={'token': token, 'message': 'Name change successful'})
         
-        elif request.json.get('action') == 'changeEmail':
+        elif action == 'changeEmail':
 
-            if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
-            if get_user_data(request.json.get('password')): return {'error': 'User with this email already exists'}
+            if not check_password_hash(user['password'], password): return JSONResponse(content={'error': 'Password is not correct'})
+            if get_user_data(password): return JSONResponse(content={'error': 'User with this email already exists'})
 
             email_payload = user_info
             email_payload['action'] = 'changeEmail'
-            email_payload['emailNew'] = request.json.get('emailNew')
+            email_payload['emailNew'] = email_new
             email_payload['expiry'] = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
 
             token = encode_token(email_payload)
-            send_email_from_template(email = request.json.get('emailNew'), template = 'changeEmail', payload = token)
+            send_email_from_template(email = email_new, template = 'changeEmail', payload = token)
 
-            query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
+            query = f"UPDATE users_{config.get('MODE')} SET link_token = %s WHERE email = %s"
             execute_query(query, (token, user_info['email']))
-            return {'message': 'Confirmation email sent'}
+            return JSONResponse(content={'message': 'Confirmation email sent'})
         
-        elif request.json.get('action') == 'changePassword':
+        elif action == 'changePassword':
 
-            if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
+            if not check_password_hash(user['password'], password): return JSONResponse(content={'error': 'Password is not correct'})
 
-            password_encrypted = generate_password_hash(request.json.get('passwordNew'))
+            password_encrypted = generate_password_hash(password_new)
 
-            query = f"UPDATE users_{current_app.config['MODE']} SET password = %s WHERE email = %s"
+            query = f"UPDATE users_{config.get('MODE')} SET password = %s WHERE email = %s"
             execute_query(query, (password_encrypted, user_info['email']))
-            return {'message': 'Password change successful'}
+            return JSONResponse(content={'message': 'Password change successful'})
         
-        elif request.json.get('action') == 'deleteAccount':
+        elif action == 'deleteAccount':
 
             if user['auth_type'] == 'password':
-                if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'Password is not correct'}
+                if not check_password_hash(user['password'], password): return JSONResponse(content={'error': 'Password is not correct'})
             
             if user['auth_type'] != 'password': 
-                if user_info['captcha_answer'] != request.json.get('captcha'): return {'error': 'Captcha is not correct'}
+                if user_info['captcha_answer'] != captcha: return JSONResponse(content={'error': 'Captcha is not correct'})
 
             if user['stripe_user_id']: stripe.Customer.delete(user['stripe_user_id'])
 
-            query = f"DELETE FROM users_{current_app.config['MODE']} WHERE email = %s"
+            query = f"DELETE FROM users_{config.get('MODE')} WHERE email = %s"
             execute_query(query, (user_info['email'],))
             return {}
 
     except Exception as error:
+        log('critical', traceback.format_exc())
         log('critical', 'Error editing user data: ' + str(error))
-        return {'critical': 'Error editing user data: ' + str(error)}
+        return JSONResponse(content={'critical': 'Error editing user data: ' + str(error)})
 
 
-@routes.route('/change-email', methods=['GET'])
-def change_email_get():
+@routes.get('/change-email')
+async def change_email_get(token: str):
 
-    try: email_payload = decode_token(request.args.get('token'))
-    except: return {'critical': 'Error decoding token'}
+    try: email_payload = decode_token(token)
+    except: return JSONResponse(content={'critical': 'Error decoding token'})
 
     user = get_user_data(email_payload['email'])
 
     # Compare current time with expiry time
-    if not check_timestamp(email_payload['expiry']): return {'error': 'linkExpired'}
-    if user['link_token'] != request.args.get('token'): return {'error': 'linkExpired'}
+    if not check_timestamp(email_payload['expiry']): return JSONResponse(content={'error': 'linkExpired'})
+    if user['link_token'] != token: return JSONResponse(content={'error': 'linkExpired'})
 
-    query = f"UPDATE users_{current_app.config['MODE']} SET email = %s, link_token = %s WHERE email = %s"
+    query = f"UPDATE users_{config.get('MODE')} SET email = %s, link_token = %s WHERE email = %s"
     execute_query(query, (email_payload['emailNew'], None, email_payload['email']))
     if user['stripe_user_id']: stripe.Customer.modify(user['stripe_user_id'], email = email_payload['emailNew'])
 
@@ -141,14 +155,14 @@ def change_email_get():
     del email_payload['emailNew']
 
     token = encode_token(email_payload)
-    return {'token': token}
+    return JSONResponse(content={'token': token})
 
 
-@routes.route('/get-captcha', methods=['GET'])
-def get_captcha_get():
+@routes.get('/get-captcha')
+async def get_captcha_get(token: str):
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'critical': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'critical': 'Error decoding token'})
             
     captcha_question = str(random.randint(100, 999))
     image = ImageCaptcha(width = 170, height = 100)
@@ -166,16 +180,16 @@ def get_captcha_get():
     token = encode_token(user_info)
 
     # Send the image and the encrypted answer as JSON
-    return jsonify({
+    return JSONResponse(content={
         'captcha_image': f"data:image/png;base64,{image_base64}",
         'token': token
     })
 
 
-@routes.route('/get-policy', methods=['GET'])
+@routes.get('/get-policy')
 def get_policy_get():
 
-    policy = request.args.get('policy')
+    policy = policy
 
     with open(f"database/policies/{policy}.md", encoding="utf-8", mode="r") as f:
         content = f.read()
@@ -186,4 +200,4 @@ def get_policy_get():
         "email_support": "secrag.info@gmail.com"
     }
 
-    return render_template_string(content, **variables)
+    return Template(content).render(variables)

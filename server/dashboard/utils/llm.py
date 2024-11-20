@@ -1,13 +1,13 @@
+from langchain_openai import ChatOpenAI
 from .llm_agent_tools import FilingRAGTool, FinancialsRAGTool, google_search_tool
 from .secedgar import get_filing
-from ..globals import stop_signals
+from ...globals import stop_signals
 from pydantic import BaseModel
 from typing import Literal, List
-from server import socketio, llm
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.callbacks import BaseCallbackHandler
-import asyncio
+
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
 system_prompt_agent = """
     You are a highly knowledgeable financial assistant who helps users with financial queries, especially related to SEC filings, financial statements, and corporate reports. \
@@ -62,8 +62,7 @@ class Keywords(BaseModel):
     ]] = []
 
 # Getting assistant response
-async def get_assistant_response(user_prompt, message_history, filing_id, socket_id, filing_date):
-
+async def get_assistant_response(user_prompt, message_history, filing_id, socket_id, filing_date, socketio_handler):
     chunk_size = 10000
     k = 3
     chunk_overlap = 3
@@ -100,13 +99,13 @@ async def get_assistant_response(user_prompt, message_history, filing_id, socket
         "ticker": filing.ticker
     }
 
-    await stream_response(agent_executor, prompt_settings, socket_id)
+    await stream_response(agent_executor, prompt_settings, socket_id, socketio_handler)
 
     # Finishing the response
-    socketio.emit('llm_response_complete', to=socket_id)
+    await socketio_handler.emit('llm_response_complete', to=socket_id)
 
 
-async def stream_response(agent_executor, prompt_settings, socket_id):
+async def stream_response(agent_executor, prompt_settings, socket_id, socketio_handler):
     buffer = ""
     async for event in agent_executor.astream_events(prompt_settings, version="v1"):
         if stop_signals.get(socket_id): break
@@ -119,7 +118,7 @@ async def stream_response(agent_executor, prompt_settings, socket_id):
                 # that the model is asking for a tool to be invoked.
                 # So we only print non-empty content
                 buffer += content
-                socketio.emit('llm_response', {'word': content}, to=socket_id)
+                await socketio_handler.emit('llm_response', {'word': content}, to=socket_id)
 
         if kind == "on_chain_start":
             if (
