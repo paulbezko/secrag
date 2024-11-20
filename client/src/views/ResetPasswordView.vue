@@ -3,7 +3,7 @@
     <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess" /></div>
     <div v-if="showError"><ErrorComp :action="action" @close="handleCloseError"/></div>
     <div v-if="loaded && !showError" class="flex-column center width-100 gap-2">
-      <div class="display display-flex-column center gap-1">
+      <div class="flex-column center gap-1">
         <div class="heading">Reset Password</div>
         <div class="text-3" style="width: 25rem; text-align: center;">Enter a new password.</div>
         <div class="flex-column center gap-1 width-100" style="max-width: 40rem;">
