@@ -21,7 +21,7 @@ from fastapi import APIRouter
 
 routes = APIRouter()
 
-def verify_signature(payload):
+def verify_signature(request, payload):
     signature = request.headers.get('X-Hub-Signature')
     if not signature:
         return False
@@ -37,7 +37,7 @@ async def webhook(request: Request):
     payload = await request.body()
 
     # Verify the signature
-    if not verify_signature(payload):
+    if not verify_signature(request, payload):
         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content="")  # Forbidden
 
     data = request.json
