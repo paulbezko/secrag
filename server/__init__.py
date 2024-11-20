@@ -1,15 +1,18 @@
-import asyncio
-from langchain_openai import ChatOpenAI
+from pathlib import Path
+from fastapi.responses import FileResponse, HTMLResponse
 from logging.handlers import TimedRotatingFileHandler
-from psycopg2.extras import RealDictCursor
-from flask_socketio import SocketIO
-from flask_cors import CORS
 from datetime import datetime
 from supabase import create_client
 from dotenv import load_dotenv
-from flask import Flask, send_from_directory, render_template
+from fastapi import FastAPI, Request
+from fastapi_socketio import SocketManager
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.logger import logger
+from server.globals import config as dashboard_config
+from logtail import LogtailHandler
 
-import psycopg2
 import logging
 import stripe
 import os
@@ -17,73 +20,99 @@ import os
 load_dotenv('.env', override=True)
 flask_key_secret = os.getenv('flask_key_secret')
 
-socketio = SocketIO(cors_allowed_origins="*", message_queue='redis://')
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key='sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS')
-
 log_filename = os.path.join("database/logs", f"{datetime.now().strftime('%d-%m-%Y')}.log")
 handler = TimedRotatingFileHandler(log_filename, when='midnight', interval=1, backupCount=90)
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 
-def create_app(mode):
+config = {}
 
-    from .general.routes import routes as general_routes
-    from .authentication.routes import routes as auth_routes
-    from .dashboard.routes import routes as dashboard_routes
-    from .subscription.routes import routes as subscription_routes
-    from .github.routes import routes as github_routes
+def create_app(mode: str):
 
-    app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist')
-    
-    # Allowing CORS
-    CORS(app)
+    app = FastAPI()
+    socketio = SocketManager(app, cors_allowed_origins="*", mount_location="/socket.io")
 
+    #######################################################################
+    ###                         LOAD CLIENT                             ###
+    app.mount("/css", StaticFiles(directory="client/dist/css"), name="css")
+    app.mount("/js", StaticFiles(directory="client/dist/js"), name="js")
+    app.mount("/img", StaticFiles(directory="client/dist/img"), name="img")
+
+    templates = Jinja2Templates(directory="client/dist")
+
+    css_file_path = Path(__file__).parent.parent / "client" / "dist" / "style.css"
+    @app.get("/style.css")
+    async def serve_css():
+        return FileResponse(css_file_path)
+    #######################################################################
+    ###                         LOAD ROUTES                             ###
+    from server.general.routes import routes as general_routes
+    from server.authentication.routes import routes as auth_routes
+    from server.dashboard.routes import routes as dashboard_routes
+    from server.subscription.routes import routes as subscription_routes
+    from server.github.routes import routes as github_routes
+
+    app.include_router(general_routes, prefix="/api")
+    app.include_router(auth_routes, prefix="/api")
+    app.include_router(subscription_routes, prefix="/api")
+    app.include_router(dashboard_routes, prefix="/api")
+    app.include_router(github_routes, prefix="/gh")
+
+    #######################################################################
+    ###                         SERVE INDEX                             ### 
     if mode == 'prod':
-        app.config['MODE'] = 'prod'
-        app.config['REDIRECT_URL'] = os.getenv('REDIRECT_URL')
-        # app.config['REDIRECT_URL'] = 'http://localhost:5000'
-
-         # Using client built static files in prod version
-        @app.route('/')
-        @app.route('/<path:path>')
-        def serve_index(path=''):
-            if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-                return send_from_directory(app.static_folder, path)
-            else:
-                return render_template('index.html')
+        config['MODE'] = 'prod'
+        config['REDIRECT_URL'] = os.getenv('REDIRECT_URL', 'http://localhost:5000')
+        # Serve index page
+        @app.get("/{full_path:path}", response_class=HTMLResponse)
+        async def serve_index(request: Request):
+            return templates.TemplateResponse("index.html", {"request": request})
 
     elif mode == 'dev':
-        app.config['MODE'] = 'dev'
-        app.config['REDIRECT_URL'] = 'http://localhost:8080'
+        config['MODE'] = 'dev'
+        config['REDIRECT_URL'] = 'http://localhost:8080'
+    
+    #######################################################################
+    ###                 LOAD ENVIRONMENTAL VARIABLES                    ###
+    config['FLASK_KEY_SECRET'] = os.getenv('FLASK_KEY_SECRET')
+    config['JWT_SECRET'] = os.getenv('JWT_SECRET')
+    config['MAIL_SENDER_USER'] = os.getenv('MAIL_SENDER_USER')
+    config['MAIL_SENDER_PASS'] = os.getenv('MAIL_SENDER_PASS')
+    config['MAIL_CONTACT_USER'] = os.getenv('MAIL_CONTACT_USER')
 
-    # Initializing environment variables
-    app.config['FLASK_KEY_SECRET'] = os.getenv('FLASK_KEY_SECRET')
-    app.config['JWT_SECRET'] = os.getenv('JWT_SECRET')
-    app.config['MAIL_SENDER_USER'] = os.getenv('MAIL_SENDER_USER')
-    app.config['MAIL_SENDER_PASS'] = os.getenv('MAIL_SENDER_PASS')
-    app.config['MAIL_CONTACT_USER'] = os.getenv('MAIL_CONTACT_USER')
+    # Stripe keys
+    config['STRIPE_WEBHOOK_KEY'] = os.getenv('STRIPE_WEBHOOK_KEY')
+    config['STRIPE_PRODUCT_BASIC_MONTHLY'] = os.getenv('STRIPE_PRODUCT_BASIC_MONTHLY')
+    config['STRIPE_PRODUCT_BASIC_YEARLY'] = os.getenv('STRIPE_PRODUCT_BASIC_YEARLY')
+    config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_MONTHLY')
+    config['STRIPE_PRODUCT_PREMIUM_YEARLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_YEARLY')
+    config['STRIPE_PRODUCT_REPLENISH'] = os.getenv('STRIPE_PRODUCT_REPLENISH')
 
-    app.config['STRIPE_WEBHOOK_KEY'] = os.getenv('STRIPE_WEBHOOK_KEY')
-    app.config['STRIPE_PRODUCT_BASIC_MONTHLY'] = os.getenv('STRIPE_PRODUCT_BASIC_MONTHLY')
-    app.config['STRIPE_PRODUCT_BASIC_YEARLY'] = os.getenv('STRIPE_PRODUCT_BASIC_YEARLY')
-    app.config['STRIPE_PRODUCT_PREMIUM_MONTHLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_MONTHLY')
-    app.config['STRIPE_PRODUCT_PREMIUM_YEARLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_YEARLY')
-    app.config['STRIPE_PRODUCT_REPLENISH'] = os.getenv('STRIPE_PRODUCT_REPLENISH')
+    config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
 
-    app.config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
+    config['INIT_LOGS_SENT'] = False
 
-    app.config['INIT_LOGS_SENT'] = False
+    dashboard_config.set(config)
 
+    #######################################################################
+    ###                         MISCELLANEOUS                           ###
     stripe.api_key = os.environ.get('STRIPE_KEY')
     supabase = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
-    # Registering routes
-    app.register_blueprint(general_routes, name='general', url_prefix='/api/')
-    app.register_blueprint(auth_routes, name='auth', url_prefix='/api/')
-    app.register_blueprint(subscription_routes, name='subscription', url_prefix='/api/')
-    app.register_blueprint(dashboard_routes, name='dashboard', url_prefix='/api/')
-    app.register_blueprint(github_routes, name='github', url_prefix='/gh/')
-    socketio.init_app(app)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"], 
+    )
+    
 
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+    logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
+
+    # Return the FastAPI app and SocketIO instance for use
     return app, socketio
+
