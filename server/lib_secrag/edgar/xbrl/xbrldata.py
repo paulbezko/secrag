@@ -852,7 +852,7 @@ class XBRLData(BaseModel):
         """
         Extract XBRL data from a filing object.
         """
-        return await run_async_or_sync(cls.from_filing(filing))
+        return await cls.from_filing(filing)
 
     def parse_financial_statements(self):
         """
