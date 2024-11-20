@@ -48,7 +48,7 @@ class VectorstoreManager:
             # log('info', f"Created Vectorstore")
         return vectorstore
     
-    def new_chat(
+    async def new_chat(
         self,
         filing : FilingObject, 
         # Optional args
@@ -72,7 +72,7 @@ class VectorstoreManager:
 
         # Case when embedding does not exist
         if len(check_for_existing_embeddings) == 0:
-            self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
+            await self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
             log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
 
         # Case when embedding already exists       
@@ -80,11 +80,14 @@ class VectorstoreManager:
             log('debug', f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
 
 
-    def _perform_embedding(self, filing_data, chunk_size, chunk_overlap, table_prepend_k):
+    async def _perform_embedding(self, filing_data, chunk_size, chunk_overlap, table_prepend_k):
         filing = FilingObject.from_dict(filing_data)
-        sec_filing_object = get_sec_filing_object(filing)
-        chunks = sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
-        self.vectorstore.add_documents(chunks)
+        sec_filing_object = await get_sec_filing_object(filing)
+        with open(filing_data["ticker"]+"_debub.md", "w") as file:
+            file.write(sec_filing_object.markdown)
+        chunks = await sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
+        await self.vectorstore.aadd_documents(chunks)
+
         self.vectorstore.save_local(self.vectorstore_dir)
 
 vectorstore_manager = VectorstoreManager()

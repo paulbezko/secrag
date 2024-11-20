@@ -1,9 +1,11 @@
+import asyncio
+import traceback
 from langchain_core.documents import Document
-from ...general.utils import try_except, log
-from edgar.financials import Financials
-from edgar.htmltools import TableBlock
-from edgar.entities import Company
-from edgar.core import set_identity
+from ...general.utils import try_except, atry_except, log
+from ...lib_secrag.edgar.financials import Financials
+from ...lib_secrag.edgar.htmltools import TableBlock
+from ...lib_secrag.edgar.entities import get_entity
+from ...lib_secrag.edgar.core import set_identity
 from datetime import datetime
 
 import pandas as pd
@@ -78,7 +80,7 @@ class SECFilingObject():
             "statement_of_comprehensive_income": self.statement_of_comprehensive_income
         }
     
-    def get_documents(self, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3):
+    async def get_documents(self, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3):
         """
         Converts the filing object into a list of Document objects for embedding.
 
@@ -95,7 +97,7 @@ class SECFilingObject():
         """
         
         # Use custom filing splitter for chunking
-        list_chunks = filing_splitter(self, self.get_financials(), chunk_size, chunk_overlap, table_prepend_k)
+        list_chunks = await filing_splitter(self, self.get_financials(), chunk_size, chunk_overlap, table_prepend_k)
         list_documents = []
         for chunk in list_chunks:
             list_documents.append(Document(
@@ -115,7 +117,7 @@ def get_filing(filing_id, filing_date) -> FilingObject:
     return filing 
 
 # Getting SEC filing object
-def get_sec_filing_object(filing_info : FilingObject):
+async def get_sec_filing_object(filing_info : FilingObject):
     """
     Load a custom CompanyFiling object from a ticker symbol and year
     
@@ -137,15 +139,28 @@ def get_sec_filing_object(filing_info : FilingObject):
     try:
 
         set_identity("{} {}".format("SECRag", "secrag.info@gmail.com"))
-        sec_filing = Company(filing_info.ticker).get_filings(form=filing_info.filing_type, date=filing_info.filing_date)[0]
+        entity = await get_entity(filing_info.ticker)
 
-        # Try retrieving financials. If it fails, return None    
-        financials = try_except(lambda: Financials(sec_filing.xbrl()))
+        sec_filing = entity.get_filings(form=filing_info.filing_type, date=filing_info.filing_date)[0]
+       
+        await asyncio.sleep(0)
+        # Try retrieving financials. If it fails, return None 
+        xbrl = await atry_except(lambda: sec_filing.xbrl()) 
+
+        if xbrl: 
+            financials = Financials(xbrl)
+        else: financials = None
+
         balance_sheet = try_except(lambda: financials.get_balance_sheet().get_dataframe())
+        await asyncio.sleep(0)
         income_statement = try_except(lambda: financials.get_income_statement().get_dataframe())
+        await asyncio.sleep(0)
         cash_flow_statement = try_except(lambda: financials.get_cash_flow_statement().get_dataframe())
+        await asyncio.sleep(0)
         statement_of_changes_in_equity = try_except(lambda: financials.get_statement_of_changes_in_equity().get_dataframe())
+        await asyncio.sleep(0)
         statement_of_comprehensive_income = try_except(lambda: financials.get_statement_of_comprehensive_income().get_dataframe())
+        await asyncio.sleep(0)
 
         # Initialize the CustomCompanyFiling object to return
         sec_filing_object = SECFilingObject(
@@ -165,9 +180,13 @@ def get_sec_filing_object(filing_info : FilingObject):
             statement_of_changes_in_equity=statement_of_changes_in_equity,
             statement_of_comprehensive_income=statement_of_comprehensive_income 
         )
+        await asyncio.sleep(0)
+
 
         return sec_filing_object
-
+    except Exception as e: 
+        log('critical', traceback.format_exc())
+        log('critical', str(e))
     finally:
         rate_limiter.release()   
 
@@ -198,14 +217,13 @@ class RateLimiter:
 
         # Block until semaphore is acquired (no timeout, it will wait)
         self.semaphore.acquire()
-        # print(f"Semaphore acquired at {self.current_time()}")
 
     def release(self):
         self.semaphore.release()
 
 
 # Custom character text splitter for SEC filings
-def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3, verbose = False):
+async def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000, chunk_overlap = 3, table_prepend_k = 3, verbose = False):
     """
     Split a filing object into chunks based on its structure and financial statements.
 
@@ -228,7 +246,11 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
     final_chunks = [] # Stores final chunks  
 
     filing_object = filing.filing.obj() # Convert filing to EDGARTOOLS filing object
+    await asyncio.sleep(0)
+
     chunked_document = filing_object.chunked_document # Convert EDGARTOOLS object to EDGARTOOLS chunks
+    await asyncio.sleep(0)
+
     structure = filing_object.structure # Retrieve EDGARTOOLS filing object's structure
 
     # Generate intro and outro chunks (outro chunks are not used)
@@ -243,10 +265,12 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
 
     # Convert rows to list
     for _ , row in chunked_document_df.iterrows():
+        await asyncio.sleep(0)
         rows.append(row)
 
     # Detects input and output sections in row
     for i, row in enumerate(rows):
+        await asyncio.sleep(0)
         # Intro and outro rows have no noted filing Item number
         if row["Item"] == "" or row["Item"] == None:
             # Flag is not raised meaning we are currently processing Intro part
@@ -263,6 +287,7 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
                     # Prepend certain number of last EDGARTOOLS chunk of the created intro chunk
                     # to the buffer for creating an overlap between chunks 
                     for prep in range(chunk_overlap):
+                        await asyncio.sleep(0)
                         if i - (chunk_overlap - prep) > 0:
                             chunk_buffer += rows[i - (chunk_overlap - prep)]["Text"]+"\n"
             # Flag is raised, therfore we are processing outro
@@ -278,8 +303,9 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
                     # Prepend certain number of last EDGARTOOLS chunk of the created outro chunk
                     # to the buffer for creating an overlap between chunks 
                     for prep in range(chunk_overlap):
+                        await asyncio.sleep(0)
                         if i - (chunk_overlap - prep) > 0:
-                            outro_chunk_buffer += rows[i - (chunk_overlap - prep)]["Text"]+"\n"
+                            chunk_buffer += rows[i - (chunk_overlap - prep)]["Text"]+"\n"
                 if i == len(rows) - 1:
                     outro_chunks.append(chunk_buffer)
 
@@ -305,6 +331,7 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
 
     # Generate chunks for financials
     for key, _ in fin_statements.items():
+        await asyncio.sleep(0)
         # Sometimes it returns tuples
         if isinstance(fin_statements[key], tuple):
             # Process each element of a tuple
@@ -337,6 +364,7 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
 
     # Process intro chunks
     for intro in intro_chunks:
+        await asyncio.sleep(0)
         chunk_metadata_model["chunk_description"] = "Overview_of_the_document"
         intro_chunk = {
                 "metadata": dict(chunk_metadata_model),
@@ -345,9 +373,9 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
             }
         final_chunks.append(intro_chunk)
 
-
     # Process filing's items chunks
     for item in chunked_document.list_items():
+        await asyncio.sleep(0)
         # Get item chapter description
         item_data = structure.get_item(item)
         if item_data != None: 
@@ -358,7 +386,9 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
 
         # Create data list
         for _, chunk in enumerate(chunks):
+                await asyncio.sleep(0)
                 for j, row in enumerate(chunk):
+                    await asyncio.sleep(0)
                     data.append({
                         "object": row,
                         "len": len(row.to_markdown())
@@ -404,6 +434,7 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
             if item_chunk_buffer["len"] > chunk_size: 
                 # Append some EDGARTOOLS chunks for overlap
                 for app in range(chunk_overlap):
+                    await asyncio.sleep(0)
                     # Avoid index out of range
                     if i + app + 1 >= max_items:
                         break
@@ -434,12 +465,14 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
                 chunk_number += 1
             # Go to next EDGARTOOLS chunk
             i += 1
+            await asyncio.sleep(0)  # This yields control back to the event loop
         # Ended processing EDGARTOOLS chunks for Item 
         # Reset buffer 
         data = []
 
     # Process outro chunks
     for outro in outro_chunks:
+        await asyncio.sleep(0)
         chunk_metadata_model["chunk_description"] = "Miscellaneous"
         outro_chunk = {
                 "metadata": dict(chunk_metadata_model),
@@ -447,5 +480,5 @@ def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size = 10000
                 "text": outro
             }
         final_chunks.append(outro_chunk)
-
+    
     return final_chunks

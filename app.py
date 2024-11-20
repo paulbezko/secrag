@@ -1,36 +1,31 @@
-import eventlet
-eventlet.monkey_patch(socket=True, select=True)
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from fastapi import Request
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from server import create_app
+from server.globals import config as global_config
+import uvicorn
 
-from server.general.utils import send_autoupdate_log
-from logtail import LogtailHandler
-from server import create_app, handler
-
-import logging
-
+load_dotenv('.env', override=True)
 
 mode = 'prod' # Controls whether the server will use built client static files or not (prod or dev)
-app, socketio = create_app(mode)
-app.logger.setLevel(logging.DEBUG)
-app.logger.addHandler(handler)
-app.logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
+app, socketio, config = create_app(mode)
 
+global_config.set(config)
 
-
-@app.before_request
-def init_send_logs():
-    # prevent spamming
-    if not app.config['INIT_LOGS_SENT']:
-        send_autoupdate_log()
-        app.config['INIT_LOGS_SENT'] = True
-
+@app.get("/style.css")
+async def serve_css():
+    return FileResponse(css_file_path)
 
 # Handle stop signal. Could not seem to make it work inside routes or init.
-from flask import request
-from server.dashboard.globals import stop_signals
+from server.globals import stop_signals
 @socketio.on('stop_llm_stream')
-def handle_stop_signal():
-    client_id = request.sid
-    stop_signals[client_id] = True
+async def handle_stop_signal(sid, data):
+    stop_signals[sid] = True
+
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', debug = True)
+    uvicorn.run(app, port=5000)

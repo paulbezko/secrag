@@ -4,6 +4,8 @@ import os
 import threading
 import time
 from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
+from fastapi import Request, status
 from flask import Blueprint, Flask, request, abort
 import subprocess
 
@@ -15,8 +17,9 @@ SECRET = os.getenv('GITHUB_WEBHOOK_SECRET').encode('utf-8')
 TARGET_BRANCH = 'prod'  # Change this to your target branch
 DELAY_BEFORE_UPDATE = 0.8 # Delay in seconds
 
-# Routes initialization
-routes = Blueprint('routes', __name__)
+from fastapi import APIRouter
+
+routes = APIRouter()
 
 def verify_signature(payload):
     signature = request.headers.get('X-Hub-Signature')
@@ -29,13 +32,13 @@ def verify_signature(payload):
     hash = hmac.new(SECRET, payload, hashlib.sha1)
     return hmac.compare_digest(signature, hash.hexdigest())
 
-@routes.route('/push', methods=['POST'])
-def webhook():
-    payload = request.get_data()
+@routes.post('/push')
+async def webhook(request: Request):
+    payload = await request.body()
 
     # Verify the signature
     if not verify_signature(payload):
-        abort(403)  # Forbidden
+        return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content="")  # Forbidden
 
     data = request.json
 
@@ -44,10 +47,10 @@ def webhook():
         print("[SecRag] Updated detected. Begin update...")
         thread = threading.Thread(target=delayed_update)
         thread.start()
-        return '', 200
+        return JSONResponse(status_code=status.HTTP_200_OK, content="")
     else:
         # If it's not the target branch, return 404
-        abort(404)
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content="")
 
 def delayed_update():
     """Function to delay execution and run the shell script."""

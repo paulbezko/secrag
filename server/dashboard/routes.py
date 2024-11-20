@@ -1,251 +1,297 @@
-import asyncio
 from .utils.miscellaneous import save_message
 from .utils.vectorstore import vectorstore_manager
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
 from .utils.llm import get_assistant_response
-from flask import request, Blueprint, current_app
-from edgar import *
-from .. import socketio
+from ..lib_secrag.edgar.entities import get_entity
 
 import json
 
-# Routes initialization
-routes = Blueprint('routes', __name__)
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 
-@routes.route('/get-chats', methods=['GET'])
-def get_chats_get():
+routes = APIRouter()
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+@routes.get('/get-chats')
+def get_chats_get(token: str):
+
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
     if user_info['email'] in memory:
         chats = list(reversed(memory[user_info['email']].keys()))
     else:
         chats = []
-    return {'chats': chats}
+    return JSONResponse(content={'chats': chats})
 
 
-@routes.route('/get-messages', methods=['GET'])
-def get_messages_get():
+@routes.get('/get-messages')
+def get_messages_get(chat: str, token: str):
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    messages = memory[user_info['email']][request.args.get('chat')]['messages']
-    filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
-    return {'messages': messages, 'filing_date': filing_date}
+    messages = memory[user_info['email']][chat]['messages']
+    filing_date = memory[user_info['email']][chat]['filing_date']
+    return JSONResponse(content={'messages': messages, 'filing_date': filing_date})
 
 
-@routes.route('/new-chat', methods=['POST'])
-def new_chat_post():
+@routes.post('/new-chat')
+async def new_chat_post(request: Request):
+    # token: str, socketId: str, chat: str, filingDate: str
+
+    data = await request.json()
+    token = data.get("token")
+    chat = data.get("chat")
+    socket_id = data.get("socketId")
+    filing_date = data.get("filingDate")
     
-    try: user_info = decode_token(request.json.get('token'))
-    except: return {'error': 'Error decoding token'}
+
+    from app import socketio, config
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     token_cost_chat = 20
-    if int(user_info['subscription_tokens_left']) < token_cost_chat: return {'error': 'Insufficient Tokens'}
+    if int(user_info['subscription_tokens_left']) < token_cost_chat: return JSONResponse(content={'error': 'Insufficient Tokens'})
 
-    socket_id = request.json.get('socketId')
-    socketio.emit('new_chat_started', to=socket_id)
+    socket_id = socket_id
+    await socketio.emit('new_chat_started', to=socket_id)
 
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
     if user_info['email'] not in memory: memory[user_info['email']] = {}
-    memory[user_info['email']][request.json.get('chat')] = {'filing_date': request.json.get('filingDate'), 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]}
+    memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
     with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
     
-    socketio.emit('new_chat_initialized', to=socket_id)
-    filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
-    socketio.emit('new_chat_downloaded', to=socket_id)
-    vectorstore_manager.new_chat(filing)
-    socketio.emit('new_chat_vectorized', to=socket_id)
+    await socketio.emit('new_chat_initialized', to=socket_id)
+    filing = get_filing(filing_id=chat, filing_date=filing_date)
+    await socketio.emit('new_chat_downloaded', to=socket_id)
+    try:
+        await vectorstore_manager.new_chat(filing)
+    except Exception as e:
+        return JSONResponse(content={'error': "Something went wrong..."})
+    await socketio.emit('new_chat_vectorized', to=socket_id)
 
-    log('debug', f'New chat created for {user_info["email"]}: {request.json.get("chat")}')
-    query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
+    log('debug', f'New chat created for {user_info["email"]}: {chat}')
+    query = f"UPDATE users_{config.get('MODE')} SET subscription_tokens_left = %s WHERE email = %s"
     execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_chat, user_info['email']))
 
     user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_chat
     token = encode_token(user_info)
 
-    return {'token': token}
+    return JSONResponse(content={'token': token})
 
 
-@routes.route('/new-chat-preview', methods=['POST'])
-def new_chat_preview_post():
+@routes.post('/new-chat-preview')
+async def new_chat_preview_post(request: Request):
+    data = await request.json()
+    chat = data.get("chat")
+    socket_id = data.get("socketId")
+    filing_date = data.get("filingDate")
 
-    socket_id = request.json.get('socketId')
-    socketio.emit('new_chat_started', to=socket_id)
+    from app import socketio
+    socket_id = socket_id
+    await socketio.emit('new_chat_started', to=socket_id)
     
-    socketio.emit('new_chat_initialized', to=socket_id)
-    filing = get_filing(filing_id=request.json.get('chat'), filing_date=request.json.get('filingDate'))
-    socketio.emit('new_chat_downloaded', to=socket_id)
-    vectorstore_manager.new_chat(filing)
-    socketio.emit('new_chat_vectorized', to=socket_id)
+    await socketio.emit('new_chat_initialized', to=socket_id)
+    filing = get_filing(filing_id=chat, filing_date=filing_date)
+    await socketio.emit('new_chat_downloaded', to=socket_id)
+    await vectorstore_manager.new_chat(filing)
+    await socketio.emit('new_chat_vectorized', to=socket_id)
 
-    return {'success': True}
+    return JSONResponse(content={'success': True})
 
 
-@routes.route('/get-filing-selection-data', methods=['GET'])
-def get_list_tickers_get():
+@routes.get('/get-filing-selection-data')
+def get_list_tickers_get(token: str):
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
     with open('database/memory/filings_new.json', 'r') as f: filings_new = json.load(f)
 
-    return {'tickers': list(filings_available.keys()), 'newFilings': filings_new}
+    return JSONResponse(content={'tickers': list(filings_available.keys()), 'newFilings': filings_new})
 
 
-@routes.route('/get-info-by-ticker', methods=['GET'])
-def get_info_by_ticker_get():
+@routes.get('/get-info-by-ticker')
+def get_info_by_ticker_get(token: str, ticker: str):
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
 
-    return {'info': filings_available[request.args.get('ticker')]}
+    return JSONResponse(content={'info': filings_available[ticker]})
 
 
-@routes.route('/get-info-by-ticker-preview', methods=['GET'])
-def get_info_by_ticker_preview_get():
+@routes.get('/get-info-by-ticker-preview')
+def get_info_by_ticker_preview_get(ticker: str):
 
     with open('database/memory/filings_preview.json', 'r') as f: filings_available = json.load(f)
-    return {'info': filings_available[request.args.get('ticker')]}
+    return JSONResponse(content={'info': filings_available[ticker]})
 
 
-@routes.route('/get-filing', methods=['GET'])
-def get_filing_get():
+@routes.get('/get-filing')
+async def get_filing_get(token: str, chat: str):
 
-    try: user_info = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
 
-    ticker, year, form_raw = request.args.get('chat').split('-')
-    filing_date = memory[user_info['email']][request.args.get('chat')]['filing_date']
+    ticker, year, form_raw = chat.split('-')
+    filing_date = memory[user_info['email']][chat]['filing_date']
     if form_raw == '10K': form = '10-K'
     elif '10Q' in form_raw: form = '10-Q'
 
     try: 
         with open(f'database/filings/{ticker.upper()}-{year}-{form_raw}.html', 'r') as f: html = f.read()
-        return {'html': html}
+        return JSONResponse(content={'html': html})
     
     except:
         try:
-            html = Company(ticker).get_filings(form=form, date=filing_date)[0].html()
+            entity = await get_entity(ticker)
+            html = entity.get_filings(form=form, date=filing_date)[0].html()
 
             with open(f'database/filings/{ticker.upper()}-{year}-{form_raw}.html', 'w') as f: f.write(html)
-            return {'html': html}
+            return JSONResponse(content={'html': html})
         
         except Exception as error:
-            return {'error': 'Error getting filing: ' + str(error)}
+            return JSONResponse(content={'error': 'Error getting filing: ' + str(error)})
 
 
-@routes.route('/get-filing-preview', methods=['GET'])
-def get_filing_preview_get():
+@routes.get('/get-filing-preview')
+async def get_filing_preview_get(chat: str, filingDate: str):
 
-    ticker, year, form_raw = request.args.get('chat').split('-')
-    filing_date = request.args.get('filingDate')
+    ticker, year, form_raw = chat.split('-')
+    filing_date = filingDate
     if form_raw == '10K': form = '10-K'
     elif '10Q' in form_raw: form = '10-Q'
 
     try: 
         with open(f'database/filings/{ticker.upper()}-{year}-{form_raw}.html', 'r') as f: html = f.read()
-        return {'html': html}
+        return JSONResponse(content={'html': html})
     
     except:
         try:
-            html = Company(ticker).get_filings(form=form, date=filing_date)[0].html()
+            entity = await get_entity(ticker)
+            html = entity.get_filings(form=form, date=filing_date)[0].html()
 
             with open(f'database/filings/{ticker.upper()}-{year}-{form_raw}.html', 'w') as f: f.write(html)
-            return {'html': html}
+            return JSONResponse(content={'html': html})
         
         except Exception as error:
-            return {'error': 'Error getting filing: ' + str(error)}
+            return JSONResponse(content={'error': 'Error getting filing: ' + str(error)})
 
 
-@routes.route('/reset-chat', methods=['POST'])
-def reset_chat_post():
+@routes.post('/reset-chat')
+async def reset_chat_post(request: Request):
+    data = await request.json()
+    chat = data.get("chat")
+    token = data.get("token")
 
-    try: user_info = decode_token(request.json.get('token'))
-    except: return {'error': 'Error decoding token'}
-
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    memory[user_info['email']][request.json.get('chat')]['messages'] = [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {request.json.get('chat')} is embedded and ready for discussion. How can I help you today?'}]
-    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
-
-    return {'success': True}
-
-
-@routes.route('/delete-chat', methods=['POST'])
-def delete_chat_post():
-
-    try: user_info = decode_token(request.json.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    del memory[user_info['email']][request.json.get('chat')]
+    memory[user_info['email']][chat]['messages'] = [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]
     with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
 
-    return {'success': True}
+    return JSONResponse(content={'success': True})
 
 
-@routes.route('/new-message-user', methods=['POST'])
-async def new_message_user_post():
+@routes.post('/delete-chat')
+async def delete_chat_post(request: Request):
+    data = await request.json()
+    chat = data.get("chat")
+    token = data.get("token")
 
-    try: user_info = decode_token(request.json.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
+
+    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    del memory[user_info['email']][chat]
+    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    return JSONResponse(content={'success': True})
+
+
+@routes.post('/new-message-user')
+async def new_message_user_post(request: Request):
+    data = await request.json()
+    message = data.get("message")
+    chat = data.get("chat")
+    last_x_messages = data.get("lastXMessages")
+    socket_id = data.get("socketId")
+    filing_date = data.get("filingDate")
+    token = data.get("token")
+
+    from app import socketio, config
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     token_cost_message = 4
-    if int(user_info['subscription_tokens_left']) < token_cost_message: return {'error': 'Insufficient Tokens'}
+    if int(user_info['subscription_tokens_left']) < token_cost_message: return JSONResponse(content={'error': 'Insufficient Tokens'})
 
-    message_history = (request.json.get('lastXMessages'))
+    message_history = (last_x_messages)
     # message_history_json = [message['content'] for message in message_history_json if 'content' in message]
-    save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'user', message = request.json.get('message'))
+    save_message(email = user_info["email"], chat = chat, role = 'user', message = message)
 
     await get_assistant_response(
-        user_prompt = request.json.get('message'),
+        user_prompt = message,
         message_history = message_history,
-        filing_id = request.json.get('chat'),
-        socket_id = request.json.get('socketId'),
-        filing_date = request.json.get('filingDate')
+        filing_id = chat,
+        socket_id = socket_id,
+        filing_date = filing_date,
+        socketio_handler=socketio
     )
 
-    query = f"UPDATE users_{current_app.config['MODE']} SET subscription_tokens_left = %s WHERE email = %s"
+    query = f"UPDATE users_{config.get('MODE')} SET subscription_tokens_left = %s WHERE email = %s"
     execute_query(query, (int(user_info['subscription_tokens_left']) - token_cost_message, user_info['email']))
 
     user_info['subscription_tokens_left'] = int(user_info['subscription_tokens_left']) - token_cost_message
     token = encode_token(user_info)
-    return {'token': token}
+    return JSONResponse(content={'token': token})
 
 
-@routes.route('/new-message-user-preview', methods=['POST'])
-async def new_message_user_preview_post():
+@routes.post('/new-message-user-preview')
+async def new_message_user_preview_post(request: Request):
+    data = await request.json()
+    message = data.get("message")
+    chat = data.get("chat")
+    last_x_messages = data.get("lastXMessages")
+    socket_id = data.get("socketId")
+    filing_date = data.get("filingDate")
+    token = data.get("token")
 
-    message_history = (request.json.get('lastXMessages'))
+    from app import socketio
+    message_history = (last_x_messages)
 
-    await get_assistant_response(
-        user_prompt = request.json.get('message'),
+    get_assistant_response(
+        user_prompt = message,
         message_history = message_history,
-        filing_id = request.json.get('chat'),
-        socket_id = request.json.get('socketId'),
-        filing_date = request.json.get('filingDate')
+        filing_id = chat,
+        socket_id = socket_id,
+        filing_date = filing_date,
+        socketio_handler=socketio
     )
 
-    return {'success': True}
+    return JSONResponse(content={'success': True})
 
 
-@routes.route('/new-message-assistant', methods=['POST'])
-def new_message_assistant_post():
+@routes.post('/new-message-assistant')
+async def new_message_assistant_post(request: Request):
+    data = await request.json()
+    message = data.get("message")
+    chat = data.get("chat")
+    token = data.get("token")
 
-    try: user_info = decode_token(request.json.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    save_message(email = user_info["email"], chat = request.json.get('chat'), role = 'assistant', message = request.json.get('message'))
-    return {'success': True}
+    save_message(email = user_info["email"], chat = chat, role = 'assistant', message = message)
+    return JSONResponse(content={'success': True})
 
 

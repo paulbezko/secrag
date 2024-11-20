@@ -1,31 +1,37 @@
+from fastapi.responses import JSONResponse
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..general.utils import get_user_data, encode_token, decode_token, send_email_from_template, execute_query, check_timestamp, log
 from datetime import datetime, timezone, timedelta
-from flask import request, Blueprint, current_app
+from ..globals import config
+from fastapi import APIRouter, Request
 
-# Routes initialization
-routes = Blueprint('routes', __name__)
+routes = APIRouter()
 
 
-@routes.route('/signup', methods=['POST'])
-def signup_post():
+@routes.post('/signup')
+async def signup_post(request: Request):
 
+    data = await request.json()
+    token = data.get("token")
+    email = data.get("email")
+    name = data.get("name")
+    password = data.get("password")
     # Determining if the user has clicked the email link or not
-    if request.json.get('token'):
+    if token:
         try: 
-            user_info = decode_token(request.json.get('token'))
+            user_info = decode_token(token)
             stage = 'SignUpAfter'
-        except: return {'error': 'Error decoding token'}
+        except: return JSONResponse(content={'error': 'Error decoding token'})
     else:
         stage = 'SignUpBefore'
-        email = request.json.get('email').lower()
+        email = email.lower()
 
 
     # The user has not requested an email yet
     if stage == 'SignUpBefore':
 
-        user = get_user_data(request.json.get('email').lower())
-        if user: return {'error': 'User with this email already exists'}
+        user = get_user_data(email.lower())
+        if user: return JSONResponse(content={'error': 'User with this email already exists'})
 
         email_payload = {
             'email': email,
@@ -36,58 +42,62 @@ def signup_post():
         token = encode_token(email_payload)
         send_email_from_template(email = email, template = 'signUp', payload = token)
         log('debug', f'Signup email sent to {email}')
-        return {'message': 'Confirmation email sent'}
+        return JSONResponse(content={'message': 'Confirmation email sent'})
 
 
     # The user came after clicking the email link
     if stage == 'SignUpAfter':
 
-        password_encrypted = generate_password_hash(request.json.get('password'))
+        password_encrypted = generate_password_hash(password)
 
         log('debug', f'User account created for {user_info['email']}')
         log('info', f'New user joined through email: {user_info['email']}')
-        query = f"UPDATE users_{current_app.config['MODE']} SET name = %s, auth_type = 'password', password = %s WHERE email = %s"
-        execute_query(query, (request.json.get('name'), password_encrypted, user_info['email']))
+        query = f"UPDATE users_{config.get('MODE')} SET name = %s, auth_type = 'password', password = %s WHERE email = %s"
+        execute_query(query, (name, password_encrypted, user_info['email']))
 
-        user_info['name'] = request.json.get('name')
+        user_info['name'] = name
         user_info['subscription'] = 'none'
         del user_info['onboarding']
 
         token = encode_token(user_info)
-        return {'token': token}
+        return JSONResponse(content={'token': token})
 
 
 
-@routes.route('/signup', methods=['GET'])
-def signup_get():
+@routes.get('/signup')
+def signup_get(token: str):
 
-    try: email_payload = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+    try: email_payload = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     # Compare current time with expiry time
-    if not check_timestamp(email_payload['expiry']): return {'error': 'linkExpired'}
-    if get_user_data(email_payload['email']): return {'critical': 'userExists'}
+    if not check_timestamp(email_payload['expiry']): return JSONResponse(content={'error': 'linkExpired'})
+    if get_user_data(email_payload['email']): return JSONResponse(content={'critical': 'userExists'})
 
     log('debug', f'Signup email confirmed for {email_payload['email']}')
-    query = f"INSERT INTO users_{current_app.config['MODE']} (email) VALUES (%s)"
+    query = f"INSERT INTO users_{config.get('MODE')} (email) VALUES (%s)"
     execute_query(query, (email_payload['email'],))
 
     user_info = email_payload
     user_info['onboarding'] = True
 
     token = encode_token(user_info)
-    return {'token': token}
+    return JSONResponse(content={'token': token})
 
 
-@routes.route('/login', methods=['POST'])
-def login_post():
+@routes.post('/login')
+async def login_post(request: Request):
+    data = await request.json()
+    token = data.get("token")
+    email = data.get("email")
+    password = data.get("password")
 
-    try: user = get_user_data(request.json.get('email').lower())
-    except: return {'error': 'Error retrieving user data'}
+    try: user = get_user_data(email.lower())
+    except: return JSONResponse(content={'error': 'Error retrieving user data'})
 
-    if not user: return {'error': 'userNotFound'}
-    if user['auth_type'] != 'password': return {'error': 'authMethodIncorrect'}
-    if not check_password_hash(user['password'], request.json.get('password')): return {'error': 'invalidCredentials'}
+    if not user: return JSONResponse(content={'error': 'userNotFound'})
+    if user['auth_type'] != 'password': return JSONResponse(content={'error': 'authMethodIncorrect'})
+    if not check_password_hash(user['password'], password): return JSONResponse(content={'error': 'invalidCredentials'})
 
     user_info = {
         'email': user['email'],
@@ -100,77 +110,89 @@ def login_post():
     }
 
     token = encode_token(user_info)
-    return {'token': token}
+    return JSONResponse(content={'token': token})
 
 
-@routes.route('/reset-password', methods=['POST'])
-def reset_password_post():
+@routes.post('/reset-password')
+async def reset_password_post(request: Request):
+    
+    data = await request.json()
+    token = data.get("token")
+    action = data.get("action")
+    email = data.get("email")
+    password = data.get("password")
 
-    if request.json.get('action') == 'resetPasswordBefore':
+    if action == 'resetPasswordBefore':
 
-        user = get_user_data(request.json.get('email').lower())
-        if not user: return {'error': 'User does not exist'}
+        user = get_user_data(email.lower())
+        if not user: return JSONResponse(content={'error': 'User does not exist'})
 
         email_payload = {
-            'email': request.json.get('email').lower(),
+            'email': email.lower(),
             'action': 'resetPasswordAfter',
             'expiry': (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
         }
 
         token = encode_token(email_payload)
-        send_email_from_template(email = request.json.get('email').lower(), template = 'resetPassword', payload = token)
-        query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
-        execute_query(query, (token, request.json.get('email').lower()))
-        return {'message': 'Confirmation email sent'}
+        send_email_from_template(email = email.lower(), template = 'resetPassword', payload = token)
+        query = f"UPDATE users_{config.get('MODE')} SET link_token = %s WHERE email = %s"
+        execute_query(query, (token, email.lower()))
+        return JSONResponse(content={'message': 'Confirmation email sent'})
     
-    elif request.json.get('action') == 'resetPasswordAfter':
+    elif action == 'resetPasswordAfter':
 
-        try: user_info = decode_token(request.json.get('token'))
-        except: return {'error': 'Error decoding token'}
+        try: user_info = decode_token(token)
+        except: return JSONResponse(content={'error': 'Error decoding token'})
 
-        password_encrypted = generate_password_hash(request.json.get('password'))
-        query = f"UPDATE users_{current_app.config['MODE']} SET password = %s, WHERE email = %s"
-        execute_query("UPDATE users SET password = %s WHERE email = %s", (password_encrypted, user_info['email']))
+        password_encrypted = generate_password_hash(password)
+        query = f"UPDATE users_{config.get('MODE')} SET password = %s, WHERE email = %s"
+        execute_query(f"UPDATE users_{config.get('MODE')} SET password = %s WHERE email = %s", (password_encrypted, user_info['email']))
 
-        return {'message': 'Password reset successful'}
+        return JSONResponse(content={'message': 'Password reset successful'})
     
 
-@routes.route('/reset-password', methods=['GET'])
-def reset_password_get():
+@routes.get('/reset-password')
+def reset_password_get(token: str):
 
-    try: email_payload = decode_token(request.args.get('token'))
-    except: return {'error': 'Error decoding token'}
+
+    try: email_payload = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
 
     # Compare current time with expiry time
-    if not check_timestamp(email_payload['expiry']): return {'error': 'linkExpired'}
+    if not check_timestamp(email_payload['expiry']): return JSONResponse(content={'error': 'linkExpired'})
 
     user = get_user_data(email_payload['email'].lower())
-    if not user: return {'error': 'User does not exist'}
-    if user['link_token'] != request.args.get('token'): return {'error': 'linkExpired'}
+    if not user: return JSONResponse(content={'error': 'User does not exist'})
+    if user['link_token'] != token: return JSONResponse(content={'error': 'linkExpired'})
 
-    query = f"UPDATE users_{current_app.config['MODE']} SET link_token = %s WHERE email = %s"
+    query = f"UPDATE users_{config.get('MODE')} SET link_token = %s WHERE email = %s"
     execute_query(query, (None, email_payload['email'].lower()))
 
     return {}
 
 
-@routes.route('/authenticate', methods=['POST'])
-def authenticate_post():
+@routes.post('/authenticate')
+async def authenticate_post(request: Request):
 
-    user = get_user_data(request.json.get('email').lower())
+    data = await request.json()
+    token = data.get("token")
+    email = data.get("email")
+    name = data.get("name")
+
+    user = get_user_data(email.lower())
     if not user:
-        log('info', f'New user joined through Google: {request.json.get('email').lower()}')
-        query = f"INSERT INTO users_{current_app.config['MODE']} (email, name, auth_type, supabase_user_id) VALUES (%s, %s, %s, %s)"
-        execute_query(query, (request.json.get('email').lower(), request.json.get('name'), request.json.get('auth_type'), request.json.get('id')))
+        log('info', f'New user joined through Google: {email.lower()}')
+        query = f"INSERT INTO users_{config.get('MODE')} (email, name, auth_type, supabase_user_id) VALUES (%s, %s, %s, %s)"
+        execute_query(query, (email.lower(), name, request.json.get('auth_type'), id))
         user_info = {
-            'email': request.json.get('email').lower(),
-            'name': request.json.get('name'),
+            'email': email.lower(),
+            'name': name,
             'auth_type': 'google',
         }
 
     elif user['auth_type'] == 'google': 
         user_info = {
-            'email': request.json.get('email').lower(),
+            'email': email.lower(),
             'name': user['name'],
             'auth_type': user['auth_type'],
             'subscription': user['subscription'],
@@ -178,7 +200,7 @@ def authenticate_post():
             'stripe_subscription_id': user['stripe_subscription_id'],
             'stripe_user_id': user['stripe_user_id'],
         }
-    else: return {'error': 'authMethodIncorrect'}
+    else: return JSONResponse(content={'error': 'authMethodIncorrect'})
 
     token = encode_token(user_info)
-    return {'token': token}
+    return JSONResponse(content={'token': token})

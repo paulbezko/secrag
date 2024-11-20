@@ -3,8 +3,8 @@ import psycopg2
 from ..general.utils import log
 from psycopg2.extras import RealDictCursor
 from psycopg2 import OperationalError, InterfaceError
-from flask import current_app
 import time
+from ..globals import config
 
 def get_user_data_stripe(stripe_user_id, retries=3):
 
@@ -20,7 +20,7 @@ def get_user_data_stripe(stripe_user_id, retries=3):
                 cursor_factory = RealDictCursor
             )
             with connection.cursor() as cursor:
-                query = f"SELECT * FROM users_{current_app.config['MODE']} WHERE stripe_user_id = %s"
+                query = f"SELECT * FROM users_{config.get('MODE')} WHERE stripe_user_id = %s"
                 cursor.execute(query, (stripe_user_id,))
                 return cursor.fetchone()
         
