@@ -40,7 +40,7 @@ async def webhook(request: Request):
     if not verify_signature(request, payload):
         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content="")  # Forbidden
 
-    data = request.json
+    data = await request.json()
 
     # Check if the push is on the desired branch
     if 'ref' in data and data['ref'] == f'refs/heads/{TARGET_BRANCH}':
