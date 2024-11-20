@@ -1,20 +1,18 @@
 <template>
-  <div>
+  <div class="flex-column center width-100 gap-2" style="padding: 2rem">
     <div v-if="showSuccess"><SuccessComp :action="action" @close="handleCloseSuccess" /></div>
     <div v-if="showError"><ErrorComp :action="action" @close="handleCloseError"/></div>
-    <div v-if="loaded && !showError" class="display display-flex-column center">
-      <div class="display display-flex-column center">
-        <div class="display-flex-column gap-1 center">
-          <div class="heading-2">Reset Password</div>
-          <div class="text-3" style="width: 25rem; text-align: center;">Enter a new password.</div>
-          <div class="display-flex-column gap-1">
-            <input class="input" v-model="password" type="password" placeholder="Password">
-            <div class="display-flex-row gap-1 width-100">
-              <input class="input flex-1" v-model="passwordConfirm" type="password" placeholder="Confirm Password">
-              <button @click="submit()" class="fa-solid fa-arrow-right text-2 button-icon"></button>
-            </div>
+    <div v-if="loaded && !showError" class="flex-column center width-100 gap-2">
+      <div class="display display-flex-column center gap-1">
+        <div class="heading">Reset Password</div>
+        <div class="text-3" style="width: 25rem; text-align: center;">Enter a new password.</div>
+        <div class="flex-column center gap-1 width-100" style="max-width: 40rem;">
+          <input class="input" v-model="password" type="password" placeholder="Password">
+          <div class="flex-row gap-1 width-100">
+            <input class="input" v-model="passwordConfirm" type="password" placeholder="Confirm Password">
+            <div @click="signupPassword('signUpAfter', $event)" class="button-icon"><SpinnerCompButton v-if="showSpinner"></SpinnerCompButton><div v-if="!showSpinner" class="fa-solid fa-arrow-right" style="color: var(--color-grey-black)"></div></div>
           </div>
-          <div v-if="error" class="text-3 text-error">{{error}}</div>
+          <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
         </div>
       </div>
     </div>
