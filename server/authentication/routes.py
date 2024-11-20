@@ -178,12 +178,14 @@ async def authenticate_post(request: Request):
     token = data.get("token")
     email = data.get("email")
     name = data.get("name")
+    id = data.get("id")
+    auth_type = data.get("auth_type")
 
     user = get_user_data(email.lower())
     if not user:
         log('info', f'New user joined through Google: {email.lower()}')
         query = f"INSERT INTO users_{config.get('MODE')} (email, name, auth_type, supabase_user_id) VALUES (%s, %s, %s, %s)"
-        execute_query(query, (email.lower(), name, request.json.get('auth_type'), id))
+        execute_query(query, (email.lower(), name, auth_type, id))
         user_info = {
             'email': email.lower(),
             'name': name,

@@ -14,6 +14,8 @@ async def subscribe_post(request: Request):
     data = await request.json()
     token = data.get("token")
     operation = data.get("operation")
+    subscription_type = data.get("subscriptionType")
+    period_type = data.get("periodType")
 
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
@@ -35,7 +37,7 @@ async def subscribe_post(request: Request):
             customer=customer,
             payment_method_types=['card', 'ideal'],
             line_items=[{
-                'price': config[f'STRIPE_PRODUCT_{request.json.get("subscriptionType").upper()}_{request.json.get("periodType").upper()}'], 
+                'price': config[f'STRIPE_PRODUCT_{subscription_type.upper()}_{period_type.upper()}'], 
                 'quantity': 1
                 }],
             mode='subscription',
