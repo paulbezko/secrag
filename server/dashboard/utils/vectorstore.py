@@ -1,7 +1,9 @@
+import asyncio
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 from ...general.utils import log
+from ...globals import embeddings_queue
 from .secedgar import FilingObject, get_sec_filing_object
 from celery import Celery
 
@@ -72,8 +74,22 @@ class VectorstoreManager:
 
         # Case when embedding does not exist
         if len(check_for_existing_embeddings) == 0:
-            await self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
-            log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+            # Filing identifier for the queue
+            queue_id = filing.ticker+filing.filing_type+filing.filing_date
+            
+            if queue_id not in embeddings_queue:
+                # Anounce filing in the queue
+                embeddings_queue.append(queue_id)
+
+                await self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
+                # Release from queue
+                embeddings_queue.remove(queue_id)
+
+                log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
+            else:
+                # Loop until the filing is released from the queue
+                while queue_id in embeddings_queue:
+                    await asyncio.sleep(0)
 
         # Case when embedding already exists       
         else:
