@@ -1,5 +1,7 @@
 # This file is needed to share the variable between the socket and the stream
 stop_signals = {}
+# This variable is used for current vectorstore embeddings processes book-keeping
+embeddings_queue = []
 
 class Config:
     def __init__(self):
