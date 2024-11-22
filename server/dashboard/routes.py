@@ -62,7 +62,6 @@ async def new_chat_post(request: Request):
     with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
     if user_info['email'] not in memory: memory[user_info['email']] = {}
     memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
-    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
     
     await socketio.emit('new_chat_initialized', to=socket_id)
     filing = get_filing(filing_id=chat, filing_date=filing_date)
@@ -70,8 +69,11 @@ async def new_chat_post(request: Request):
     try:
         await vectorstore_manager.new_chat(filing)
     except Exception as e:
-        return JSONResponse(content={'error': "Something went wrong..."})
+        return JSONResponse(content={'error': "Unparsable filing"})
     await socketio.emit('new_chat_vectorized', to=socket_id)
+
+    # Save initialized chat only if vectorstore manager succeeded allocation
+    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
 
     log('debug', f'New chat created for {user_info["email"]}: {chat}')
     query = f"UPDATE users_{config.get('MODE')} SET subscription_tokens_left = %s WHERE email = %s"
@@ -97,7 +99,10 @@ async def new_chat_preview_post(request: Request):
     await socketio.emit('new_chat_initialized', to=socket_id)
     filing = get_filing(filing_id=chat, filing_date=filing_date)
     await socketio.emit('new_chat_downloaded', to=socket_id)
-    await vectorstore_manager.new_chat(filing)
+    try:
+        await vectorstore_manager.new_chat(filing)
+    except:
+        return JSONResponse(content={'error': "Unparsable filing"})    
     await socketio.emit('new_chat_vectorized', to=socket_id)
 
     return JSONResponse(content={'success': True})
