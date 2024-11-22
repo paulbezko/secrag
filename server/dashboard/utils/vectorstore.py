@@ -80,8 +80,11 @@ class VectorstoreManager:
             if queue_id not in embeddings_queue:
                 # Anounce filing in the queue
                 embeddings_queue.append(queue_id)
-
-                await self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
+                try:
+                    await self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
+                except Exception as e:
+                    embeddings_queue.remove(queue_id)
+                    raise e
                 # Release from queue
                 embeddings_queue.remove(queue_id)
 
