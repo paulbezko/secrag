@@ -446,7 +446,7 @@ class EntityData:
 
     @classmethod
     async def for_ticker(cls, ticker: str, include_old_filings: bool = True):
-        cik = find_cik(ticker)
+        cik = await find_cik(ticker)
         if cik:
             return await CompanyData.for_cik(cik, include_old_filings=include_old_filings)
 
@@ -813,6 +813,7 @@ async def download_entity_submissions_from_sec(cik: int,
     """Get the company filings for a given cik"""
     try:
         submission_json = await download_json_async(f"https://data.sec.gov/submissions/CIK{cik:010}.json")
+        await asyncio.sleep(0.1)
     except httpx.HTTPStatusError as e:
         # Handle the case where the cik is invalid and not found on Edgar
         if e.response.status_code == 404:
@@ -823,6 +824,7 @@ async def download_entity_submissions_from_sec(cik: int,
     if include_old_filings:
         for old_file in submission_json['filings']['files']:
             old_sub = await download_json_async("https://data.sec.gov/submissions/" + old_file['name'])
+            await asyncio.sleep(0.1)
             for column in old_sub:
                 await asyncio.sleep(0)
                 submission_json['filings']['recent'][column] += old_sub[column]

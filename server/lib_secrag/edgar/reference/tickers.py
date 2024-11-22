@@ -1,3 +1,4 @@
+import asyncio
 import re
 import json
 from functools import lru_cache
@@ -8,7 +9,7 @@ import pandas as pd
 import pyarrow as pa
 from httpx import HTTPStatusError
 from edgar.core import listify, log
-from edgar.httprequests import download_file, download_json, download_datafile
+from edgar.httprequests import download_file, download_file_async, download_json, download_datafile
 from edgar.reference.data.common import read_parquet_from_package
 
 __all__ = ['cusip_ticker_mapping', 'get_ticker_from_cusip', 'get_company_tickers', 'get_icon_from_ticker', 'find_cik',
@@ -36,9 +37,10 @@ def cusip_ticker_mapping(allow_duplicate_cusips: bool = True) -> pd.DataFrame:
     return df
 
 
-@lru_cache(maxsize=None)
-def get_cik_tickers():
+
+async def get_cik_tickers():
     try:
+        raise Exception("")
         source = StringIO(download_file("https://www.sec.gov/include/ticker.txt", as_text=True))
         data = pd.read_csv(source,
                            sep='\t',
@@ -46,7 +48,9 @@ def get_cik_tickers():
                            names=['ticker', 'cik']).dropna()
     except Exception:
         # Fallback: Use the JSON data from the alternative URL
-        json_data = json.loads(download_file("https://www.sec.gov/files/company_tickers.json", as_text=True))
+        data = await download_file_async("https://www.sec.gov/files/company_tickers.json", as_text=True)
+        await asyncio.sleep(0.1)
+        json_data = json.loads(data)
         data = pd.DataFrame.from_dict(json_data, orient='index')
         data = data.rename(columns={'ticker': 'ticker', 'cik_str': 'cik'})
         data = data[['ticker', 'cik']]
@@ -58,9 +62,8 @@ def get_cik_tickers():
     return data
 
 
-@lru_cache(maxsize=None)
-def get_company_cik_lookup():
-    df = get_cik_tickers()
+async def get_company_cik_lookup():
+    df = await get_cik_tickers()
 
     lookup = {}
     for ticker, cik in zip(df['ticker'], df['cik']):
@@ -126,13 +129,13 @@ def find_mutual_fund_cik(ticker):
     return lookup.get(ticker.upper())
 
 
-def find_company_cik(ticker):
-    lookup = get_company_cik_lookup()
+async def find_company_cik(ticker):
+    lookup = await get_company_cik_lookup()
     ticker = ticker.upper().replace('.', '-')
     return lookup.get(ticker)
 
 
-def find_cik(ticker):
+async def find_cik(ticker):
     """
     Find the CIK for a given ticker, checking both company and mutual fund/ETF data.
 
@@ -140,7 +143,7 @@ def find_cik(ticker):
     :return: Integer, the CIK for the given ticker, or None if not found
     """
     # First, check company CIKs
-    cik = find_company_cik(ticker)
+    cik = await find_company_cik(ticker)
     if cik is not None:
         return cik
 
