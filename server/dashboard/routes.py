@@ -47,7 +47,7 @@ async def new_chat_post(request: Request):
     chat = data.get("chat")
     socket_id = data.get("socketId")
     filing_date = data.get("filingDate")
-    
+    cik = data.get("cik") ########################################################## CIK RETRIEVAL HERE
 
     from app import socketio
     try: user_info = decode_token(token)
