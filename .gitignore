@@ -43,6 +43,7 @@ cython_debug/
 *.pkl
 
 client/dist
+csons/logs
 database/memory/chats.json
 database/filings/*
 database/markdowns/*
