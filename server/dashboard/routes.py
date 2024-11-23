@@ -47,7 +47,7 @@ async def new_chat_post(request: Request):
     chat = data.get("chat")
     socket_id = data.get("socketId")
     filing_date = data.get("filingDate")
-    cik = data.get("cik") ########################################################## CIK RETRIEVAL HERE
+    cik = data.get("cik")
 
     from app import socketio
     try: user_info = decode_token(token)
@@ -64,7 +64,7 @@ async def new_chat_post(request: Request):
     memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
     
     await socketio.emit('new_chat_initialized', to=socket_id)
-    filing = get_filing(filing_id=chat, filing_date=filing_date)
+    filing = get_filing(filing_id=chat, filing_date=filing_date, filing_cik=cik)
     await socketio.emit('new_chat_downloaded', to=socket_id)
     try:
         await vectorstore_manager.new_chat(filing)
