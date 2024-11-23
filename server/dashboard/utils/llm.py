@@ -105,7 +105,7 @@ async def get_assistant_response(user_prompt, message_history, filing_id, socket
     await socketio_handler.emit('llm_response_complete', to=socket_id)
 
 
-async def stream_response(agent_executor, prompt_settings, socket_id, socketio_handler):
+async def stream_response(agent_executor: AgentExecutor, prompt_settings, socket_id, socketio_handler):
     buffer = ""
     async for event in agent_executor.astream_events(prompt_settings, version="v1"):
         if stop_signals.get(socket_id): break
@@ -133,11 +133,9 @@ async def stream_response(agent_executor, prompt_settings, socket_id, socketio_h
                 pass
 
         elif kind == "on_tool_start":
-            pass
+            await socketio_handler.emit(event["name"], to=socket_id)            
 
         elif kind == "on_tool_end":
             pass
             
-        
-
     stop_signals.pop(socket_id, None)
