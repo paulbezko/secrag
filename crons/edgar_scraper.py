@@ -26,7 +26,7 @@ def get_json_ciks_tickers():
     json_ciks_tickers = {}
     for key, value in json_data.items():
         if '-' in json_data[key]['ticker']: continue # Removing all tickers that have a dash in them
-        json_ciks_tickers[json_data[key]['cik_str']] = f"{json_data[key]['ticker']} | {json_data[key]['title']}"
+        json_ciks_tickers[json_data[key]['cik_str']] = f"{json_data[key]['ticker']} | {json_data[key]['cik_str']} | {json_data[key]['title']}"
 
     return json_ciks_tickers
 
