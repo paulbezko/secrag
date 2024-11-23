@@ -149,7 +149,7 @@ class SECFilingObject():
         return list_documents
 
 # Getting filing object
-def get_filing(filing_id, filing_date, filing_cik) -> FilingObject:
+def get_filing(filing_id, filing_date, filing_cik = None) -> FilingObject:
 
     ticker, filing_year, filing_type = filing_id.split("-")
     if filing_type == "10K": filing_type = "10-K"
