@@ -1,0 +1,124 @@
+2024-10-18 08:25:05,647 - INFO - Starting filing scraper
+2024-10-18 08:25:08,393 - CRITICAL - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:25:08,393 - CRITICAL - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:25:08,393 - CRITICAL - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:25:08,521 - INFO - Finished filing scraper
+2024-10-18 08:26:28,035 - INFO - Starting filing scraper
+2024-10-18 08:26:30,676 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:26:30,676 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:26:30,676 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:26:30,708 - INFO - Finished filing scraper
+2024-10-18 08:43:36,492 - INFO - Starting filing scraper
+2024-10-18 08:43:36,879 - DEBUG - Updated ticker json
+
+Added tickers: 
+{}
+
+Removed tickers: 
+{}
+2024-10-18 08:43:39,126 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:43:39,152 - INFO - Finished filing scraper
+2024-10-18 08:44:14,739 - INFO - Starting filing scraper
+2024-10-18 08:44:15,134 - DEBUG - Updated ticker json
+
+Added tickers: 
+{}
+
+Removed tickers: 
+{}
+2024-10-18 08:44:17,242 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:44:17,273 - INFO - Finished filing scraper
+2024-10-18 08:45:29,836 - INFO - Starting filing scraper
+2024-10-18 08:45:30,298 - DEBUG - Updated ticker json
+
+Added tickers: 
+{}
+
+Removed tickers: 
+{}
+2024-10-18 08:45:32,505 - INFO - Finished scraping
+ New filings: 
+[]
+2024-10-18 08:45:32,536 - INFO - Finished filing scraper
+2024-10-18 08:49:51,462 - INFO - Starting filing scraper
+2024-10-18 08:49:51,868 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-18 08:49:54,046 - DEBUG - New filings: 0
+2024-10-18 08:49:54,074 - INFO - Finished filing scraper
+2024-10-31 22:26:17,567 - INFO - Starting filing scraper
+2024-10-31 22:26:17,970 - DEBUG - Added tickers: 53 | Removed tickers: 173
+2024-10-31 22:26:21,707 - DEBUG - New filings: 631
+2024-10-31 22:26:21,732 - INFO - Finished filing scraper
+2024-10-31 22:33:12,236 - INFO - Starting filing scraper
+2024-10-31 22:33:12,623 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:33:14,513 - DEBUG - New filings: 0
+2024-10-31 22:33:14,542 - INFO - Finished filing scraper
+2024-10-31 22:40:56,476 - INFO - Starting filing scraper
+2024-10-31 22:40:57,327 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:40:59,212 - DEBUG - New filings: 0
+2024-10-31 22:40:59,251 - INFO - Finished filing scraper
+2024-10-31 22:45:42,605 - INFO - Starting filing scraper
+2024-10-31 22:45:43,092 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:45:45,019 - DEBUG - New filings: 0
+2024-10-31 22:45:45,048 - INFO - Finished filing scraper
+2024-10-31 22:46:35,127 - INFO - Starting filing scraper
+2024-10-31 22:46:35,464 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:46:37,301 - DEBUG - New filings: 0
+2024-10-31 22:46:37,330 - INFO - Finished filing scraper
+2024-10-31 22:47:29,607 - INFO - Starting filing scraper
+2024-10-31 22:47:30,083 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:47:31,972 - DEBUG - New filings: 0
+2024-10-31 22:47:31,998 - INFO - Finished filing scraper
+2024-10-31 22:48:54,401 - INFO - Starting filing scraper
+2024-10-31 22:48:54,819 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:50:03,707 - INFO - Starting filing scraper
+2024-10-31 22:50:04,122 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:50:06,149 - DEBUG - New filings: 0
+2024-10-31 22:50:06,179 - INFO - Finished filing scraper
+2024-10-31 22:50:39,940 - INFO - Starting filing scraper
+2024-10-31 22:50:40,212 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:50:57,628 - INFO - Starting filing scraper
+2024-10-31 22:50:57,911 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:51:06,897 - INFO - Starting filing scraper
+2024-10-31 22:51:07,173 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:51:08,041 - DEBUG - New filings: 0
+2024-10-31 22:51:08,043 - INFO - Finished filing scraper
+2024-10-31 22:52:16,381 - INFO - Starting filing scraper
+2024-10-31 22:52:16,828 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:52:17,716 - DEBUG - New filings: 0
+2024-10-31 22:52:17,718 - INFO - Finished filing scraper
+2024-10-31 22:52:41,221 - INFO - Starting filing scraper
+2024-10-31 22:52:41,485 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:52:42,235 - DEBUG - New filings: 0
+2024-10-31 22:52:42,237 - INFO - Finished filing scraper
+2024-10-31 22:53:47,933 - INFO - Starting filing scraper
+2024-10-31 22:53:48,403 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 22:53:49,429 - DEBUG - New filings: 804
+2024-10-31 22:53:49,431 - INFO - Finished filing scraper
+2024-10-31 23:00:04,129 - INFO - Starting filing scraper
+2024-10-31 23:00:04,562 - DEBUG - Added tickers: 0 | Removed tickers: 0
+2024-10-31 23:00:06,498 - DEBUG - New filings: 804
+2024-10-31 23:00:06,520 - INFO - Finished filing scraper
+2024-11-23 20:02:45,578 - INFO - Starting edgar scraper
+2024-11-23 20:06:54,268 - INFO - Finished edgar scraper
