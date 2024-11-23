@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime, timezone
 from psycopg2 import OperationalError, InterfaceError
 from ..globals import config
-from fastapi import logger
+# from fastapi import logger
 import traceback
 
 import psycopg2
@@ -13,6 +13,13 @@ import smtplib
 import time
 import jwt
 import os
+
+import tracemalloc
+import logging
+
+tracemalloc.start()
+
+logger = logging.Logger("a")
 
 
 def log(level, message):
