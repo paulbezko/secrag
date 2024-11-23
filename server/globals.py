@@ -16,3 +16,6 @@ class Config:
 
 # Singleton instance
 config = Config()
+
+sec_rate_limit = 7
+sec_rate_limit_counter = 0

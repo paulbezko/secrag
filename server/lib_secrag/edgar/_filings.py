@@ -1138,12 +1138,12 @@ class Filing:
         """Preview this filing's primary document as markdown. This should display in the console"""
         print(self.text())
 
-    def xbrl(self) -> Optional[Union[XBRLData, XBRLInstance]]:
+    async def xbrl(self) -> Optional[Union[XBRLData, XBRLInstance]]:
         """
         Get the XBRL document for the filing, parsed and as a FilingXbrl object
         :return: Get the XBRL document for the filing, parsed and as a FilingXbrl object, or None
         """
-        return get_xbrl_object(self)
+        return await get_xbrl_object(self)
 
     def serve(self, port: int = 8000) -> AttachmentServer:
         """Serve the filings on a local server
