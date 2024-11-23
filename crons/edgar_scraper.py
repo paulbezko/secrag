@@ -1,8 +1,8 @@
 from dateutil.relativedelta import relativedelta
-from edgar.core import set_identity
+from ..server.lib_secrag.edgar.core import set_identity
 from datetime import datetime, timezone
 from logger import log, configure_logger
-from edgar import get_filings
+from ..server.lib_secrag.edgar import get_filings
 
 import traceback
 import requests
@@ -11,6 +11,11 @@ import json
 import pytz
 import time
 import os
+
+import sys
+
+# Add the path to custom libs
+sys.path.append("server/lib_secrag")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_directory = "database/memory"
