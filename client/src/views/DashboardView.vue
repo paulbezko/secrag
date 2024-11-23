@@ -468,7 +468,6 @@ export default {
         this.filteredOptionsVisible = this.filteredOptions.filter(option =>
           option.toLowerCase().includes(this.optionInput.toLowerCase())
         );
-        console.log(this.filteredOptionsVisible)
       } else {
         this.filteredOptionsVisible = [];
       }
@@ -518,7 +517,6 @@ export default {
         this.selectedYear = '';
         this.selectedFiling = '';
         this.selectedNewFiling = '';
-        console.log(selectedCIK)
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
           chat: newChatName,
