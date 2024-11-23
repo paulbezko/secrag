@@ -55,8 +55,9 @@ async def elapse_rate_limit_count():
 
 # Creating a class for filing information
 class FilingObject():
-    def __init__(self, ticker, filing_date, filing_type, filing_year) -> None:
+    def __init__(self, ticker, cik, filing_date, filing_type, filing_year) -> None:
         self.ticker = ticker
+        self.cik = cik
         self.filing_date = filing_date
         self.filing_type = filing_type
         self.filing_year = filing_year
@@ -64,6 +65,7 @@ class FilingObject():
     def to_dict(self):
         return {
             'ticker': self.ticker,
+            'cik': self.cik,
             'filing_date': self.filing_date,
             'filing_type': self.filing_type,
             'filing_year': self.filing_year
@@ -73,6 +75,7 @@ class FilingObject():
     def from_dict(data):
         return FilingObject(
             ticker=data['ticker'],
+            cik=data['cik'],
             filing_date=data['filing_date'],
             filing_type=data['filing_type'],
             filing_year=data['filing_year']
@@ -146,13 +149,13 @@ class SECFilingObject():
         return list_documents
 
 # Getting filing object
-def get_filing(filing_id, filing_date) -> FilingObject:
+def get_filing(filing_id, filing_date, filing_cik) -> FilingObject:
 
     ticker, filing_year, filing_type = filing_id.split("-")
     if filing_type == "10K": filing_type = "10-K"
     elif "10Q" in filing_type: filing_type = "10-Q"
     else: raise Exception(f"Unsupported filing type {filing_type}")
-    filing = FilingObject(ticker=ticker, filing_date=filing_date, filing_type=filing_type, filing_year=filing_year)
+    filing = FilingObject(ticker=ticker, cik=filing_cik, filing_date=filing_date, filing_type=filing_type, filing_year=filing_year)
     return filing 
 
 # Getting SEC filing object
@@ -184,7 +187,7 @@ async def get_sec_filing_object(filing_info : FilingObject):
         launch_rate_count_timer(1)
         
         set_identity("{} {}".format("SECRag", "secrag.info@gmail.com"))
-        entity: EntityData = await launch_rate_limited(lambda: get_entity(filing_info.ticker), 3)
+        entity: EntityData = await launch_rate_limited(lambda: get_entity(filing_info.cik), 3)
         await asyncio.sleep(0.1)
 
         sec_filing = entity.get_filings(form=filing_info.filing_type, date=filing_info.filing_date)[0]
@@ -368,7 +371,7 @@ async def filing_splitter(filing : SECFilingObject, fin_statements, chunk_size =
             # If item is a dataframe, convert it to markdown
             # Otherwise, just return "no data"
             text = fin_statements[key].to_markdown() if type(fin_statements[key]) is pd.DataFrame and not fin_statements[key].empty  else "no data"
-            # Update metadata model  
+            # Update metadata model
             chunk_metadata_model["chunk_description"] = key
             # Create final chunk
             fin_chunk = {
