@@ -103,26 +103,49 @@
       </div>
       <div class="backdrop z-17"></div>
     </div>
-    <div v-if="newChat" class="flex-column center gap-2" style="padding: 2rem">
+    <div v-if="newChat" class="flex-column center gap-2 width-100" style="padding: 2rem; max-width: 40rem;">
       <div class="subheading">Create a new Chat</div>
-      <div class="text-3 text-center" style="max-width: 24rem;">Select a Ticker, Year of interest, and a Filing Type</div>
-      <div class="flex-column switch-row-to-column gap-1 width-100">
-        <div class="relative width-100">
-          <input type="text" class="input width-100" v-model="tickerInput" @input="filterTickers" @focus="showSuggestions = true" @blur="handleBlur" placeholder="Ticker" :class="{ 'selected-option': selectedTicker !== '' }"/>
-          <div v-if="showSuggestions && filteredTickers.length > 0" class="suggestions-container">
-            <div v-for="ticker in filteredTickers.slice(0, 10)" :key="ticker" class="suggestion-item" @mousedown="selectTickerFromSuggestion(ticker)">
-              {{ ticker }}
+      <div class="flex-column gap-1 center width-100">
+        <div class="text-3 text-center">Choose what to select the company by</div>
+        <div class="flex-column gap-1 relative width-100">
+          <div class="flex-row gap-1 width-100">
+            <div class="button button-card" :class="{ active: selectedType === 'Name' }" @click="selectType('Name')">Name</div>
+            <div class="button button-card" :class="{ active: selectedType === 'Ticker' }" @click="selectType('Ticker')">Ticker</div>
+            <div class="button button-card" :class="{ active: selectedType === 'CIK' }" @click="selectType('CIK')">CIK</div>
+          </div>
+          <input 
+            type="text"
+            class="input width-100"
+            v-model="optionInput" 
+            @input="filterOptions" 
+            @focus="showSuggestions = true" 
+            :placeholder="'Input ' + selectedType" 
+            :class="{ 'selected-option': selectedOption !== '' }"
+          />
+          <div v-if="showSuggestions && filteredOptionsVisible.length > 0" class="suggestions-container">
+            <div v-for="option in filteredOptionsVisible.slice(0, 10)" :key="option" class="suggestion-item" @mousedown="selectOptionFromSuggestion(option)">
+              {{ option }}
             </div>
           </div>
         </div>
-        <select class="input" @change="selectYear($event.target.value)" v-model="selectedYear" :class="{ 'input-disabled': selectedTicker === '' , 'selected-option': selectedYear !== '' }" :disabled="selectedTicker === ''">
-          <option value="" disabled hidden selected>Year</option>
+      </div>
+      
+      <div class="flex-column center gap-1 width-100">
+        <div class="text-3 text-center" style="max-width: 24rem;">Select remaining parameters</div>
+        <select 
+          class="input"
+          @change="selectYear($event.target.value)" 
+          v-model="selectedYear" 
+          :class="{ 'input-disabled': selectedTicker === '' , 'selected-option': selectedYear !== '' }" 
+          :disabled="selectedTicker === ''"
+        >
+          <option value="" disabled hidden selected>Select Year</option>
           <option v-for="option in yearOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
         </select>
         <select class="input" @change="selectFiling($event.target.value)" v-model="selectedFiling" :class="{ 'input-disabled': selectedYear === '', 'selected-option': selectedFiling !== '' }" :disabled="selectedYear === ''">
-          <option value="" disabled hidden selected>Filing</option>
+          <option value="" disabled hidden selected>Select Filing</option>
           <option v-for="option in filingOptions" :key="option" class="text-inter text-4" :value="option">
             {{ option }}
           </option>
@@ -136,6 +159,7 @@
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
+<!-- 
       <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
       <div class="text-3">Or choose one of the Recent Filings</div>
       <div class="flex-row gap-1">
@@ -152,7 +176,8 @@
         :disabled="!selectedNewFiling">
         Create Chat
       </div>
-      <div v-if="error && selectedNewFiling !== ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
+      <div v-if="error && selectedNewFiling !== ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div> 
+-->
     </div>
 
     <!-- Chat Section -->
@@ -304,8 +329,10 @@ export default {
 
       // Ticker selection
       tickerInfo: {},
-      tickerOptions: [],
+      companyKeys: [],
       yearOptions: [],
+      selectedType: 'Name',
+      selectedOption: '',
       selectedTicker: '', // Initialize selected ticker
       selectedYear: '', // Initialize selected year
       selectedDate: '',
@@ -313,8 +340,9 @@ export default {
       selectedFilingType: '',
       selectedNewFiling: '',
 
-      tickerInput: '',
-      filteredTickers: [],
+      optionInput: '',
+      filteredOptions: [],
+      filteredOptionsVisible: [],
       showSuggestions: false,
 
       // Socket
@@ -381,7 +409,7 @@ export default {
     // Load List Tickers
     loadFilingSelectionData() {
       axios.get(`${config.apiUrl}/api/get-filing-selection-data`, {params: { token: localStorage.getItem('_u') }})
-      .then(response => {this.newFilings = response.data.newFilings; this.tickerOptions = response.data.tickers;})
+      .then(response => {this.newFilings = response.data.newFilings; this.companyKeys = response.data.tickers; this.selectOptions()})
       .catch(error => {console.error('Error getting filing selection data:', error)});
     },
 
@@ -401,16 +429,56 @@ export default {
       this.chatHistoryHeight = `${availableHeight}px`;
     },
 
-    // Select Ticker
-    selectTicker(option) {
+    // Select option
+    selectOption() {
+      
+      this.selectedTicker = this.companyKeys.find(key => {
+        const [ticker, cik, name] = key.split(" | ");
+        return ticker === this.selectedOption || name === this.selectedOption || cik === this.selectedOption;
+      });
+
       this.error = null; 
-      this.selectedTicker = option; 
       this.selectedYear = '';
       this.selectedFiling = '';
       this.selectedNewFiling = '';
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: option }})
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: this.selectedTicker }})
       .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
       .catch(error => {console.error('Error getting ticker info:', error)});
+    },
+
+    selectOptions() {
+      this.filteredOptionsVisible = [];
+      this.selectedTicker = '';
+      this.selectedYear = '';
+      this.selectedFiling = '';
+      if (this.selectedType === 'Name') {
+        this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[2]); // Extract names
+        
+      } else if (this.selectedType === 'Ticker') {
+        this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[0]); // Extract tickers
+      } else if (this.selectedType === 'CIK') {
+        this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[1]); // Extract CIKs
+      }
+    },
+
+    filterOptions() {
+      this.selectedOption = '';
+      this.showSuggestions = true;
+      if (this.optionInput) {
+        this.filteredOptionsVisible = this.filteredOptions.filter(option =>
+          option.toLowerCase().includes(this.optionInput.toLowerCase())
+        );
+        console.log(this.filteredOptionsVisible)
+      } else {
+        this.filteredOptionsVisible = [];
+      }
+    },
+
+    selectType(option) {
+      this.optionInput = '';
+      this.selectedOption = '';
+      this.selectedType = option;
+      this.selectOptions(); // Update filteredTickers when type changes
     },
 
     // Select Year and Filing
@@ -423,7 +491,7 @@ export default {
 
       if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
 
-      let selectedTicker, selectedYear, selectedDate, selectedFilingType
+      let selectedTicker, selectedCIK, selectedYear, selectedDate, selectedFilingType
 
       if (this.selectedNewFiling) {
         [selectedTicker, selectedFilingType, selectedDate] = this.selectedNewFiling.split(" ");
@@ -433,6 +501,7 @@ export default {
 
       else {
         selectedTicker = this.selectedTicker.split(" | ")[0]
+        selectedCIK = this.selectedTicker.split(" | ")[1]
         selectedYear = this.selectedYear
         selectedFilingType = this.selectedFiling.split(' ')[0].replace('-', '')
         selectedDate = this.selectedFiling.split(' ')[1]
@@ -449,11 +518,13 @@ export default {
         this.selectedYear = '';
         this.selectedFiling = '';
         this.selectedNewFiling = '';
+        console.log(selectedCIK)
         let response = await axios.post(`${config.apiUrl}/api/new-chat`, {
           token: localStorage.getItem('_u'),
           chat: newChatName,
           filingDate: selectedDate,
           ticker: selectedTicker,
+          cik: selectedCIK,
           socketId: this.socketId
         });
 
@@ -727,24 +798,13 @@ export default {
     }
   },
 
-  selectTickerFromSuggestion(ticker) {
-    this.tickerInput = ticker;
-    this.selectedTicker = ticker;
-    this.showSuggestions = false;
-    this.selectTicker(ticker);
-  },
-
-  handleBlur() {
-    // Delay hiding suggestions to allow for mousedown event on suggestion
-    setTimeout(() => {
+  selectOptionFromSuggestion(option) {
+      this.optionInput = option;
+      this.selectedOption = option;
       this.showSuggestions = false;
-      // If input doesn't match any valid ticker, clear it
-      if (!this.tickerOptions.includes(this.tickerInput)) {
-        this.tickerInput = '';
-        this.selectedTicker = '';
-      }
-    }, 200);
-  },
+      this.selectOption(option);
+    },
+
   handleUserScroll() {if (this.assistantMessageBeingRendered) {this.userHasScrolled = true}},
   }
 };
