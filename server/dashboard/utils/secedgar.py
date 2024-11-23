@@ -1,18 +1,57 @@
 import asyncio
 import traceback
+from typing import Optional, Union
 from langchain_core.documents import Document
+import sys
+
+# Add the path to custom libs
+sys.path.append("server/lib_secrag")
+
+from ...lib_secrag.edgar.xbrl.facts import XBRLInstance
+from ...lib_secrag.edgar.xbrl.xbrldata import XBRLData
+from ...globals import sec_rate_limit, sec_rate_limit_counter
 from ...general.utils import try_except, atry_except, log
 from ...lib_secrag.edgar.financials import Financials
 from ...lib_secrag.edgar.htmltools import TableBlock
-from ...lib_secrag.edgar.entities import get_entity
+from ...lib_secrag.edgar.entities import EntityData, get_entity
 from ...lib_secrag.edgar.core import set_identity
-from datetime import datetime
 
 import pandas as pd
-
-import threading
-import time
 import re
+
+
+# Launches async task and triggers rate limiter 
+async def launch_rate_limited(function, num_of_func_requests: int = 1):
+    global sec_rate_limit_counter
+    while sec_rate_limit_counter >= sec_rate_limit:
+        await asyncio.sleep(0)
+    sec_rate_limit_counter += num_of_func_requests
+    launch_rate_count_timer(num_of_func_requests)
+    result = await function()
+    return result
+
+# Launches sync task and triggers rate limiter 
+async def launch_rate_limited_sync_func(function, num_of_func_requests: int = 1):
+    global sec_rate_limit_counter
+    await asyncio.sleep(0)
+    while sec_rate_limit_counter >= sec_rate_limit:
+        await asyncio.sleep(0)
+    sec_rate_limit_counter += num_of_func_requests    
+    launch_rate_count_timer(num_of_func_requests)
+    result = function()
+    return result
+
+# Launches task that decreases rate limit counter after some time
+def launch_rate_count_timer(instances: int = 1):
+    for i in range(instances):
+        asyncio.create_task(elapse_rate_limit_count())
+
+# Function that decreases rate limit counter after some time
+async def elapse_rate_limit_count():
+    global sec_rate_limit_counter
+    await asyncio.sleep(0.2)
+    sec_rate_limit_counter -= 1
+
 
 # Creating a class for filing information
 class FilingObject():
@@ -133,20 +172,28 @@ async def get_sec_filing_object(filing_info : FilingObject):
     CustomCompanyFiling
         A custom CompanyFiling object with the specified ticker and year
     """
+    global sec_rate_limit, sec_rate_limit_counter
+    if sec_rate_limit_counter >= sec_rate_limit:
+        print("SEC rate limit exceeded")
 
-    rate_limiter = RateLimiter(rate_limit=2)
-    rate_limiter.acquire()
+    while sec_rate_limit_counter >= sec_rate_limit:
+        await asyncio.sleep(0)
     try:
 
+        sec_rate_limit_counter += 1
+        launch_rate_count_timer(1)
+        
         set_identity("{} {}".format("SECRag", "secrag.info@gmail.com"))
-        entity = await get_entity(filing_info.ticker)
+        entity: EntityData = await launch_rate_limited(lambda: get_entity(filing_info.ticker), 3)
+        await asyncio.sleep(0.1)
 
         sec_filing = entity.get_filings(form=filing_info.filing_type, date=filing_info.filing_date)[0]
        
         await asyncio.sleep(0)
         # Try retrieving financials. If it fails, return None 
-        xbrl = await atry_except(lambda: sec_filing.xbrl()) 
+        xbrl: Optional[Union[XBRLData, XBRLInstance]] = await launch_rate_limited(lambda: atry_except(lambda: sec_filing.xbrl()))
 
+        await asyncio.sleep(0.1)
         if xbrl: 
             financials = Financials(xbrl)
         else: financials = None
@@ -163,11 +210,12 @@ async def get_sec_filing_object(filing_info : FilingObject):
         await asyncio.sleep(0)
 
         # Initialize the CustomCompanyFiling object to return
+        markdown = await launch_rate_limited_sync_func(lambda: sec_filing.markdown())        
         sec_filing_object = SECFilingObject(
             filing = sec_filing,
             file_number=sec_filing.file_number, 
             filing_html = "",
-            markdown = sec_filing.markdown(),
+            markdown = markdown,
             cik=sec_filing.cik, 
             ticker=filing_info.ticker, 
             filing_type=filing_info.filing_type,
@@ -181,45 +229,13 @@ async def get_sec_filing_object(filing_info : FilingObject):
             statement_of_comprehensive_income=statement_of_comprehensive_income 
         )
         await asyncio.sleep(0)
-
+        
 
         return sec_filing_object
     except Exception as e: 
-        log('critical', traceback.format_exc())
-        log('critical', str(e))
-    finally:
-        rate_limiter.release()   
-
-
-# Creating a class for rate limiting
-class RateLimiter:
-    def __init__(self, rate_limit):
-        self.rate_limit = rate_limit  # Maximum number of calls per second
-        self.semaphore = threading.Semaphore(rate_limit)
-        self.lock = threading.Lock()
-        self.reset_time = time.time() + 1
-
-    def current_time(self):
-        """Helper function to get current time in yyyy-mm-dd : hh-mm-ss.ms format."""
-        return datetime.now().strftime('%Y-%m-%d : %H-%M-%S.%f')[:-3]
-
-    def acquire(self):
-        with self.lock:
-            current_time = time.time()
-            if current_time >= self.reset_time:
-                # Reset the semaphore and reset_time every second
-                self.semaphore = threading.Semaphore(self.rate_limit)
-                self.reset_time = current_time + 1
-
-        # Check if semaphore is already exhausted
-        if self.semaphore._value == 0:
-            log('warning', f"Rate limit exceeded at {self.current_time()} - waiting for capacity")
-
-        # Block until semaphore is acquired (no timeout, it will wait)
-        self.semaphore.acquire()
-
-    def release(self):
-        self.semaphore.release()
+        log('info', traceback.format_exc())
+        log('info', str(e))
+        print(traceback.format_exc(),str(e))
 
 
 # Custom character text splitter for SEC filings
