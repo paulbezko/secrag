@@ -129,10 +129,11 @@ async def process_filing(filing: Filing):
 
 async def main():
     i = 0
+    start_year = 2024
     while i < 5:
-        year = 2024 - i
+        year = start_year - i
         print("processing year", year)
-        filings = get_filings(form=["10-K", "10-Q"], year=2024-i)
+        filings = get_filings(form=["10-K", "10-Q"], year=year)
         i += 1
         await asyncio.sleep(0.15)
         # list_filings = filings.to_list()
