@@ -62,7 +62,7 @@
         <img src="../assets/home/stopwatch_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
       </div>
     </div>
-    <div class="flex-column center gap-4 fade-in" style="padding-top: 20rem; padding-inline: 2rem;">
+    <div class="flex-column center gap-4 fade-in light-dark-mode" style="padding-top: 20rem; padding-inline: 2rem;">
       <div class="text-2 text-center">~ We provide access to filings for any public company. No matter which one you're looking for, we have it. ~</div>
       <div class="flex-row width-100 show-on-large">
         <div class="flex-row width-100 space-between">

@@ -187,17 +187,15 @@ async def get_captcha_get(token: str):
 
 
 @routes.get('/get-policy')
-def get_policy_get():
-
-    policy = policy
+def get_policy_get(policy: str):
 
     with open(f"database/policies/{policy}.md", encoding="utf-8", mode="r") as f:
         content = f.read()
 
     variables = {
-        "project_name": "SECRag",
+        "project_name": "SECRAG",
         "company_name": "Manart",
-        "email_support": "secrag.info@gmail.com"
+        "email_support": "contact@secrag.com"
     }
 
     return Template(content).render(variables)
