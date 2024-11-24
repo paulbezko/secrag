@@ -766,7 +766,7 @@ async def get_entity(entity_identifier: IntString, include_old_filings: bool = T
 
     if is_cik:
         # Cast to int to handle zero-padding
-        return EntityData.for_cik(int(entity_identifier), include_old_filings=include_old_filings)
+        return await EntityData.for_cik(int(entity_identifier), include_old_filings=include_old_filings)
 
     # Get by ticker
     is_ticker = isinstance(entity_identifier, str) and re.match("[A-Za-z]{1,6}", entity_identifier, re.IGNORECASE)
