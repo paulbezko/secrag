@@ -78,7 +78,7 @@ a {
     --color-grey-dark: #757575;  /* Lighter grey-dark for borders */
     --color-black: #dddddd;  /* Very light text on dark background */
 
-    --shadow: -10px -10px 20px var(--color-grey-dark), 10px 10px 20px var(--color-grey-dark);
+    --shadow: -10px -10px 20px var(--color-white), 10px 10px 20px var(--color-white);
   }
 }
 
@@ -888,5 +888,9 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
     border: 1px solid var(--color-blue-highlight);
     background-color: var(--color-blue-dark);
     color: var(--color-black);
+  }
+
+  .light-dark-mode img {
+    filter: brightness(0) invert(1); /* This inverts the colors of images to white (i.e., turns dark logos into light ones) */
   }
 }
