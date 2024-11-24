@@ -87,7 +87,7 @@ async def process_filing(filing: Filing):
             await asyncio.sleep(0.15)
             xbrl = await atry_except(lambda: filing.xbrl())
             
-            financials = Financials(xbrl)
+            financials = try_except(lambda: Financials(xbrl))
             balance_sheet = try_except(lambda: financials.get_balance_sheet().get_dataframe())
 
             income_statement = try_except(lambda: financials.get_income_statement().get_dataframe())
