@@ -59,10 +59,7 @@ async def new_chat_post(request: Request):
     socket_id = socket_id
     await socketio.emit('new_chat_started', to=socket_id)
 
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    if user_info['email'] not in memory: memory[user_info['email']] = {}
-    memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
-    
+
     await socketio.emit('new_chat_initialized', to=socket_id)
     filing = get_filing(filing_id=chat, filing_date=filing_date, filing_cik=cik)
     await socketio.emit('new_chat_downloaded', to=socket_id)
@@ -73,6 +70,9 @@ async def new_chat_post(request: Request):
     await socketio.emit('new_chat_vectorized', to=socket_id)
 
     # Save initialized chat only if vectorstore manager succeeded allocation
+    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    if user_info['email'] not in memory: memory[user_info['email']] = {}
+    memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
     with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
 
     log('debug', f'New chat created for {user_info["email"]}: {chat}')
