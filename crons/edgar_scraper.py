@@ -1,8 +1,8 @@
 from dateutil.relativedelta import relativedelta
-from edgar.core import set_identity
+from ..server.lib_secrag.edgar.core import set_identity
 from datetime import datetime, timezone
 from logger import log, configure_logger
-from edgar import get_filings
+from ..server.lib_secrag.edgar import get_filings
 
 import traceback
 import requests
@@ -11,6 +11,11 @@ import json
 import pytz
 import time
 import os
+
+import sys
+
+# Add the path to custom libs
+sys.path.append("server/lib_secrag")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_directory = "database/memory"
@@ -26,7 +31,7 @@ def get_json_ciks_tickers():
     json_ciks_tickers = {}
     for key, value in json_data.items():
         if '-' in json_data[key]['ticker']: continue # Removing all tickers that have a dash in them
-        json_ciks_tickers[json_data[key]['cik_str']] = f"{json_data[key]['ticker']} | {json_data[key]['title']}"
+        json_ciks_tickers[json_data[key]['cik_str']] = f"{json_data[key]['ticker']} | {json_data[key]['cik_str']} | {json_data[key]['title']}"
 
     return json_ciks_tickers
 
