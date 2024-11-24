@@ -55,6 +55,33 @@ a {
   --shadow: -10px -10px 20px var(--color-black),  10x 10px 20px var(--color-black);
 }
 
+/* Dark mode variables */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-yellow-dark: #b88600;
+    --color-yellow: #FFB81C;  /* Slightly muted yellow */
+    --color-yellow-light: #FFDA4D;  /* Softer, less bright */
+    --color-yellow-highlight: #2c2b20;  /* Lighter yellow for highlights */
+
+    --color-red: #E57373;  /* Softer red for warnings */
+    --color-green: #81C784;  /* Softer green for success */
+
+    --color-blue-dark: #0d1b2a;  /* Darker blue background */
+    --color-blue: #1e2a47;  /* Slightly muted blue for sections */
+    --color-blue-light: #2a3a67;  /* Lighter shade of blue for buttons and highlights */
+    --color-blue-highlight: #3f649b;  /* Muted, softer blue highlight */
+
+    --color-white: #13151a;  /* Slightly softer white for dark mode */
+    --color-grey-light: #161a24;  /* Softer dark grey background */
+    --color-grey: #424242;  /* Muted mid-grey for text */
+    --color-grey-semidark: #616161;  /* Softer semi-dark grey */
+    --color-grey-dark: #757575;  /* Lighter grey-dark for borders */
+    --color-black: #dddddd;  /* Very light text on dark background */
+
+    --shadow: -10px -10px 20px var(--color-white), 10px 10px 20px var(--color-white);
+  }
+}
+
 hr {
   border: none;
 }
@@ -763,7 +790,7 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
   left: 0;
   right: 0;
   overflow-y: auto;
-  background-color: white;
+  background-color: var(--color-white);
   border: 1px solid var(--color-grey);
   border-top: none;
   border-radius: 1rem;
@@ -779,4 +806,91 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
 
 .suggestion-item:hover {
   background-color: var(--color-grey-light);
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .shadow {box-shadow: 0px 0px 40px var(--color-white)}
+  .shadow-wide {box-shadow: 0px 0px 200px 2px var(--color-white);}
+
+  .button-primary {background-color: var(--color-yellow); color: var(--color-white)}
+  .button-primary:hover {background-color: var(--color-yellow-light); color: var(--color-white)}
+  .button-secondary {background-color: var(--color-blue); color: var(--color-black)}
+  .button-secondary:hover {background-color: var(--color-blue-dark); color: var(--color-black)}
+
+  .button-disabled {cursor: default; color: var(--color-grey-dark) !important; background-color: var(--color-grey) !important;}
+
+  .text-link:hover *,
+  .text-link:hover {
+    color: var(--color-yellow);
+  }
+
+  .text-link.encouraged:hover *,
+  .text-link.encouraged:hover {
+    color: var(--color-yellow);
+  }
+
+  .text-link.discouraged:hover,
+  .text-link.discouraged:hover  * {
+    color: var(--color-red);
+  }
+
+  .input:focus,
+  .input:hover,
+  .input:active {
+    outline: none;
+    font-size: var(--text-3);
+    border: 1px solid var(--color-blue-highlight);
+    background-color: var(--color-blue-dark)
+  }
+
+  .button-icon:hover {
+    color: var(--color-yellow-dark);
+    /* border: 1px solid var(--color-yellow);
+    box-shadow: inset 0px 0px 0px 2px var(--color-yellow); */
+    background-color: var(--color-yellow-highlight);
+    border: 1px solid var(--color-yellow-dark);
+  }
+
+  .icon-link:hover {
+    color: var(--color-yellow);
+  }
+
+  .button-card:hover {
+    border: 1px solid var(--color-blue-highlight); 
+    background-color: var(--color-blue-dark); 
+    color: var(--color-blue-highlight);
+  }
+  
+  .button-card.active {
+    border: 1px solid var(--color-yellow-dark); 
+    background-color: var(--color-yellow-highlight); 
+    color: var(--color-yellow-dark);
+  }
+
+  .selected-option {
+    background: var(--color-yellow-highlight);
+    border: 1px solid var(--color-yellow-dark);
+    color: var(--color-yellow-dark);
+  }
+
+  .sidebar-element:hover,
+  .sidebar-element.active {
+    background-color: var(--color-blue);
+    border-radius: .5rem;
+    cursor: pointer;
+  }
+
+  textarea:focus,
+  textarea:hover,
+  textarea:active {
+    outline: none;
+    border: 1px solid var(--color-blue-highlight);
+    background-color: var(--color-blue-dark);
+    color: var(--color-black);
+  }
+
+  .light-dark-mode img {
+    filter: brightness(0) invert(1); /* This inverts the colors of images to white (i.e., turns dark logos into light ones) */
+  }
 }

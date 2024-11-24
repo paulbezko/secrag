@@ -513,6 +513,8 @@ export default {
       try {
 
         this.newChatLoading = true;
+        this.selectedOption = '';
+        this.selectedType = 'Name';
         this.selectedTicker = '';
         this.selectedYear = '';
         this.selectedFiling = '';
