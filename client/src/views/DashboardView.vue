@@ -524,7 +524,9 @@ export default {
           ticker: selectedTicker,
           cik: selectedCIK,
           socketId: this.socketId
-        }, timeout = 120000);
+        }, {
+          timeout: 120000
+        });
 
         if (response.data.error) {
           if (response.data.error === 'Insufficient Tokens') {this.confirmAction = 'insufficientTokens', this.showConfirm = true}
