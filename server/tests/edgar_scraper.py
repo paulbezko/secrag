@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 
@@ -74,9 +75,11 @@ async def atry_except(func, default=None, expected_exc=(Exception,)):
 
 async def process_filing(filing: Filing):
             print(f"Processing {filing.cik} {filing.form} {filing.filing_date}")
-
+            filing_form = filing.form.replace("/","")  
+            if os.path.exists(f"database/bulk/markdowns/{filing.cik}_{filing_form}_{filing.filing_date}.md"):
+                 return
+            
             f_html = filing.html()
-            filing_form = filing.form.replace("/","")
             with open(f"database/bulk/htmls/{filing.cik}_{filing_form}_{filing.filing_date}.html", "w") as f:
                 f.write(f_html)
             
