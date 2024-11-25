@@ -412,7 +412,7 @@ export default {
       if ((!this.selectedTicker || !this.selectedYear || !this.selectedFiling) && !this.selectedNewFiling) {return}
       if (this.chats.length === 1) {this.error = 'You can only have one chat in preview mode.'; return}
 
-      let selectedTicker, selectedYear, selectedDate, selectedFilingType
+      let selectedTicker, selectedCIK, selectedYear, selectedDate, selectedFilingType
 
       if (this.selectedNewFiling) {
         [selectedTicker, selectedFilingType, selectedDate] = this.selectedNewFiling.split(" ");
@@ -422,6 +422,7 @@ export default {
 
       else {
         selectedTicker = this.selectedTicker.split(" | ")[0]
+        selectedCIK = this.selectedTicker.split(" | ")[1]
         selectedYear = this.selectedYear
         selectedFilingType = this.selectedFiling.split(' ')[0].replace('-', '')
         selectedDate = this.selectedFiling.split(' ')[1]
@@ -444,6 +445,7 @@ export default {
           chat: newChatName,
           filingDate: selectedDate,
           ticker: selectedTicker,
+          cik: selectedCIK,
           socketId: this.socketId
         });
 

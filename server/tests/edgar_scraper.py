@@ -22,7 +22,7 @@ from lib_secrag.edgar.core import set_identity
 from lib_secrag.edgar import get_filings
 import asyncio
 
-set_identity("{} {}".format("SECRAG", "secrag.info@gmail.com"))
+# set_identity("{} {}".format("SECRAG", "secrag.info@gmail.com"))
 
 sec_rate_limit = 1
 sec_rate_limit_counter = 0
@@ -80,8 +80,8 @@ async def process_filing(filing: Filing):
                  return
             
             f_html = filing.html()
-            with open(f"database/bulk/htmls/{filing.cik}_{filing_form}_{filing.filing_date}.html", "w") as f:
-                f.write(f_html)
+            # with open(f"database/bulk/htmls/{filing.cik}_{filing_form}_{filing.filing_date}.html", "w") as f:
+            #     f.write(f_html)
             
             f_md = html_to_markdown(f_html)
             with open(f"database/bulk/markdowns/{filing.cik}_{filing_form}_{filing.filing_date}.md", "w") as f:
@@ -128,17 +128,13 @@ async def process_filing(filing: Filing):
             await asyncio.sleep(0.15)
 
 async def main():
-    i = 0
-    start_year = 2024
-    while i < 5:
-        year = start_year - i
-        print("processing year", year)
-        filings = get_filings(form=["10-K", "10-Q"], year=year)
-        i += 1
-        await asyncio.sleep(0.15)
-        # list_filings = filings.to_list()
-        for filing in filings:
-            await process_filing(filing)
+    year = 2019
+    print("processing year", year)
+    filings = get_filings(form=["10-K", "10-Q"], year=year)
+    await asyncio.sleep(0.15)
+    # list_filings = filings.to_list()
+    for filing in filings:
+        await process_filing(filing)
 
 
 if __name__ == "__main__":

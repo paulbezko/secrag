@@ -154,7 +154,7 @@ class XBRLAttachments:
 
     @staticmethod
     async def download_and_parse(doc_type: str, parser, url: str):
-        content = await download_file_async(url)
+        content = await download_file_async(url, path='')
         return {doc_type: parser(content)}
 
     @staticmethod
