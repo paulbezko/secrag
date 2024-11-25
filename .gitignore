@@ -44,6 +44,7 @@ cython_debug/
 
 client/dist
 crons/logs/*
+database/bulk/*
 database/memory/chats.json
 database/filings/*
 database/markdowns/*

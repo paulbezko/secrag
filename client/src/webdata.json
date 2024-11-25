@@ -7,7 +7,7 @@
             "name": "Guide",
             "priceMonthly": 10,
             "features": [
-            "10-K report analysis",
+            "10-K / 10-Q analysis",
             "Unlimited chats",
             "1200 monthly tokens"
             ]
@@ -17,7 +17,6 @@
             "priceMonthly": 20,
             "features": [
             "All Guide features",
-            "10-Q report analysis",
             "2400 monthly tokens"
             ]
         }
