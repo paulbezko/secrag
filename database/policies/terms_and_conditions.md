@@ -1,6 +1,6 @@
 # Terms of Service
 
-*Last updated: January 6, 2023*
+*Last updated: November 25, 2024*
 
 From everyone at {{ project_name }}, thank you for using our products! We build them to help you do your best work. Because we don’t know every one of our customers personally, we have to put in place some Terms of Service to help keep the ship afloat.
 

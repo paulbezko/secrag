@@ -42,6 +42,10 @@
                 <div class="fa-solid fa-file-pen text-center sidebar-element-icon" style="min-width: 2rem;"></div>
                 <div :class="isSmallScreen ? 'text-3' : 'text-4'">New Chat</div>
               </div>
+              <router-link to="/signup" class="flex-row gap-05 sidebar-element menu accent" style="align-items: center;">
+                <div class="fa-solid fa-star text-center sidebar-element-icon" style="min-width: 2rem;"></div>
+                <div class="text-bold" :class="isSmallScreen ? 'text-3' : 'text-4'">Analyze Any Filing</div>
+              </router-link>
             </div>
             <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
             <div class="flex-column gap-1">
@@ -345,7 +349,7 @@ export default {
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 175; 
+      const headerHeight = 208; 
       if (this.isSmallScreen) {heightAdjustment = -52;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
