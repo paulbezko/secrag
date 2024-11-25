@@ -42,7 +42,9 @@ a {
 
   --color-blue-dark: #001E3D;
   --color-blue: #002E5D;
-  --color-blue-light: #004386;
+  --color-blue-light: #133392;
+  --color-blue-semilighter: #ccd2e7;
+  --color-blue-lighter: #dbdfeb;  /* Lighter shade of blue for buttons and highlights */
   --color-blue-highlight: #e5eef7;
 
   --color-white: #FFFFFF;
@@ -60,7 +62,7 @@ a {
   :root {
     --color-yellow-dark: #b88600;
     --color-yellow: #FFB81C;  /* Slightly muted yellow */
-    --color-yellow-light: #FFDA4D;  /* Softer, less bright */
+    --color-yellow-light: #fcca34;  /* Softer, less bright */
     --color-yellow-highlight: #2c2b20;  /* Lighter yellow for highlights */
 
     --color-red: #E57373;  /* Softer red for warnings */
@@ -69,6 +71,8 @@ a {
     --color-blue-dark: #0d1b2a;  /* Darker blue background */
     --color-blue: #1e2a47;  /* Slightly muted blue for sections */
     --color-blue-light: #2a3a67;  /* Lighter shade of blue for buttons and highlights */
+    --color-blue-semilighter: #283155;
+    --color-blue-lighter: #212941;  /* Lighter shade of blue for buttons and highlights */
     --color-blue-highlight: #3f649b;  /* Muted, softer blue highlight */
 
     --color-white: #13151a;  /* Slightly softer white for dark mode */
@@ -290,12 +294,17 @@ code {
   transition: all 0.2s ease;
 }
 
+.button-navbar {
+  /* font-family: "Roboto Serif", serif; */
+  /* font-weight: 500; */
+}
+
 .button-disabled {cursor: default; color: var(--color-grey-semidark) !important; background-color: var(--color-grey) !important;}
 
 .button-primary {background-color: var(--color-yellow); color: var(--color-black)}
 .button-primary:hover {background-color: var(--color-yellow-light); color: var(--color-black)}
-.button-secondary {background-color: var(--color-blue); color: var(--color-grey-light)}
-.button-secondary:hover {background-color: var(--color-blue-dark); color: var(--color-grey-light)}
+.button-secondary {background-color: var(--color-blue-lighter); color: var(--color-blue-dark)}
+.button-secondary:hover {background-color: var(--color-blue-semilighter); color: var(--color-blue-dark)}
 
 .button-card {
   max-width: 100%;
@@ -669,6 +678,10 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
   cursor: pointer;
 }
 
+.sidebar-element.accent {
+  background-color: var(--color-blue-highlight);
+}
+
 .sidebar-element-icon {
   background-color: var(--color-white);
   padding: .3rem;
@@ -815,8 +828,8 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
 
   .button-primary {background-color: var(--color-yellow); color: var(--color-white)}
   .button-primary:hover {background-color: var(--color-yellow-light); color: var(--color-white)}
-  .button-secondary {background-color: var(--color-blue); color: var(--color-black)}
-  .button-secondary:hover {background-color: var(--color-blue-dark); color: var(--color-black)}
+  .button-secondary {background-color: var(--color-blue-lighter); color: var(--color-black)}
+  .button-secondary:hover {background-color: var(--color-blue-semilighter); color: var(--color-black)}
 
   .button-disabled {cursor: default; color: var(--color-grey-dark) !important; background-color: var(--color-grey) !important;}
 
