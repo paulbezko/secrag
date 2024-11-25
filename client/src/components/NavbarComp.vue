@@ -4,7 +4,7 @@
       <div class="flex-row width-100" style="justify-content: space-between;">
         <div class="flex-row center gap-2">
           <router-link class="text-3 text-bold text-link" to="/">{{projectName}}</router-link>
-          <router-link class="text-3 show-on-large text-link" v-if="!authenticated" to="/preview">Try it out</router-link>
+          <router-link class="text-3 show-on-large text-link" v-if="!authenticated" to="/preview">Try for free</router-link>
           <div class="text-3" style="color: transparent" v-if="authenticated && !subscribed">Dashboard</div>
           <router-link class="text-3 show-on-large text-link" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
         </div>
@@ -14,7 +14,7 @@
           <router-link class="text-3 text-link" to="/#contact">Contact</router-link>
         </div>
         <div class="flex-row gap-2 show-on-large">
-          <router-link class="text-3 text-link" v-if="!authenticated" to="/login">Sign In</router-link>
+          <router-link class="button button-navbar button-secondary" v-if="!authenticated" to="/signup">Sign Up</router-link>
           <router-link class="text-3 text-link" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
           <div class="text-3" style="color: transparent" v-if="authenticated && subscribed">Subscribe</div>
           <div class="text-3 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>

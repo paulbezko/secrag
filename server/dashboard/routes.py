@@ -91,13 +91,14 @@ async def new_chat_preview_post(request: Request):
     chat = data.get("chat")
     socket_id = data.get("socketId")
     filing_date = data.get("filingDate")
+    cik = data.get("cik")
 
     from app import socketio
     socket_id = socket_id
     await socketio.emit('new_chat_started', to=socket_id)
     
     await socketio.emit('new_chat_initialized', to=socket_id)
-    filing = get_filing(filing_id=chat, filing_date=filing_date)
+    filing = get_filing(filing_id=chat, filing_date=filing_date, filing_cik=cik)
     await socketio.emit('new_chat_downloaded', to=socket_id)
     try:
         await vectorstore_manager.new_chat(filing)
