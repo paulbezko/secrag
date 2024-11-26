@@ -12,6 +12,7 @@
           <router-link class="text-3 text-link" to="/#about">About</router-link>
           <router-link class="text-3 text-link" to="/#faq">FAQ</router-link>
           <router-link class="text-3 text-link" to="/#contact">Contact</router-link>
+          <a class="text-3 text-link" href="https://open.spotify.com/show/69BXlAfewT4Pdeja7YDYdz">Podcast</a>
         </div>
         <div class="flex-row gap-2 show-on-large">
           <router-link class="button button-navbar button-secondary" v-if="!authenticated" to="/signup">Sign Up</router-link>
