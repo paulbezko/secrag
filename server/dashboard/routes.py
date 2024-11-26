@@ -272,10 +272,15 @@ async def new_message_user_preview_post(request: Request):
     filing_date = data.get("filingDate")
     token = data.get("token")
 
+    client_ip = request.client.host
+    forwarded_for = request.headers.get('X-Forwarded-For')
+    if forwarded_for:
+        client_ip = forwarded_for.split(',')[0].strip()
+
     from app import socketio
     message_history = (last_x_messages)
 
-    get_assistant_response(
+    llm_response = await get_assistant_response(
         user_prompt = message,
         message_history = message_history,
         filing_id = chat,
@@ -283,6 +288,15 @@ async def new_message_user_preview_post(request: Request):
         filing_date = filing_date,
         socketio_handler=socketio
     )
+    # Some idea for logging preview chat data
+    
+    # data = {
+    #     "client_ip": client_ip,
+    #     "chat": chat,
+    #     "prompt": message,
+    #     "response": llm_response
+    # }
+    # mongodb.push(data)
 
     return JSONResponse(content={'success': True})
 
