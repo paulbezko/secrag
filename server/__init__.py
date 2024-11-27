@@ -90,8 +90,6 @@ def create_app(mode: str):
     config['STRIPE_PRODUCT_PREMIUM_YEARLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_YEARLY')
     config['STRIPE_PRODUCT_REPLENISH'] = os.getenv('STRIPE_PRODUCT_REPLENISH')
 
-    config['MONGO_URI'] = os.getenv('MONGO_URI')
-
     config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
 
     config['INIT_LOGS_SENT'] = False
