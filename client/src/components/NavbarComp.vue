@@ -14,7 +14,7 @@
         </div>
         <div class="flex-row gap-2 show-on-large">
           <router-link class="button button-navbar button-secondary" v-if="!authenticated" to="/signup">Sign Up</router-link>
-          <router-link class="text-3 text-link" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
+          <router-link class="text-3 text-link" style="color: var(--color-yellow)" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
           <router-link class="text-3 show-on-large text-link" style="color: var(--color-yellow)" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
           <div class="text-3 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>
         </div>
