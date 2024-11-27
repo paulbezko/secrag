@@ -1,9 +1,9 @@
-from .utils.miscellaneous import save_message
+from .utils.miscellaneous import save_message, get_user_ip
 from .utils.vectorstore import vectorstore_manager
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
 from .utils.llm import get_assistant_response
-from .utils.mongo import mongo_insert_message, mongo_get_messages_by_chat, mongo_get_chats_by_email, mongo_insert_chat, mongo_reset_chat, mongo_delete_chat, mongo_log_response
+from .utils.mongo import mongo_insert_message, mongo_get_messages_by_chat, mongo_get_chats_by_user_id, mongo_insert_chat, mongo_reset_chat, mongo_delete_chat, mongo_log_response
 from ..lib_secrag.edgar.entities import get_entity
 from ..globals import config, mongo
 import json
@@ -25,8 +25,7 @@ def get_chats_get(token: str):
     # else:
     #     chats = []
 
-    print('ass')
-    response = mongo_get_chats_by_email(mongo.collection_messages_authenticated, user_info['email'])
+    response = mongo_get_chats_by_user_id(mongo.collection_messages_authenticated, user_info['email'])
     if 'error' in response:
         mongo_log_response(response)
         return JSONResponse(content={'error': 'Something went wrong with chat retrieval.'})
@@ -110,6 +109,8 @@ async def new_chat_preview_post(request: Request):
     filing_date = data.get("filingDate")
     cik = data.get("cik")
 
+    user_ip = get_user_ip(request)
+
     from app import socketio
     socket_id = socket_id
     await socketio.emit('new_chat_started', to=socket_id)
@@ -122,6 +123,10 @@ async def new_chat_preview_post(request: Request):
     except:
         return JSONResponse(content={'error': "Unparsable filing"})    
     await socketio.emit('new_chat_vectorized', to=socket_id)
+
+    response = mongo_insert_chat(mongo.collection_messages_anonymous, user_ip, None, chat, filing_date)
+    mongo_log_response(response)
+    if 'error' in response: return JSONResponse(content={'error': 'Something went wrong with chat creation.'})
 
     return JSONResponse(content={'success': True})
 
@@ -280,7 +285,7 @@ async def new_message_user_post(request: Request):
     # message_history_json = [message['content'] for message in message_history_json if 'content' in message]
     # save_message(email = user_info["email"], chat = chat, role = 'user', message = message)
 
-    response = mongo_insert_message(mongo.collection_messages_authenticated, email = user_info["email"], chat_id = chat, role = 'user', content = message)
+    response = mongo_insert_message(mongo.collection_messages_authenticated, user_info["email"], chat, 'user', message)
     mongo_log_response(response)
     if 'error' in response:
         return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
@@ -312,10 +317,17 @@ async def new_message_user_preview_post(request: Request):
     filing_date = data.get("filingDate")
     token = data.get("token")
 
+    user_ip = get_user_ip(request)
+
     from app import socketio
     message_history = (last_x_messages)
 
-    get_assistant_response(
+    response = mongo_insert_message(mongo.collection_messages_anonymous, user_ip, chat, 'user', message)
+    mongo_log_response(response)
+    if 'error' in response:
+        return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
+
+    await get_assistant_response(
         user_prompt = message,
         message_history = message_history,
         filing_id = chat,
@@ -337,9 +349,7 @@ async def new_message_assistant_post(request: Request):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    # save_message(email = user_info["email"], chat = chat, role = 'assistant', message = message)
-
-    response = mongo_insert_message(mongo.collection_messages_authenticated, email = user_info["email"], chat_id = chat, role = 'assistant', content = message)
+    response = mongo_insert_message(mongo.collection_messages_authenticated, user_info["email"], chat, 'assistant', message)
     mongo_log_response(response)
     if 'error' in response:
         return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
@@ -347,3 +357,17 @@ async def new_message_assistant_post(request: Request):
     return JSONResponse(content={'success': True})
 
 
+@routes.post('/new-message-assistant-preview')
+async def new_message_assistant_preview_post(request: Request):
+    data = await request.json()
+    message = data.get("message")
+    chat = data.get("chat")
+
+    user_ip = get_user_ip(request)
+
+    response = mongo_insert_message(mongo.collection_messages_anonymous, user_ip, chat, 'assistant', message)
+    mongo_log_response(response)
+    if 'error' in response:
+        return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
+
+    return JSONResponse(content={'success': True})
