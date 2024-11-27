@@ -1,8 +1,13 @@
+import sys
+# Add the path to custom libs
+sys.path.append("server/lib_secrag")
+sys.path.append(".")
+
 from dateutil.relativedelta import relativedelta
-from ..server.lib_secrag.edgar.core import set_identity
+from server.lib_secrag.edgar.core import set_identity
 from datetime import datetime, timezone
 from logger import log, configure_logger
-from ..server.lib_secrag.edgar import get_filings
+from server.lib_secrag.edgar import get_filings
 
 import traceback
 import requests
@@ -12,10 +17,6 @@ import pytz
 import time
 import os
 
-import sys
-
-# Add the path to custom libs
-sys.path.append("server/lib_secrag")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_directory = "database/memory"
@@ -68,7 +69,7 @@ def refresh_filings(json_ciks_tickers, period_type, period):
             year = str(filing.filing_date)[:4]
 
             # Appending to new json
-            json_filings_new.append(f"{ticker_title.split(" | ")[0]} {filing.form} {filing.filing_date}")
+            json_filings_new.append(f"{ticker_title.split(" | ")[0]} | {filing.cik} | {filing.company} | {filing.form} | {filing.filing_date}")
 
             # Appending to available json
             if ticker_title not in json_filings: json_filings[ticker_title] = {}
