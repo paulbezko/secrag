@@ -597,8 +597,19 @@ export default {
         this.assistantMessageBeingRendered = false;
         if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
         this.userHasScrolled = false;
+        let response = await axios.post(`${config.apiUrl}/api/new-message-assistant-preview`, {
+          chat: this.activeChat,
+          message: this.llmResponseBuffer,
+        });
+        
+        if (response.data.error) {
+          console.log(response.data.error);
+          return;
+        }
+
         this.stopButtonShown = false;
         this.llmResponseBuffer = '';
+
       } catch (error) {
         console.error('Error sending message:', error);
       }
