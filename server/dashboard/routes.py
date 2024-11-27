@@ -3,8 +3,9 @@ from .utils.vectorstore import vectorstore_manager
 from ..general.utils import encode_token, decode_token, execute_query, log
 from .utils.secedgar import get_filing
 from .utils.llm import get_assistant_response
+from .utils.mongo import mongo_insert_message, mongo_get_messages_by_chat, mongo_get_chats_by_email, mongo_insert_chat, mongo_reset_chat, mongo_delete_chat, mongo_log_response
 from ..lib_secrag.edgar.entities import get_entity
-from ..globals import config
+from ..globals import config, mongo
 import json
 
 from fastapi import APIRouter, Request
@@ -18,12 +19,19 @@ def get_chats_get(token: str):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    if user_info['email'] in memory:
-        chats = list(reversed(memory[user_info['email']].keys()))
-    else:
-        chats = []
-    return JSONResponse(content={'chats': chats})
+    # with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # if user_info['email'] in memory:
+    #     chats = list(reversed(memory[user_info['email']].keys()))
+    # else:
+    #     chats = []
+
+    print('ass')
+    response = mongo_get_chats_by_email(mongo.collection_messages_authenticated, user_info['email'])
+    if 'error' in response:
+        mongo_log_response(response)
+        return JSONResponse(content={'error': 'Something went wrong with chat retrieval.'})
+
+    return JSONResponse(content={'chats': response})
 
 
 @routes.get('/get-messages')
@@ -32,10 +40,16 @@ def get_messages_get(chat: str, token: str):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    messages = memory[user_info['email']][chat]['messages']
-    filing_date = memory[user_info['email']][chat]['filing_date']
-    return JSONResponse(content={'messages': messages, 'filing_date': filing_date})
+    # with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # messages = memory[user_info['email']][chat]['messages']
+    # filing_date = memory[user_info['email']][chat]['filing_date']
+
+    response = mongo_get_messages_by_chat(mongo.collection_messages_authenticated, user_info['email'], chat)
+    if 'error' in response:
+        mongo_log_response(response)
+        return JSONResponse(content={'error': 'Something went wrong with message retrieval.'})
+
+    return JSONResponse(content=response)
 
 
 @routes.post('/new-chat')
@@ -59,7 +73,6 @@ async def new_chat_post(request: Request):
     socket_id = socket_id
     await socketio.emit('new_chat_started', to=socket_id)
 
-
     await socketio.emit('new_chat_initialized', to=socket_id)
     filing = get_filing(filing_id=chat, filing_date=filing_date, filing_cik=cik)
     await socketio.emit('new_chat_downloaded', to=socket_id)
@@ -70,10 +83,14 @@ async def new_chat_post(request: Request):
     await socketio.emit('new_chat_vectorized', to=socket_id)
 
     # Save initialized chat only if vectorstore manager succeeded allocation
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    if user_info['email'] not in memory: memory[user_info['email']] = {}
-    memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
-    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+    # with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # if user_info['email'] not in memory: memory[user_info['email']] = {}
+    # memory[user_info['email']][chat] = {'filing_date': filing_date, 'messages': [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]}
+    # with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    response = mongo_insert_chat(mongo.collection_messages_authenticated, user_info['email'], user_info['name'], chat, filing_date)
+    mongo_log_response(response)
+    if 'error' in response: return JSONResponse(content={'error': 'Something went wrong with chat creation.'})
 
     log('debug', f'New chat created for {user_info["email"]}: {chat}')
     query = f"UPDATE users_{config.get('MODE')} SET subscription_tokens_left = %s WHERE email = %s"
@@ -145,10 +162,18 @@ async def get_filing_get(token: str, chat: str):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # ticker, year, form_raw = chat.split('-')
+    # filing_date = memory[user_info['email']][chat]['filing_date']
+
+    response = mongo_get_messages_by_chat(mongo.collection_messages_authenticated, user_info['email'], chat)
+    if 'error' in response:
+        mongo_log_response(response)
+        return JSONResponse(content={'error': 'Something went wrong with filing retrieval.'})
 
     ticker, year, form_raw = chat.split('-')
-    filing_date = memory[user_info['email']][chat]['filing_date']
+    filing_date = response['filing_date']
+
     if form_raw == '10K': form = '10-K'
     elif '10Q' in form_raw: form = '10-Q'
 
@@ -201,9 +226,14 @@ async def reset_chat_post(request: Request):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    memory[user_info['email']][chat]['messages'] = [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]
-    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+    # with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # memory[user_info['email']][chat]['messages'] = [{'role': 'assistant', 'content': f'Hello {user_info["name"]}! {chat} is embedded and ready for discussion. How can I help you today?'}]
+    # with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    response = mongo_reset_chat(mongo.collection_messages_authenticated, user_info['email'], chat)
+    mongo_log_response(response)
+    if 'error' in response:
+        return JSONResponse(content={'error': 'Something went wrong with chat reset.'})
 
     return JSONResponse(content={'success': True})
 
@@ -217,9 +247,14 @@ async def delete_chat_post(request: Request):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
-    del memory[user_info['email']][chat]
-    with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+    # with open('database/memory/chats.json', 'r') as f: memory = json.load(f)
+    # del memory[user_info['email']][chat]
+    # with open('database/memory/chats.json', 'w') as f: json.dump(memory, f, indent=2)
+
+    response = mongo_delete_chat(mongo.collection_messages_authenticated, user_info['email'], chat)
+    mongo_log_response(response)
+    if 'error' in response:
+        return JSONResponse(content={'error': 'Something went wrong with chat deletion.'})
 
     return JSONResponse(content={'success': True})
 
@@ -243,7 +278,12 @@ async def new_message_user_post(request: Request):
 
     message_history = (last_x_messages)
     # message_history_json = [message['content'] for message in message_history_json if 'content' in message]
-    save_message(email = user_info["email"], chat = chat, role = 'user', message = message)
+    # save_message(email = user_info["email"], chat = chat, role = 'user', message = message)
+
+    response = mongo_insert_message(mongo.collection_messages_authenticated, email = user_info["email"], chat_id = chat, role = 'user', content = message)
+    mongo_log_response(response)
+    if 'error' in response:
+        return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
 
     await get_assistant_response(
         user_prompt = message,
@@ -297,7 +337,13 @@ async def new_message_assistant_post(request: Request):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    save_message(email = user_info["email"], chat = chat, role = 'assistant', message = message)
+    # save_message(email = user_info["email"], chat = chat, role = 'assistant', message = message)
+
+    response = mongo_insert_message(mongo.collection_messages_authenticated, email = user_info["email"], chat_id = chat, role = 'assistant', content = message)
+    mongo_log_response(response)
+    if 'error' in response:
+        return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
+
     return JSONResponse(content={'success': True})
 
 

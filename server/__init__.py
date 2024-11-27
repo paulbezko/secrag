@@ -45,6 +45,7 @@ def create_app(mode: str):
     @app.get("/style.css")
     async def serve_css():
         return FileResponse(css_file_path)
+    
     #######################################################################
     ###                         LOAD ROUTES                             ###
     from server.general.routes import routes as general_routes
@@ -89,6 +90,8 @@ def create_app(mode: str):
     config['STRIPE_PRODUCT_PREMIUM_YEARLY'] = os.getenv('STRIPE_PRODUCT_PREMIUM_YEARLY')
     config['STRIPE_PRODUCT_REPLENISH'] = os.getenv('STRIPE_PRODUCT_REPLENISH')
 
+    config['MONGO_URI'] = os.getenv('MONGO_URI')
+
     config['TELEGRAM_BOT_KEY'] = os.getenv('TELEGRAM_BOT_KEY')
 
     config['INIT_LOGS_SENT'] = False
@@ -108,7 +111,6 @@ def create_app(mode: str):
         allow_headers=["*"], 
     )
     
-
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
