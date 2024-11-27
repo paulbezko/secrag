@@ -7,7 +7,8 @@
         <div class="text-1 fade-in delay-2">{{ heroSubheading }}</div>
         <div class="flex-row width-100 gap-2 switch-row-to-column" style="justify-content: start; align-items: start;">
           <div v-if="!isAuthenticated" class="fade-in delay-3 flex-column center"><router-link to="/preview" class="button button-primary">Try for Free</router-link></div>
-          <div v-if="isAuthenticated" class="fade-in delay-3 flex-column center"><router-link to="/dashboard" class="button button-primary">Go to Dashboard</router-link></div>
+          <div v-if="isAuthenticated && !isSubscribed" class="fade-in delay-3 flex-column center"><router-link to="/dashboard" class="button button-primary">Subscribe Here</router-link></div>
+          <div v-if="isAuthenticated && isSubscribed" class="fade-in delay-3 flex-column center"><router-link to="/dashboard" class="button button-primary">Go to Dashboard</router-link></div>
         </div>
       </div>
       <div class="flex-column center width-100 show-on-large" style="max-width: 52rem; padding-inline: 2rem;">
