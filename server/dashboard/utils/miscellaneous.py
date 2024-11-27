@@ -11,7 +11,7 @@ def get_user_ip(request: Request):
     ip_address = request.client.host
 
     # For apps behind a reverse proxy, check headers
-    forwarded_ip = request.headers.get('X-Forwarded-For')
+    forwarded_ip = request.headers.get('cf-connecting-ip')
     real_ip = request.headers.get('X-Real-IP')
 
     # Prefer header values if they exist (proxy scenario)

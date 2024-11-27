@@ -134,7 +134,7 @@ async def stream_response(agent_executor: AgentExecutor, prompt_settings, socket
                 pass
 
         elif kind == "on_tool_start":
-            await socketio_handler.emit(event["name"], to=socket_id)            
+            await socketio_handler.emit(event["name"], to=socket_id)
 
         elif kind == "on_tool_end":
             pass
