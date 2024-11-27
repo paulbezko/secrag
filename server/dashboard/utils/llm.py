@@ -99,11 +99,12 @@ async def get_assistant_response(user_prompt, message_history, filing_id, socket
         "ticker": filing.ticker
     }
 
-    await stream_response(agent_executor, prompt_settings, socket_id, socketio_handler)
+    response = await stream_response(agent_executor, prompt_settings, socket_id, socketio_handler)
 
     # Finishing the response
     await socketio_handler.emit('llm_response_complete', to=socket_id)
 
+    return response
 
 async def stream_response(agent_executor: AgentExecutor, prompt_settings, socket_id, socketio_handler):
     buffer = ""
@@ -139,3 +140,4 @@ async def stream_response(agent_executor: AgentExecutor, prompt_settings, socket
             pass
             
     stop_signals.pop(socket_id, None)
+    return buffer
