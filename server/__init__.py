@@ -45,6 +45,7 @@ def create_app(mode: str):
     @app.get("/style.css")
     async def serve_css():
         return FileResponse(css_file_path)
+    
     #######################################################################
     ###                         LOAD ROUTES                             ###
     from server.general.routes import routes as general_routes
@@ -108,7 +109,6 @@ def create_app(mode: str):
         allow_headers=["*"], 
     )
     
-
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     logger.addHandler(LogtailHandler(source_token='r7bKwtvkMf9iBBqAsYXmJyFS'))
