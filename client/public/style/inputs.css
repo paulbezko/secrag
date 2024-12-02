@@ -75,8 +75,8 @@ textarea:focus,
 textarea:hover,
 textarea:active {
     outline: none;
-    border: 1px solid var(--color-blue);
-    background-color: var(--color-blue-highlight)
+    border: 1px solid var(--color-form-border-hover);
+    background-color: var(--color-form-background-hover)
 }
   
 textarea:disabled {

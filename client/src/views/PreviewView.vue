@@ -50,10 +50,10 @@
             <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
-                <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
+                <li class="text-4 sidebar-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
                     <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
-                    <div class="flex-row gap-05">
+                    <div class="flex-row gap-025">
                       <div v-if="hoveredChat === chat" @click="resetChat()" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="deleteChat()" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
                     </div>

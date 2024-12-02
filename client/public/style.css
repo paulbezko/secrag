@@ -14,6 +14,7 @@ html {
 
 
 html::-webkit-scrollbar {display: none;}
+::-webkit-scrollbar-corner { background: rgba(0,0,0,0.0); }
 
 body {
   margin: 0;
@@ -99,7 +100,7 @@ hr {
 
 .text-button {font-size: var(--text-button);}
 .text-chat {font-size: var(--text-chat); line-height: 150%;}
-.text-error {font-size: var(--text-error); color: var(--color-red); font-weight: 700;}
+.text-error {font-size: var(--text-error); color: var(--color-text-negative); font-weight: 700;}
 
 .text-center {text-align: center;}
 .text-bold {font-weight: 700;}
@@ -149,6 +150,7 @@ code {
   max-width: 100%; /* Prevents overflow from the container */
 }
 
+.gap-025 {gap: .25rem;}
 .gap-05 {gap: .5rem;}
 .gap-1 {gap: 1rem;}
 .gap-2 {gap: 2rem;}
@@ -336,17 +338,17 @@ code {
 }
 
 .chat-container-scroll::-webkit-scrollbar-track {
-  background: var(--color-white);
+  background: var(--color-background-secondary);
   border-radius: 4px;
 }
 
 .chat-container-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-grey);
+  background: var(--color-background-tertiary);
   border-radius: 4px;
 }
 
 .chat-container-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-grey);
+  background: var(--color-background-tertiary);
 }
 
 .chat-message-user {
@@ -365,7 +367,7 @@ math {margin-block: 1rem;}
 ol {padding-left: 2rem;}
 semantics, mrow {word-wrap: break-word; overflow-wrap: break-word;}
 table {width: 100%; border-collapse: collapse;}
-table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
+table, th, td {border-bottom: 1px solid var(--color-border); padding: 1rem; background-color: var(--color-background-secondary) !important}
 
 .chat-input {
   width: 100%;
@@ -398,7 +400,7 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  background-color: var(--color-white);
+  background-color: var(--color-background-secondary);
   width: 100%;
   height: 100%;
   overflow-y: scroll;
@@ -478,7 +480,6 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
 }
 
 .sidebar-element-icon {
-  background-color: var(--color-white);
   padding: .3rem;
   border-radius: .5rem;
 }
@@ -494,17 +495,17 @@ table, th, td {border-bottom: 1px solid var(--color-grey); padding: 1rem;}
 }
 
 .chat-history::-webkit-scrollbar-track {
-  background: var(--color-white); /* Background of the scrollbar track */
+  background: var(--color-background-secondary); /* Background of the scrollbar track */
   border-radius: 4px; /* Optional: rounded edges for the thumb */
 }
 
 .chat-history::-webkit-scrollbar-thumb {
-  background: var(--color-grey); /* Color of the scrollbar thumb */
+  background: var(--color-background-tertiary); /* Color of the scrollbar thumb */
   border-radius: 4px; /* Optional: rounded edges for the thumb */
 }
 
 .chat-history::-webkit-scrollbar-thumb:hover {
-  background: var(--color-grey); /* Color of the thumb on hover */
+  background: var(--color-background-tertiary); /* Color of the thumb on hover */
 }
 
 

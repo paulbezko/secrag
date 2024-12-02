@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="text-4 flex-column center width-100 gap-05" style="padding-bottom: 1rem">
-        <div class="flex-row center gap-05">Have an account already? <router-link class="text-4 text-link text-link-accent" to="/login">Login</router-link></div>
+        <div class="flex-row center gap-05">Have an account already? <router-link class="text-4 text-link text-link-accent text-bold" to="/login">Login</router-link></div>
         <div class="text-4 text-center">By signing up you agree to our <router-link to="/terms-and-conditions" class="text-4" style="text-decoration: underline">Terms and Conditions</router-link></div>
       </div>
     </div>
