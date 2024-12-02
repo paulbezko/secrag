@@ -4,7 +4,7 @@
       <div class="flex-row width-100" style="justify-content: space-between;">
         <div class="flex-row center gap-2">
           <router-link class="text-3 text-bold text-link" to="/">{{projectName}}</router-link>
-          <router-link class="text-3 show-on-large text-link" style="color: var(--color-yellow)" v-if="!authenticated" to="/preview">Try for Free</router-link>
+          <router-link class="text-3 show-on-large text-link text-bold text-link-accent" v-if="!authenticated" to="/preview">Try for Free</router-link>
         </div>
         <div class="flex-row center gap-2 show-on-large">
           <router-link class="text-3 text-link" to="/#about">About</router-link>
@@ -14,8 +14,8 @@
         </div>
         <div class="flex-row gap-2 show-on-large">
           <router-link class="button button-navbar button-secondary" v-if="!authenticated" to="/signup">Sign Up</router-link>
-          <router-link class="text-3 text-link" style="color: var(--color-yellow)" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
-          <router-link class="text-3 show-on-large text-link" style="color: var(--color-yellow)" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
+          <router-link class="text-3 text-link text-link-accent" v-if="authenticated && !subscribed" to="/subscribe">Subscribe</router-link>
+          <router-link class="text-3 show-on-large text-link text-link-accent" v-if="authenticated && subscribed" to="/dashboard">Dashboard</router-link>
           <div class="text-3 text-link" v-if="authenticated" @click="toggleProfile">Profile</div>
         </div>
         <div class="flex-row gap-2 show-on-small">

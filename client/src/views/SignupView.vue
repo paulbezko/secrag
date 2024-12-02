@@ -5,7 +5,7 @@
     <div v-if="stage === 'signUpBefore'" class="flex-column width-100 flex-1 space-between gap-2">
       <div></div>
       <div class="flex-column center">
-        <router-link to="/" class="fa-solid fa-xmark text-1" style="position: absolute; top: 2rem; left: 2rem;"></router-link>
+        <router-link to="/" class="fa-solid fa-xmark text-1 text-link" style="position: absolute; top: 2rem; left: 2rem;"></router-link>
         <div class="flex-column center width-100 gap-2" style="max-width: 50rem;">
           <div class="heading text-center">Welcome to {{ projectName }}</div>
           <div class="text-2 text-center">Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.</div>
@@ -16,12 +16,12 @@
             </div>
             <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
-          <div class="text-3 text-bold flex-row gap-1 center text-link" @click="signupGoogle()"><div class="fa-brands fa-google text-3"></div>Sign In with Google</div>
+          <div class="text-3 flex-row gap-1 center text-link" @click="signupGoogle()"><div class="fa-brands fa-google text-3"></div>Sign In with Google</div>
         </div>
       </div>
       <div class="text-4 flex-column center width-100 gap-05" style="padding-bottom: 1rem">
-        <div class="flex-row center gap-05">Have an account already? <router-link class="text-4 text-link" to="/login">Login</router-link></div>
-        <div class="text-4 text-center">By signing up you agree to our <router-link to="/terms-and-conditions" class="text-4">Terms and Conditions</router-link></div>
+        <div class="flex-row center gap-05">Have an account already? <router-link class="text-4 text-link text-link-accent" to="/login">Login</router-link></div>
+        <div class="text-4 text-center">By signing up you agree to our <router-link to="/terms-and-conditions" class="text-4" style="text-decoration: underline">Terms and Conditions</router-link></div>
       </div>
     </div>
     <div v-if="stage === 'signUpAfter'" class="display display-flex-column center">

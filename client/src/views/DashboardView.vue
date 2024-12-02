@@ -60,7 +60,7 @@
                 <div :class="isSmallScreen ? 'text-3' : 'text-4'">New Chat</div>
               </div>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li 
@@ -82,7 +82,7 @@
                 </li>
               </ul>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
               <div class="fa-solid fa-file text-center sidebar-element-icon" style="min-width: 2rem;"></div>
               <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share Feedback</a>
@@ -423,7 +423,7 @@ export default {
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 175; 
+      const headerHeight = 155; 
       if (this.isSmallScreen) {heightAdjustment = -52;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
