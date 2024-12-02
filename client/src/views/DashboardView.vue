@@ -116,7 +116,7 @@
           <input 
             type="text"
             class="input width-100"
-            v-model="optionInput" 
+            v-on:input="optionInput = $event.target.value"
             @input="filterOptions" 
             @focus="showSuggestions = true" 
             :placeholder="'Input ' + selectedType" 
