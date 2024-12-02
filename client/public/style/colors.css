@@ -187,5 +187,9 @@
 
     --color-shadow: #0a0a0a;
     --shadow: 0 4px 12px var(--color-shadow), 0 8px 20px var(--color-shadow);
+
+    .light-dark-mode img {
+      filter: brightness(0) invert(1);
+    }
   }
 }
