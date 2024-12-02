@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="text-4 flex-row center width-100 gap-05" style="padding-bottom: 1rem">
-      No account yet? <router-link class="text-4 text-link text-link-accent" to="/signup">Sign Up</router-link>
+      No account yet? <router-link class="text-4 text-link text-link-accent text-bold" to="/signup">Sign Up</router-link>
     </div>
   </div>
 </template>

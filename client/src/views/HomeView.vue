@@ -198,7 +198,7 @@
     <div id="contact" class="flex-column gap-4 text-left width-100" style="max-width: 112rem; padding-top: 20rem; padding-inline: 2rem;">
       <div class="flex-column gap-2">
         <div class="heading">Contact Us</div>
-        <div class="text-1">Got a question or a remark? <a href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C" class="text-link text-bold">Send us a message!</a></div>
+        <div class="text-1">Got a question or a remark? <a href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C" class="text-link text-bold text-link-accent">Send us a message!</a></div>
       </div>
       <div class="flex-column text-4 gap-05" style="padding-bottom: 2rem;">
         <div style="text-align: justify; color: var(--color-grey-semidark)">The information provided through this platform is for informational and educational purposes only and is not intended as financial, legal, or professional advice. The platform uses AI to retrieve and summarize information from publicly available SEC filings; however, it may not always capture the complete context of the documents. Users are encouraged to review the original filings and consult with a qualified professional for any investment or business decisions. The platform and its creators are not responsible for any inaccuracies, omissions, or actions taken based on the content provided. Use of this platform is at your own risk.</div>

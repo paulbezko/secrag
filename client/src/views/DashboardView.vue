@@ -64,7 +64,7 @@
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li 
-                  class="text-4 sidebar-element text-link" 
+                  class="text-4 sidebar-element" 
                   v-for="chat in chats" 
                   :key="chat" 
                   :class="{ active: currentChat === chat }" 
@@ -74,7 +74,7 @@
                   >
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
                     <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
-                    <div class="flex-row gap-05">
+                    <div class="flex-row gap-025">
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('resetChat')" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
                     </div>
@@ -843,7 +843,7 @@ export default {
 
 .loading-dot {
   animation: dot ease-in-out 1.5s infinite;
-  background-color: var(--color-yellow-dark);
+  background-color: var(--color-primary-text);
   display: inline-block;
   height: 0.5rem; /* Increase the size slightly to avoid pixelation */
   width: 0.5rem;
@@ -860,9 +860,9 @@ export default {
 }
 
 @keyframes dot {
-  0% { background-color: var(--color-yellow-dark);}
-  50% { background-color: var(--color-yellow);}
-  100% { background-color: var(--color-yellow-dark);}
+  0% { background-color: var(--color-primary-text);}
+  50% { background-color: var(--color-primary);}
+  100% { background-color: var(--color-primary-text);}
 }
 
 
