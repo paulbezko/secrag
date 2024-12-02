@@ -26,7 +26,7 @@
 
     <!-- Sidebar Section -->
     <transition name="slide">
-      <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
+      <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 20rem;' : 'max-width: 20rem;'">
         <div class="flex-column height-100">
           <div class="flex-column gap-05">
             <div class="flex-column gap-05" :class="isSmallScreen ? 'text-3' : 'text-4'">
@@ -47,7 +47,7 @@
                 <div class="text-bold" :class="isSmallScreen ? 'text-3' : 'text-4'">Analyze Any Filing</div>
               </router-link>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
@@ -61,7 +61,7 @@
                 </li>
               </ul>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
               <div class="fa-solid fa-file text-center sidebar-element-icon" style="min-width: 2rem;"></div>
               <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share Feedback</a>
@@ -337,20 +337,24 @@ export default {
     // Initialize Socket
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {(this.socketId = socket.id)}); // console.log("Connected to socket", socket.id);
-      socket.on("new_chat_started", () => {this.newChatLoadingMessage = 'Creating chat';});
+      socket.on("connect", () => {(this.socketId = socket.id); console.log("Connected to socket", socket.id);} ); // console.log("Connected to socket", socket.id);
+      socket.on("new_chat_started", () => {this.newChatLoadingMessage = 'Creating chat'; console.log("New chat started");});
       socket.on("new_chat_initialized", () => {this.newChatLoadingMessage = 'Downloading the filing';});
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
       socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
+
+
+      socket.emit('ping', { message: 'Ping!' });
+      socket.on('pong', (data) => console.log('Pong received:', data.message));
     },
 
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 208; 
-      if (this.isSmallScreen) {heightAdjustment = -52;}
+      const headerHeight = 188; 
+      if (this.isSmallScreen) {heightAdjustment = -64;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
     },

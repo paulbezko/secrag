@@ -23,15 +23,15 @@
     <div id="about" class="flex-column width-100 center gap-4" style="padding-inline: 2rem;">
       <div class="heading text-center fade-in">The SEC Filing Problem</div>
       <div class="flex-row gap-4 center fade-in">
-        <div class="text-2 text-center" style="max-width: 50rem;">For investors, analysts, and legal professionals, deciphering complex SEC filings can be <b style="color: var(--color-red);">overwhelming</b>.</div>
+        <div class="text-2 text-center" style="max-width: 50rem;">For investors, analysts, and legal professionals, deciphering complex SEC filings can be <b style="color: var(--color-text-negative);">overwhelming</b>.</div>
         <img src="../assets/home/face_with_monocle_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
       </div>
       <div class="flex-row gap-4 center fade-in">
-        <div class="text-2 text-center" style="max-width: 50rem;">Extracting key insights from lengthy documents often requires <b style="color: var(--color-red);">hours</b> of manual effort and expertise.</div>
+        <div class="text-2 text-center" style="max-width: 50rem;">Extracting key insights from lengthy documents often requires <b style="color: var(--color-text-negative);">hours</b> of manual effort and expertise.</div>
         <img src="../assets/home/hourglass_done_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
       </div>
       <div class="flex-row gap-4 center fade-in">
-        <div class="text-2 text-center" style="max-width: 50rem;">It's easy to <b style="color: var(--color-red);">miss critical information</b>, and traditional search tools don’t provide the contextual understanding needed to make informed decisions quickly.</div>
+        <div class="text-2 text-center" style="max-width: 50rem;">It's easy to <b style="color: var(--color-text-negative);">miss critical information</b>, and traditional search tools don’t provide the contextual understanding needed to make informed decisions quickly.</div>
         <img src="../assets/home/money_with_wings_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
       </div>
     </div>
@@ -40,14 +40,14 @@
       <div class="flex-row switch-row-to-column gap-4 center width-100 fade-in">
         <div class="flex-column vertical-line gap-2 width-100">
           <div class="subheading">Step 1: Find the Filing You Need</div>
-          <div class="text-2"><b style="color: var(--color-green);">Easily</b> search our comprehensive library of SEC filings and select the document you want to explore. Whether it’s a recent filing or a historical one, everything is at your fingertips, ready to be <b style="color: var(--color-green);">analyzed in seconds.</b></div>
+          <div class="text-2"><b style="color: var(--color-text-positive);">Easily</b> search our comprehensive library of SEC filings and select the document you want to explore. Whether it’s a recent filing or a historical one, everything is at your fingertips, ready to be <b style="color: var(--color-text-positive);">analyzed in seconds.</b></div>
         </div>
         <img src="../assets/home/card_index_dividers_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
       </div>
       <div class="flex-row switch-row-to-column gap-4 center width-100 fade-in">
         <div class="flex-column vertical-line gap-2 width-100">
           <div class="subheading">Step 2: Get Instant Answers with AI</div>
-          <div class="text-2">Ask our advanced AI-powered model any question about the filing and <b style="color: var(--color-green);">get detailed, clear insights immediately.</b> No more sifting through pages—just direct answers to the key information you’re looking for, all in <b style="color: var(--color-green);">real time.</b></div>
+          <div class="text-2">Ask our advanced AI-powered model any question about the filing and <b style="color: var(--color-text-positive);">get detailed, clear insights immediately.</b> No more sifting through pages—just direct answers to the key information you’re looking for, all in <b style="color: var(--color-text-positive);">real time.</b></div>
         </div>
         <img src="../assets/home/bookmark_tabs_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
       </div>
@@ -55,9 +55,9 @@
         <div class="flex-column vertical-line gap-2 width-100">
           <div class="subheading">Why This Works:</div>
           <ul class="text-2">
-            <li><b style="color: var(--color-green);">Fast Access:</b> No manual searching. Instant results.</li>
-            <li><b style="color: var(--color-green);">Clear Insights:</b> Get precise answers without the overwhelm.</li>
-            <li><b style="color: var(--color-green);">User-Friendly:</b> Navigate filings and interact with AI effortlessly.</li>
+            <li><b style="color: var(--color-text-positive);">Fast Access:</b> No manual searching. Instant results.</li>
+            <li><b style="color: var(--color-text-positive);">Clear Insights:</b> Get precise answers without the overwhelm.</li>
+            <li><b style="color: var(--color-text-positive);">User-Friendly:</b> Navigate filings and interact with AI effortlessly.</li>
           </ul>
         </div>
         <img src="../assets/home/stopwatch_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
