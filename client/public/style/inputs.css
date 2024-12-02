@@ -67,6 +67,7 @@ input:-webkit-autofill:active {
 }
   
 textarea {
+    color: var(--color-text);
     background-color: var(--color-background-secondary);
     transition: all 0.2s ease;
 }

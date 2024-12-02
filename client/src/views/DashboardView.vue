@@ -230,6 +230,7 @@
             class="chat-input" 
             rows="1" 
             v-model="newMessage" 
+            v-on:input="newMessage = $event.target.value"
             @keydown.enter.exact.prevent 
             @keyup.enter.exact="sendMessage('textarea')"
             @input="adjustTextareaHeight('textarea')" 
@@ -684,16 +685,18 @@ export default {
     },
 
     async stopResponse() {
+      this.stopButtonShown = false;
       return new Promise((resolve) => {
-        socket.emit("stop_llm_stream");
-        this.responseStopped = true; 
+        this.responseStopped = true;
         this.assistantMessageLoading = false;
+        socket.emit("stop_llm_stream");
         setTimeout(() => {resolve()}, 100);
       });
     },
 
     async saveAssitantResponse() {
       try {
+        this.stopButtonShown = false;
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
         if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
@@ -709,7 +712,6 @@ export default {
           return;
         }
         
-        this.stopButtonShown = false;
         this.llmResponseBuffer = '';
         
       } catch (error) {
