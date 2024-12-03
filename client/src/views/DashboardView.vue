@@ -73,7 +73,7 @@
                   @mouseleave="hoveredChat = null"
                   >
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
-                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
+                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat.replace(/-/g, ' ') }}</div>
                     <div class="flex-row gap-025">
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('resetChat')" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
@@ -156,7 +156,9 @@
         class="button button-primary flex-row gap-1 width-100" 
         :class="{ 'button-disabled': (!selectedTicker || !selectedYear || !selectedFiling)}" 
         @click="createChat()"
-        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)">
+        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)"
+        >
+        
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
@@ -434,7 +436,7 @@ export default {
     // Select option
     selectOption() {
       
-      this.selectedTicker = this.companyKeys.find(key => {
+      const selectedTicker = this.companyKeys.find(key => {
         const [ticker, cik, name] = key.split(" | ");
         return ticker === this.selectedOption || name === this.selectedOption || cik === this.selectedOption;
       });
@@ -443,8 +445,12 @@ export default {
       this.selectedYear = '';
       this.selectedFiling = '';
       this.selectedNewFiling = '';
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: this.selectedTicker }})
-      .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: selectedTicker }})
+      .then(response => {
+        this.tickerInfo = response.data.info; 
+        this.yearOptions = Object.keys(this.tickerInfo);
+        this.selectedTicker = selectedTicker
+      })
       .catch(error => {console.error('Error getting ticker info:', error)});
     },
 
@@ -455,7 +461,6 @@ export default {
       this.selectedFiling = '';
       if (this.selectedType === 'Name') {
         this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[2]); // Extract names
-        
       } else if (this.selectedType === 'Ticker') {
         this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[0]); // Extract tickers
       } else if (this.selectedType === 'CIK') {
