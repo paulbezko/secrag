@@ -36,7 +36,7 @@
               </router-link>
               <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
                 <div class="fa-solid fa-coins text-center sidebar-element-icon" style="min-width: 2rem;"></div>
-                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Tokens: {{ subscriptionTokensLeft }}</div>
+                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Prompts Left: {{ subscriptionTokensLeft }}</div>
               </div>
               <div @click="toggleNewChat" class="flex-row gap-05 sidebar-element menu" style="align-items: center;" :class="{ active: newChat }">
                 <div class="fa-solid fa-file-pen text-center sidebar-element-icon" style="min-width: 2rem;"></div>
@@ -252,7 +252,7 @@ export default {
       lastScrollTime: 0,
       userHasScrolled: false,
 
-      subscriptionTokensLeft: 60,
+      subscriptionTokensLeft: 20,
 
       // Chat data
       chats: [],
@@ -465,7 +465,7 @@ export default {
           return;
         }
 
-        this.subscriptionTokensLeft += -20
+        this.subscriptionTokensLeft += -0
         this.chats.unshift(newChatName);
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
@@ -517,9 +517,9 @@ export default {
   
     // Send Message
     async sendMessage() {
-      if (this.subscriptionTokensLeft < 4) {this.confirmAction = 'insufficientTokens', this.showConfirm = true; return}
+      if (this.subscriptionTokensLeft < 1) {this.confirmAction = 'insufficientTokens', this.showConfirm = true; return}
 
-      this.subscriptionTokensLeft += -4
+      this.subscriptionTokensLeft += -1
       this.userHasScrolled = false;
       this.stopButtonShown = true
       // If there's an ongoing response, stop it and save it first
