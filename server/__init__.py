@@ -42,10 +42,21 @@ def create_app(mode: str):
     templates = Jinja2Templates(directory="client/dist")
 
     css_file_path = Path(__file__).parent.parent / "client" / "dist" / "style.css"
+    robots_file_path = Path(__file__).parent.parent / "client" / "dist" / "robots.txt"
+    sitemap_file_path = Path(__file__).parent.parent / "client" / "dist" / "sitemap.xml"
+    
     @app.get("/style.css")
     async def serve_css():
         return FileResponse(css_file_path)
+    @app.get("/robots.txt")
+    async def serve_robots():
+        return FileResponse(robots_file_path)
+    @app.get("/sitemap.xml")
+    async def serve_sitemap():
+        return FileResponse(sitemap_file_path)
     
+    app.mount("/style", StaticFiles(directory="client/dist/style"), name="style")
+
     #######################################################################
     ###                         LOAD ROUTES                             ###
     from server.general.routes import routes as general_routes
