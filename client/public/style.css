@@ -1,10 +1,9 @@
 @import url('style/colors.css');
 @import url('style/buttons.css');
 @import url('style/inputs.css');
+@import url('style/typography.css');
 
 html {
-  font-family: "Roboto Serif", serif;
-  font-size: 62.5%;
   -webkit-tap-highlight-color: transparent;
 
   -ms-overflow-style: none;  /* IE and Edge */
@@ -23,7 +22,6 @@ body {
 }
 
 * {
-  text-decoration: none;
   box-sizing: border-box;
 }
 
@@ -58,89 +56,11 @@ hr {
 .shadow {box-shadow: 0px 0px 40px var(--color-shadow)}
 .shadow-wide {box-shadow: 0px 0px 200px 2px var(--color-shadow);}
 
-@media (min-width: 800px) {
-  :root {
-    --heading: 4.8rem;
-    --subheading: 3.6rem;
-
-    --text-1: 2.4rem;
-    --text-2: 2.0rem;
-    --text-3: 1.6rem;
-    --text-4: 1.2rem;
-
-    --text-button: 1.4rem;
-    --text-error: 1.2rem;
-    --text-chat: 1.4rem;
-  }
-}
-
-@media (max-width: 800px) {
-  :root {
-    --heading: 4.2rem;
-    --subheading: 3.0rem;
-
-    --text-1: 2.0rem;
-    --text-2: 1.6rem;
-    --text-3: 1.4rem;
-    --text-4: 1.2rem;
-
-    --text-button: 1.6rem;
-    --text-error: 1.4rem;
-    --text-chat: 1.6rem;
-  }
-}
-
-.heading {font-size: var(--heading); font-weight: 700; color: var(--color-text)}
-.subheading {font-size: var(--subheading); font-weight: 700; color: var(--color-text)}
-
-.text-1 {font-size: var(--text-1); line-height: 150%;}
-.text-2 {font-size: var(--text-2); line-height: 150%;}
-.text-3 {font-size: var(--text-3); line-height: 150%;}
-.text-4 {font-size: var(--text-4); line-height: 150%;}
-
-.text-button {font-size: var(--text-button);}
-.text-chat {font-size: var(--text-chat); line-height: 150%;}
-.text-error {font-size: var(--text-error); color: var(--color-text-negative); font-weight: 700;}
-
-.text-center {text-align: center;}
-.text-bold {font-weight: 700;}
-.text-overflow {
-  white-space: nowrap;     /* Prevent text from wrapping */
-  overflow: hidden;        /* Hide the overflowed text */
-  text-overflow: ellipsis; /* Show ellipsis when text overflows */
-}
-
-.text-link *,
-.text-link {
-  color: var(--color-text);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.text-link:hover *,
-.text-link:hover {
-  color: var(--color-secondary-text);
-}
-
-.text-link.encouraged:hover *,
-.text-link.encouraged:hover {
-  color: var(--color-secondary-text);
-}
-
-.text-link.discouraged:hover,
-.text-link.discouraged:hover  * {
-  color: var(--color-text-negative);
-}
-
-.text-link-accent {
-  color: var(--color-primary);
-}
-
 .policy a {
   text-decoration: underline;
 }
 
-.text-inter {font-family: 'Inter', sans-serif;}
+
 
 code {
   white-space: pre-wrap; /* Allows wrapping of long lines */
@@ -418,17 +338,17 @@ table, th, td {border-bottom: 1px solid var(--color-border); padding: 1rem; back
 }
 
 .filing-html::-webkit-scrollbar-track {
-  background: var(--color-white); /* Background of the scrollbar track */
+  background: var(--color-background-secondary); /* Background of the scrollbar track */
   border-radius: 4px; /* Optional: rounded edges for the thumb */
 }
 
 .filing-html::-webkit-scrollbar-thumb {
-  background: var(--color-grey); /* Color of the scrollbar thumb */
+  background: var(--color-background-tertiary); /* Color of the scrollbar thumb */
   border-radius: 4px; /* Optional: rounded edges for the thumb */
 }
 
 .filing-html::-webkit-scrollbar-thumb:hover {
-  background: var(--color-grey); /* Color of the thumb on hover */
+  background: var(--color-background-tertiary); /* Color of the thumb on hover */
 }
 
 
@@ -540,7 +460,7 @@ table, th, td {border-bottom: 1px solid var(--color-border); padding: 1rem; back
   .sidebar {
     right: 0;
     border-left: 1px solid var(--color-border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow);
   }
   .sidebar-element {
     padding: 1rem;
