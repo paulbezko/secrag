@@ -61,7 +61,7 @@
   :root {
     --color-background-primary: #F4F6F9;
     --color-background-secondary: #ffffff;
-    --color-background-tertiary: #e1e4e7;
+    --color-background-tertiary: #e4eaf1;
 
     --color-text: #2D2D2D;
     --color-text-placeholder: #b3b3b3;
@@ -128,7 +128,7 @@
   :root {
     --color-background-primary: #161a24;
     --color-background-secondary: #13141a;
-    --color-background-tertiary: #2b2b2b;
+    --color-background-tertiary: #1b2430;
 
     --color-text: #e7e7e7;
     --color-text-placeholder: #858585;
