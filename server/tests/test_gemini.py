@@ -8,10 +8,17 @@ with open("server/tests/test.md", "r") as f:
     text = f.read()
 
 prompt = f"""
-You are given a full 10-K filing in a markdown form. Split it into appropriate chunks and provide a contextural summary of the chunk. Output a python list of these chunks and their summaries.
+Summarize the most unusual and noteworthy aspects of the 10-K filing in the form of a LinkedIn post, written from the perspective of an independent analyst.
 
+- Start with a catchy two-sentence hook.
+- Highlight key anomalies, unexpected trends, or unique details.
+- Keep the tone analytical and engaging, while avoiding excessive jargon.
+- Limit the summary to a few sentences.
+
+Input text:
 {text}
 """
+
 
 url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
 api_key = "AIzaSyDQMl7clb1OI61AtDyDyUjyO7sGdcXwoog"

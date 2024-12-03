@@ -54,7 +54,7 @@ async def new_chat_post(request: Request):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    token_cost_chat = 20
+    token_cost_chat = 0
     if int(user_info['subscription_tokens_left']) < token_cost_chat: return JSONResponse(content={'error': 'Insufficient Tokens'})
 
     socket_id = socket_id
@@ -248,7 +248,7 @@ async def new_message_user_post(request: Request):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    token_cost_message = 4
+    token_cost_message = 1
     if int(user_info['subscription_tokens_left']) < token_cost_message: return JSONResponse(content={'error': 'Insufficient Tokens'})
 
     message_history = (last_x_messages)
