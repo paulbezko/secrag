@@ -60,11 +60,11 @@
                 <div :class="isSmallScreen ? 'text-3' : 'text-4'">New Chat</div>
               </div>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li 
-                  class="text-4 sidebar-element text-link" 
+                  class="text-4 sidebar-element" 
                   v-for="chat in chats" 
                   :key="chat" 
                   :class="{ active: currentChat === chat }" 
@@ -73,8 +73,8 @@
                   @mouseleave="hoveredChat = null"
                   >
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
-                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
-                    <div class="flex-row gap-05">
+                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat.replace(/-/g, ' ') }}</div>
+                    <div class="flex-row gap-025">
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('resetChat')" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="toggleConfirm('deleteChat')" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
                     </div>
@@ -82,7 +82,7 @@
                 </li>
               </ul>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
               <div class="fa-solid fa-file text-center sidebar-element-icon" style="min-width: 2rem;"></div>
               <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share Feedback</a>
@@ -116,7 +116,8 @@
           <input 
             type="text"
             class="input width-100"
-            v-model="optionInput" 
+            v-model="optionInput"
+            v-on:input="optionInput = $event.target.value"
             @input="filterOptions" 
             @focus="showSuggestions = true" 
             :placeholder="'Input ' + selectedType" 
@@ -155,7 +156,9 @@
         class="button button-primary flex-row gap-1 width-100" 
         :class="{ 'button-disabled': (!selectedTicker || !selectedYear || !selectedFiling)}" 
         @click="createChat()"
-        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)">
+        :disabled="(!selectedTicker || !selectedYear || !selectedFiling)"
+        >
+        
         Create Chat
       </div>
       <div v-if="error && selectedNewFiling === ''" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
@@ -229,6 +232,7 @@
             class="chat-input" 
             rows="1" 
             v-model="newMessage" 
+            v-on:input="newMessage = $event.target.value"
             @keydown.enter.exact.prevent 
             @keyup.enter.exact="sendMessage('textarea')"
             @input="adjustTextareaHeight('textarea')" 
@@ -423,7 +427,7 @@ export default {
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 175; 
+      const headerHeight = 155; 
       if (this.isSmallScreen) {heightAdjustment = -52;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
@@ -432,7 +436,7 @@ export default {
     // Select option
     selectOption() {
       
-      this.selectedTicker = this.companyKeys.find(key => {
+      const selectedTicker = this.companyKeys.find(key => {
         const [ticker, cik, name] = key.split(" | ");
         return ticker === this.selectedOption || name === this.selectedOption || cik === this.selectedOption;
       });
@@ -441,8 +445,12 @@ export default {
       this.selectedYear = '';
       this.selectedFiling = '';
       this.selectedNewFiling = '';
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: this.selectedTicker }})
-      .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker`, {params: { token: localStorage.getItem('_u'), ticker: selectedTicker }})
+      .then(response => {
+        this.tickerInfo = response.data.info; 
+        this.yearOptions = Object.keys(this.tickerInfo);
+        this.selectedTicker = selectedTicker
+      })
       .catch(error => {console.error('Error getting ticker info:', error)});
     },
 
@@ -453,7 +461,6 @@ export default {
       this.selectedFiling = '';
       if (this.selectedType === 'Name') {
         this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[2]); // Extract names
-        
       } else if (this.selectedType === 'Ticker') {
         this.filteredOptions = this.companyKeys.map(key => key.split(" | ")[0]); // Extract tickers
       } else if (this.selectedType === 'CIK') {
@@ -683,16 +690,18 @@ export default {
     },
 
     async stopResponse() {
+      this.stopButtonShown = false;
       return new Promise((resolve) => {
-        socket.emit("stop_llm_stream");
-        this.responseStopped = true; 
+        this.responseStopped = true;
         this.assistantMessageLoading = false;
+        socket.emit("stop_llm_stream");
         setTimeout(() => {resolve()}, 100);
       });
     },
 
     async saveAssitantResponse() {
       try {
+        this.stopButtonShown = false;
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
         if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
@@ -708,7 +717,6 @@ export default {
           return;
         }
         
-        this.stopButtonShown = false;
         this.llmResponseBuffer = '';
         
       } catch (error) {
@@ -843,7 +851,7 @@ export default {
 
 .loading-dot {
   animation: dot ease-in-out 1.5s infinite;
-  background-color: var(--color-yellow-dark);
+  background-color: var(--color-primary-text);
   display: inline-block;
   height: 0.5rem; /* Increase the size slightly to avoid pixelation */
   width: 0.5rem;
@@ -860,9 +868,9 @@ export default {
 }
 
 @keyframes dot {
-  0% { background-color: var(--color-yellow-dark);}
-  50% { background-color: var(--color-yellow);}
-  100% { background-color: var(--color-yellow-dark);}
+  0% { background-color: var(--color-primary-text);}
+  50% { background-color: var(--color-primary);}
+  100% { background-color: var(--color-primary-text);}
 }
 
 

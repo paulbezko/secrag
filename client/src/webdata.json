@@ -7,18 +7,18 @@
             "name": "Guide",
             "priceMonthly": 10,
             "features": [
-            "10-K / 10-Q analysis",
-            "Unlimited chats",
-            "1200 monthly tokens"
+            "10-K / 10-Q Analysis",
+            "Unlimited Chats",
+            "1200 Monthly Prompts"
             ]
         },
         "Premium" :{
             "name": "Insight",
             "priceMonthly": 20,
             "features": [
-            "All Guide features",
+            "All Guide Features",
             "Priority Support",
-            "2400 monthly tokens"
+            "2400 Monthly Prompts"
             ]
         }
     },

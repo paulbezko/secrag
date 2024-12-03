@@ -11,7 +11,7 @@ app, socketio = create_app(mode)
 # Handle stop signal. Could not seem to make it work inside routes or init.
 from server.globals import stop_signals
 @socketio.on('stop_llm_stream')
-async def handle_stop_signal(sid, data):
+async def handle_stop_signal(sid):
     stop_signals[sid] = True
 
 

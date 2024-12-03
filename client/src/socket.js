@@ -9,7 +9,6 @@ export const state = reactive({
   LLMResponseEvents: []
 });
 
-// "undefined" means the URL will be computed from the `window.location` object
-// const URL = process.env.NODE_ENV === "production" ? undefined : "http://localhost:5000";
+
 import {config} from '@/config';
-export const socket = io(config.socketUrl);
+export const socket = io(config.socketUrl, {transports: ['websocket', 'polling']});
