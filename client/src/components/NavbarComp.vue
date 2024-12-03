@@ -9,7 +9,7 @@
         <div class="flex-row center gap-2 show-on-large">
           <router-link class="text-3 text-link" to="/#about">About</router-link>
           <router-link class="text-3 text-link" to="/#faq">FAQ</router-link>
-          <router-link class="text-3 text-link" to="/#contact">Contact</router-link>
+          <a class="text-3 text-link" href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C">Contact</a>
           <a class="text-3 text-link" href="https://open.spotify.com/show/69BXlAfewT4Pdeja7YDYdz">Podcast</a>
         </div>
         <div class="flex-row gap-2 show-on-large">
@@ -31,7 +31,7 @@
         <hr class="width-100" v-if="authenticated && subscribed" style="border-top: 1px solid var(--color-grey)">
         <router-link class="text-2" @click="toggleDropdown()" to="/#about">About</router-link>
         <router-link class="text-2" @click="toggleDropdown()" to="/#faq">FAQ</router-link>
-        <router-link class="text-2" @click="toggleDropdown()" to="/#contact">Contact</router-link>
+        <a class="text-2" href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C">Contact</a>
         <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
         <router-link class="text-2" v-if="!authenticated" to="/signup">Sign Up</router-link>
         <router-link class="text-2" v-if="!authenticated" to="/login">Login</router-link>

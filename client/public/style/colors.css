@@ -127,7 +127,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background-primary: #161a24;
-    --color-background-secondary: #13151a;
+    --color-background-secondary: #13141a;
     --color-background-tertiary: #2b2b2b;
 
     --color-text: #e7e7e7;
@@ -188,6 +188,7 @@
     --color-shadow: #0a0a0a;
     --shadow: 0 4px 12px var(--color-shadow), 0 8px 20px var(--color-shadow);
 
+    
     .light-dark-mode img {
       filter: brightness(0) invert(1);
     }

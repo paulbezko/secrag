@@ -52,7 +52,7 @@
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
                 <li class="text-4 sidebar-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
-                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
+                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat.replace(/-/g, ' ') }}</div>
                     <div class="flex-row gap-025">
                       <div v-if="hoveredChat === chat" @click="resetChat()" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="deleteChat()" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
@@ -346,10 +346,6 @@ export default {
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
       socket.on("llm_response", (data) => {if (!this.responseStopped && data && data.word) {this.llmResponseBuffer += data.word; this.updateAssistantMessage()}});
       socket.on("llm_response_complete", () => {this.saveAssitantResponse()});
-
-
-      socket.emit('ping', { message: 'Ping!' });
-      socket.on('pong', (data) => console.log('Pong received:', data.message));
     },
 
     // Update Chat History Height
@@ -364,7 +360,7 @@ export default {
     // Select option
     selectOption() {
       
-      this.selectedTicker = this.companyKeys.find(key => {
+      const selectedTicker = this.companyKeys.find(key => {
         const [ticker, cik, name] = key.split(" | ");
         return ticker === this.selectedOption || name === this.selectedOption || cik === this.selectedOption;
       });
@@ -373,8 +369,12 @@ export default {
       this.selectedYear = '';
       this.selectedFiling = '';
       this.selectedNewFiling = '';
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker-preview`, {params: { ticker: this.selectedTicker }})
-      .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker-preview`, {params: { ticker: selectedTicker }})
+      .then(response => {
+        this.tickerInfo = response.data.info; 
+        this.yearOptions = Object.keys(this.tickerInfo)
+        this.selectedTicker = selectedTicker
+      })
       .catch(error => {console.error('Error getting ticker info:', error)});
     },
 
