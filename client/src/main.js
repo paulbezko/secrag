@@ -44,7 +44,7 @@ const router = createRouter({
     { path: '/reset-password', component: () => import('./views/ResetPasswordView.vue') },
     { path: '/subscribe', component: () => import('./views/SubscribeView.vue'), meta: { requiresAuthentication: true } },
     { path: '/dashboard', component: () => import('./views/DashboardView.vue'), meta: { requiresAuthentication: true, requiresSubscription: true } },
-    { path: '/dashboard-new', component: () => import('./views/DashboardNewView.vue') },
+    // { path: '/dashboard-new', component: () => import('./views/DashboardNewView.vue') },
     { path: '/change-email', component: () => import('./views/ChangeEmailView.vue'), meta: { requiresAuthentication: true } },
     { path: '/:pathMatch(.*)', component: () => import('./views/404View.vue') },
   ],
