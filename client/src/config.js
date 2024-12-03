@@ -1,11 +1,11 @@
 // src/config.js
 const dev = {
-  apiUrl: 'http://127.0.0.1:5000',
+  apiUrl: 'http://192.168.0.128:5000',
   webUrl: 'http://192.168.0.128:8080',
   socketUrl: 'http://192.168.0.128:5000' 
 };
 
-// const prod = {
+// const dev = {
 //   apiUrl: 'http://localhost:5000',
 //   webUrl: 'http://localhost:5000',
 //   socketUrl: 'http://localhost:5000'

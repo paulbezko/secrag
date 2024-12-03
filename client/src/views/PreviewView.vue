@@ -26,7 +26,7 @@
 
     <!-- Sidebar Section -->
     <transition name="slide">
-      <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 18rem;' : 'max-width: 18rem;'">
+      <div class="sidebar flex-column gap-1 z-15 text-inter" v-if="sidebarShown" :style="isSmallScreen ? 'max-width: 20rem;' : 'max-width: 20rem;'">
         <div class="flex-column height-100">
           <div class="flex-column gap-05">
             <div class="flex-column gap-05" :class="isSmallScreen ? 'text-3' : 'text-4'">
@@ -36,7 +36,7 @@
               </router-link>
               <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
                 <div class="fa-solid fa-coins text-center sidebar-element-icon" style="min-width: 2rem;"></div>
-                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Tokens: {{ subscriptionTokensLeft }}</div>
+                <div :class="isSmallScreen ? 'text-3' : 'text-4'">Prompts Left: {{ subscriptionTokensLeft }}</div>
               </div>
               <div @click="toggleNewChat" class="flex-row gap-05 sidebar-element menu" style="align-items: center;" :class="{ active: newChat }">
                 <div class="fa-solid fa-file-pen text-center sidebar-element-icon" style="min-width: 2rem;"></div>
@@ -47,13 +47,13 @@
                 <div class="text-bold" :class="isSmallScreen ? 'text-3' : 'text-4'">Analyze Any Filing</div>
               </router-link>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-column gap-1">
               <ul :style="{ height: chatHistoryHeight }" style="list-style-type: none; padding: 0" class="flex-column gap-05 chat-history">
-                <li class="text-4 sidebar-element text-link" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
+                <li class="text-4 sidebar-element" v-for="chat in chats" :key="chat" :class="{ active: currentChat === chat }" @click="selectChat(chat)" @mouseover="hoveredChat = chat" @mouseleave="hoveredChat = null">
                   <div class="flex-row space-between" :class="isSmallScreen ? 'text-3' : 'text-4'" style="align-items: center; white-space: nowrap; overflow: hidden; ">
-                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat }}</div>
-                    <div class="flex-row gap-05">
+                    <div style="max-width: 9rem; text-overflow: ellipsis;">{{ chat.replace(/-/g, ' ') }}</div>
+                    <div class="flex-row gap-025">
                       <div v-if="hoveredChat === chat" @click="resetChat()" class="fa-solid fa-rotate-right icon-link-active sidebar-element-icon"></div>
                       <div v-if="hoveredChat === chat" @click="deleteChat()" class="fa-solid fa-trash-can icon-link-active sidebar-element-icon"></div>
                     </div>
@@ -61,7 +61,7 @@
                 </li>
               </ul>
             </div>
-            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-grey);"></div>
+            <div class="width-100" style="padding-right: 0.5rem;"><hr class="width-100" style="border-top: 1px solid var(--color-border);"></div>
             <div class="flex-row gap-05 sidebar-element menu" style="align-items: center;">
               <div class="fa-solid fa-file text-center sidebar-element-icon" style="min-width: 2rem;"></div>
               <a href="mailto:secrag.info@gmail.com?subject=Feedback&body=Hi%20there%2C" :class="isSmallScreen ? 'text-3' : 'text-4'">Share Feedback</a>
@@ -95,7 +95,8 @@
           <input 
             type="text"
             class="input width-100"
-            v-model="optionInput" 
+            v-model="optionInput"
+            v-on:input="optionInput = $event.target.value"
             @input="filterOptions" 
             @focus="showSuggestions = true" 
             :placeholder="'Input ' + selectedType" 
@@ -189,6 +190,7 @@
             class="chat-input" 
             rows="1" 
             v-model="newMessage" 
+            v-on:input="newMessage = $event.target.value"
             @keydown.enter.exact.prevent 
             @keyup.enter.exact="sendMessage('textarea')"
             @input="adjustTextareaHeight('textarea')" 
@@ -250,7 +252,7 @@ export default {
       lastScrollTime: 0,
       userHasScrolled: false,
 
-      subscriptionTokensLeft: 60,
+      subscriptionTokensLeft: 20,
 
       // Chat data
       chats: [],
@@ -337,8 +339,8 @@ export default {
     // Initialize Socket
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {(this.socketId = socket.id)}); // console.log("Connected to socket", socket.id);
-      socket.on("new_chat_started", () => {this.newChatLoadingMessage = 'Creating chat';});
+      socket.on("connect", () => {(this.socketId = socket.id); console.log("Connected to socket", socket.id);} ); // console.log("Connected to socket", socket.id);
+      socket.on("new_chat_started", () => {this.newChatLoadingMessage = 'Creating chat'; console.log("New chat started");});
       socket.on("new_chat_initialized", () => {this.newChatLoadingMessage = 'Downloading the filing';});
       socket.on("new_chat_downloaded", () => {this.newChatLoadingMessage = 'Vectorizing the filing';});
       socket.on("new_chat_vectorized", () => {this.newChatLoadingMessage = 'Finishing up';});
@@ -349,8 +351,8 @@ export default {
     // Update Chat History Height
     updateChatHistoryHeight() {
       let heightAdjustment = 0
-      const headerHeight = 208; 
-      if (this.isSmallScreen) {heightAdjustment = -52;}
+      const headerHeight = 188; 
+      if (this.isSmallScreen) {heightAdjustment = -64;}
       const availableHeight = window.innerHeight - headerHeight + heightAdjustment;
       this.chatHistoryHeight = `${availableHeight}px`;
     },
@@ -358,7 +360,7 @@ export default {
     // Select option
     selectOption() {
       
-      this.selectedTicker = this.companyKeys.find(key => {
+      const selectedTicker = this.companyKeys.find(key => {
         const [ticker, cik, name] = key.split(" | ");
         return ticker === this.selectedOption || name === this.selectedOption || cik === this.selectedOption;
       });
@@ -367,8 +369,12 @@ export default {
       this.selectedYear = '';
       this.selectedFiling = '';
       this.selectedNewFiling = '';
-      axios.get(`${config.apiUrl}/api/get-info-by-ticker-preview`, {params: { ticker: this.selectedTicker }})
-      .then(response => {this.tickerInfo = response.data.info; this.yearOptions = Object.keys(this.tickerInfo)})
+      axios.get(`${config.apiUrl}/api/get-info-by-ticker-preview`, {params: { ticker: selectedTicker }})
+      .then(response => {
+        this.tickerInfo = response.data.info; 
+        this.yearOptions = Object.keys(this.tickerInfo)
+        this.selectedTicker = selectedTicker
+      })
       .catch(error => {console.error('Error getting ticker info:', error)});
     },
 
@@ -459,7 +465,7 @@ export default {
           return;
         }
 
-        this.subscriptionTokensLeft += -20
+        this.subscriptionTokensLeft += -0
         this.chats.unshift(newChatName);
         this.selectChat(newChatName);
         if (this.isSmallScreen) {this.sidebarShown = false;}
@@ -511,9 +517,9 @@ export default {
   
     // Send Message
     async sendMessage() {
-      if (this.subscriptionTokensLeft < 4) {this.confirmAction = 'insufficientTokens', this.showConfirm = true; return}
+      if (this.subscriptionTokensLeft < 1) {this.confirmAction = 'insufficientTokens', this.showConfirm = true; return}
 
-      this.subscriptionTokensLeft += -4
+      this.subscriptionTokensLeft += -1
       this.userHasScrolled = false;
       this.stopButtonShown = true
       // If there's an ongoing response, stop it and save it first
@@ -583,16 +589,18 @@ export default {
     },
 
     async stopResponse() {
+      this.stopButtonShown = false;
       return new Promise((resolve) => {
-        socket.emit("stop_llm_stream");
-        this.responseStopped = true; 
+        this.responseStopped = true;
         this.assistantMessageLoading = false;
+        socket.emit("stop_llm_stream");
         setTimeout(() => {resolve()}, 100);
       });
     },
 
     async saveAssitantResponse() {
       try {
+        this.stopButtonShown = false;
         this.assistantMessageLoading = false;
         this.assistantMessageBeingRendered = false;
         if (!this.userHasScrolled) {this.$nextTick(() => {this.scrollToBottom("smooth")})}
@@ -607,7 +615,6 @@ export default {
           return;
         }
 
-        this.stopButtonShown = false;
         this.llmResponseBuffer = '';
 
       } catch (error) {

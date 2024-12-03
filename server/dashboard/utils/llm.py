@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from typing import Literal, List
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from datetime import datetime
 
 llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
@@ -39,7 +40,7 @@ system_prompt_agent = """
     find the partial answer using either financial_data_filing_retriever or non-financial_data_filing_retriever and then 
     you can use Google search to add missing pieces.
 
-    Do not use Google search to look up formulas. Rely on your own knowledge for that. 
+    Do not use Google search to look up formulas. Rely on your own knowledge for that. Current date and time is {current_datetime}
     """
 
 openai_agent_prompt = ChatPromptTemplate.from_messages(
@@ -96,7 +97,8 @@ async def get_assistant_response(user_prompt, message_history, filing_id, socket
         "input": user_prompt, 
         "chat_history": message_history, 
         "filing_date": filing.filing_date, 
-        "ticker": filing.ticker
+        "ticker": filing.ticker,
+        "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
     response = await stream_response(agent_executor, prompt_settings, socket_id, socketio_handler)

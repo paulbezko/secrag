@@ -19,12 +19,12 @@
             <div v-if="error" class="text-4 text-error text-center flex-row gap-05 center"><div class="fa-solid fa-triangle-exclamation text-error"></div>{{ error }}</div>
           </div>
           <div class="text-4 text-link discouraged" @click="resetPassword($event)">Forgot Password?</div>
-          <div class="text-3 text-bold flex-row gap-1 center text-link" @click="loginGoogle()"><div class="fa-brands fa-google text-3"></div>Sign In with Google</div>
+          <div class="text-3 flex-row gap-1 center text-link" @click="loginGoogle()"><div class="fa-brands fa-google text-3"></div>Sign In with Google</div>
         </div>
       </div>
     </div>
     <div class="text-4 flex-row center width-100 gap-05" style="padding-bottom: 1rem">
-      No account yet? <router-link class="text-4 text-link" to="/signup">Sign Up</router-link>
+      No account yet? <router-link class="text-4 text-link text-link-accent text-bold" to="/signup">Sign Up</router-link>
     </div>
   </div>
 </template>
