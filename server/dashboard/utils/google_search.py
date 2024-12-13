@@ -3,7 +3,7 @@ from googlesearch import search
 import requests
 import requests
 import time
-
+import asyncio
 import tiktoken
 
 token_encoder = tiktoken.encoding_for_model("gpt-4o-mini")
@@ -38,7 +38,7 @@ def get_html_text(url: str):
     '''Extracts text from web page'''
     retries = 0
     while retries < 2:
-        response = requests.get(url, headers=firefox_headers)
+        response = requests.get(url, headers=firefox_headers, timeout=3)
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
             text = soup.get_text()
@@ -63,6 +63,24 @@ def search_with_retries(query: str, num_results: int = 10, max_retries: int = 3)
         except Exception as e:
             time.sleep(0.5)
             retries += 1
+    return "No parsable results found"
+
+async def search_with_retries_async(query: str, num_results: int = 10, max_retries: int = 3):
+    retries = 0
+    while retries < max_retries:
+        await asyncio.sleep(0)
+        try:
+            results = search(query, num_results=10)
+            for url in results:
+                if check_url_not_blacklisted(url):
+                    website_text = get_html_text(url)
+                    if website_text:
+                        return get_first_15000_tokens(website_text.strip())
+            return "No parsable results found"
+        except Exception as e:
+            time.sleep(0.5)
+            retries += 1
+    return "No parsable results found"
 
 def get_first_15000_tokens(text):
     # Tokenize the input text
@@ -74,3 +92,7 @@ def get_first_15000_tokens(text):
 def google_search(query: str) -> str:
     '''Searches Google for links and return the first parsable link's text (Processes up to 10 links)'''
     return search_with_retries(query, num_results=10)
+
+async def google_search_async(query: str) -> str:
+    '''Searches Google for links and return the first parsable link's text (Processes up to 10 links)'''
+    return await search_with_retries_async(query, num_results=10)
