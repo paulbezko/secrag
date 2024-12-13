@@ -39,6 +39,8 @@ system_prompt_agent = """
     Use Google search as little as possible. If the question can be at least partially answered using data in the filing, 
     find the partial answer using either financial_data_filing_retriever or non-financial_data_filing_retriever and then 
     you can use Google search to add missing pieces.
+    
+    You are only allowed to use Google search once. If it produces no helpful result, just say so.
 
     Do not use Google search to look up formulas. Rely on your own knowledge for that. Current date and time is {current_datetime}
     """

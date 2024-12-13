@@ -1,5 +1,5 @@
 from .vectorstore import vectorstore_manager
-from .google_search import google_search
+from .google_search import google_search, google_search_async
 
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional, Type
@@ -138,7 +138,7 @@ class GoogleSearchTool(BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool asynchronously."""
-        return google_search(query=query)
+        return await google_search_async(query=query)
 
 
 def remove_special_characters(input_string):
