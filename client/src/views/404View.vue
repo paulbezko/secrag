@@ -1,28 +1,14 @@
 <template>
-  <div class="flex-column width-100" style="padding-inline: 2rem; height: 100vh; align-items: center">
-    <NavbarComp :authenticated=isAuthenticated :subscribed=isSubscribed />
-    <div class="flex-column center gap-2 height-100">
-      <div class="heading">Uh Oh, 404</div>
-      <div class="text-3">Seems like this page does not exist.</div>
-      <router-link class="button button-primary" to="/">Back to Safety</router-link>
+  <div class="flex-column center width-100" style="height: 100vh;">
+    <div class="flex-row gap-1 center">
+      <img :src="require('@/assets/dashboard/slightly_smiling_face_3d.png')" class="assistant-image">
+      <div class="flex-column gap-05" style="font-family: 'Inter', sans-serif; font-size: 1.4rem;">
+        <div class="text-1">Uh Oh, page not found!</div>
+        <a class="text-1" href="/">Back to Safety</a>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import NavbarComp from '../components/NavbarComp.vue';
-import { mapState } from 'vuex';
-
-export default {
-  components: {
-    NavbarComp
-  },
-  data() {return {
-    pageLoaded: false,
-    subscription: ''
-  }},
-  computed: {
-    ...mapState(['isAuthenticated', 'isSubscribed']),
-  },
-}
 </script>

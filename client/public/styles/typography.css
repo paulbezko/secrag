@@ -13,7 +13,7 @@ html {
     --subheading: 3.6rem;
 
     --text-1: 2.4rem;
-    --text-2: 2.0rem;
+    --text-2: 2rem;
     --text-3: 1.6rem;
     --text-4: 1.2rem;
 
@@ -26,9 +26,9 @@ html {
 @media (max-width: 800px) {
   :root {
     --heading: 4.2rem;
-    --subheading: 3.0rem;
+    --subheading: 3rem;
 
-    --text-1: 2.0rem;
+    --text-1: 2rem;
     --text-2: 1.6rem;
     --text-3: 1.4rem;
     --text-4: 1.2rem;
@@ -39,23 +39,56 @@ html {
   }
 }
 
-.heading {font-size: var(--heading); font-weight: 700; color: var(--color-text)}
-.subheading {font-size: var(--subheading); font-weight: 700; color: var(--color-text)}
+.heading {
+  font-size: var(--heading);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.subheading {
+  font-size: var(--subheading);
+  font-weight: 700;
+  color: var(--color-text);
+}
 
-.text-1 {font-size: var(--text-1); line-height: 150%;}
-.text-2 {font-size: var(--text-2); line-height: 150%;}
-.text-3 {font-size: var(--text-3); line-height: 150%;}
-.text-4 {font-size: var(--text-4); line-height: 150%;}
+.text-1 {
+  font-size: var(--text-1);
+  line-height: 150%;
+}
+.text-2 {
+  font-size: var(--text-2);
+  line-height: 150%;
+}
+.text-3 {
+  font-size: var(--text-3);
+  line-height: 150%;
+}
+.text-4 {
+  font-size: var(--text-4);
+  line-height: 150%;
+}
 
-.text-button {font-size: var(--text-button);}
-.text-chat {font-size: var(--text-chat); line-height: 150%;}
-.text-error {font-size: var(--text-error); color: var(--color-text-negative); font-weight: 700;}
+.text-button {
+  font-size: var(--text-button);
+}
+.text-chat {
+  font-size: var(--text-chat);
+  line-height: 150%;
+}
+.text-error {
+  font-size: var(--text-error);
+  color: var(--color-text-negative);
+  font-weight: 700;
+}
 
-.text-center {text-align: center;}
-.text-bold {font-weight: 700;}
+.text-center {
+  text-align: center;
+}
+.text-bold {
+  font-weight: 700;
+}
 .text-overflow {
-  white-space: nowrap;     /* Prevent text from wrapping */
-  overflow: hidden;        /* Hide the overflowed text */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide the overflowed text */
   text-overflow: ellipsis; /* Show ellipsis when text overflows */
 }
 
@@ -65,7 +98,7 @@ html {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-  
+
 .text-link:hover *,
 .text-link:hover {
   color: var(--color-secondary-text);
@@ -77,7 +110,7 @@ html {
 }
 
 .text-link.discouraged:hover,
-.text-link.discouraged:hover  * {
+.text-link.discouraged:hover * {
   color: var(--color-text-negative);
 }
 
@@ -86,5 +119,5 @@ html {
 }
 
 .text-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }

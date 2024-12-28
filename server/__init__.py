@@ -33,29 +33,7 @@ def create_app(mode: str):
     app = FastAPI()
     socketio = SocketManager(app, cors_allowed_origins="*", mount_location="/socket.io")
 
-    #######################################################################
-    ###                         LOAD CLIENT                             ###
-    app.mount("/css", StaticFiles(directory="client/dist/css"), name="css")
-    app.mount("/js", StaticFiles(directory="client/dist/js"), name="js")
-    app.mount("/img", StaticFiles(directory="client/dist/img"), name="img")
 
-    templates = Jinja2Templates(directory="client/dist")
-
-    css_file_path = Path(__file__).parent.parent / "client" / "dist" / "style.css"
-    robots_file_path = Path(__file__).parent.parent / "client" / "dist" / "robots.txt"
-    sitemap_file_path = Path(__file__).parent.parent / "client" / "dist" / "sitemap.xml"
-    
-    @app.get("/style.css")
-    async def serve_css():
-        return FileResponse(css_file_path)
-    @app.get("/robots.txt")
-    async def serve_robots():
-        return FileResponse(robots_file_path)
-    @app.get("/sitemap.xml")
-    async def serve_sitemap():
-        return FileResponse(sitemap_file_path)
-    
-    app.mount("/style", StaticFiles(directory="client/dist/style"), name="style")
 
     #######################################################################
     ###                         LOAD ROUTES                             ###
@@ -65,15 +43,44 @@ def create_app(mode: str):
     from server.subscription.routes import routes as subscription_routes
     from server.github.routes import routes as github_routes
 
-    app.include_router(general_routes, prefix="/api")
-    app.include_router(auth_routes, prefix="/api")
-    app.include_router(subscription_routes, prefix="/api")
-    app.include_router(dashboard_routes, prefix="/api")
-    app.include_router(github_routes, prefix="/gh")
+    from server.v2.routes import routes as v2_routes
+
+    # app.include_router(general_routes, prefix="/api")
+    # app.include_router(auth_routes, prefix="/api")
+    # app.include_router(subscription_routes, prefix="/api")
+    # app.include_router(dashboard_routes, prefix="/api")
+    # app.include_router(github_routes, prefix="/gh")
+
+    app.include_router(v2_routes, prefix="/api")
 
     #######################################################################
     ###                         SERVE INDEX                             ### 
     if mode == 'prod':
+
+        #######################################################################
+        ###                         LOAD CLIENT                             ###
+        app.mount("/css", StaticFiles(directory="client/dist/css"), name="css")
+        app.mount("/js", StaticFiles(directory="client/dist/js"), name="js")
+        app.mount("/img", StaticFiles(directory="client/dist/img"), name="img")
+
+        templates = Jinja2Templates(directory="client/dist")
+
+        css_file_path = Path(__file__).parent.parent / "client" / "dist" / "style.css"
+        robots_file_path = Path(__file__).parent.parent / "client" / "dist" / "robots.txt"
+        sitemap_file_path = Path(__file__).parent.parent / "client" / "dist" / "sitemap.xml"
+        
+        @app.get("/style.css")
+        async def serve_css():
+            return FileResponse(css_file_path)
+        @app.get("/robots.txt")
+        async def serve_robots():
+            return FileResponse(robots_file_path)
+        @app.get("/sitemap.xml")
+        async def serve_sitemap():
+            return FileResponse(sitemap_file_path)
+        
+        app.mount("/style", StaticFiles(directory="client/dist/style"), name="style")
+
         config['MODE'] = 'prod'
         config['REDIRECT_URL'] = os.getenv('REDIRECT_URL', 'http://localhost:5000')
         # Serve index page

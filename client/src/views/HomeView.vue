@@ -1,320 +1,704 @@
 <template>
-  <div class="flex-column center width-100">
-    <NavbarComp :authenticated=isAuthenticated :subscribed=isSubscribed />
-    <div class="flex-row width-100 gap-8 center" style="padding-inline: 2rem; height: calc(100vh - 6rem)">
-      <div class="flex-column gap-4 center" style="max-width: 52rem;">
-        <div class="heading fade-in delay-1">{{ heroHeading }}</div>
-        <div class="text-1 fade-in delay-2">{{ heroSubheading }}</div>
-        <div class="flex-row width-100 gap-2 switch-row-to-column" style="justify-content: start; align-items: start;">
-          <div v-if="!isAuthenticated" class="fade-in delay-3 flex-column center"><router-link to="/preview" class="button button-primary">Try for Free</router-link></div>
-          <div v-if="isAuthenticated && !isSubscribed" class="fade-in delay-3 flex-column center"><router-link to="/dashboard" class="button button-primary">Subscribe Here</router-link></div>
-          <div v-if="isAuthenticated && isSubscribed" class="fade-in delay-3 flex-column center"><router-link to="/dashboard" class="button button-primary">Go to Dashboard</router-link></div>
-        </div>
-      </div>
-      <div class="flex-column center width-100 show-on-large" style="max-width: 52rem; padding-inline: 2rem;">
-        <div class="relative width-100" style="height: 60rem" >
-          <img src="../assets/home/hero 1.png" class="absolute shadow fade-in delay-4" style="top: 42.5%; left: 42.5%; max-width: 70%; z-index: 4; transform: translate(-50%, -50%)">
-          <img src="../assets/home/hero 2.png" class="absolute shadow fade-in delay-3" style="top: 47.5%; left: 47.5%; max-width: 70%; z-index: 3; transform: translate(-50%, -50%)">
-          <img src="../assets/home/hero 3.png" class="absolute shadow fade-in delay-2" style="top: 52.5%; left: 52.5%; max-width: 70%; z-index: 2; transform: translate(-50%, -50%)">
-          <img src="../assets/home/hero 4.png" class="absolute shadow fade-in delay-1" style="top: 57.5%; left: 57.5%; max-width: 70%; z-index: 1; transform: translate(-50%, -50%)">
-        </div>
-      </div>
-    </div>
-    <div id="about" class="flex-column width-100 center gap-4" style="padding-inline: 2rem;">
-      <div class="heading text-center fade-in">The SEC Filing Problem</div>
-      <div class="flex-row gap-4 center fade-in">
-        <div class="text-2 text-center" style="max-width: 50rem;">For investors, analysts, and legal professionals, deciphering complex SEC filings can be <b style="color: var(--color-text-negative);">overwhelming</b>.</div>
-        <img src="../assets/home/face_with_monocle_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
-      </div>
-      <div class="flex-row gap-4 center fade-in">
-        <div class="text-2 text-center" style="max-width: 50rem;">Extracting key insights from lengthy documents often requires <b style="color: var(--color-text-negative);">hours</b> of manual effort and expertise.</div>
-        <img src="../assets/home/hourglass_done_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
-      </div>
-      <div class="flex-row gap-4 center fade-in">
-        <div class="text-2 text-center" style="max-width: 50rem;">It's easy to <b style="color: var(--color-text-negative);">miss critical information</b>, and traditional search tools don’t provide the contextual understanding needed to make informed decisions quickly.</div>
-        <img src="../assets/home/money_with_wings_3d 1.png" class="fade-in" style="width: 10rem; height: 10rem;">
-      </div>
-    </div>
-    <div class="flex-column width-100 center gap-8" style="max-width: 88rem; padding-top: 20rem; padding-inline: 2rem;">
-      <div class="heading text-center fade-in">Our Simple, Two-Step Solution</div>
-      <div class="flex-row switch-row-to-column gap-4 center width-100 fade-in">
-        <div class="flex-column vertical-line gap-2 width-100">
-          <div class="subheading">Step 1: Find the Filing You Need</div>
-          <div class="text-2"><b style="color: var(--color-text-positive);">Easily</b> search our comprehensive library of SEC filings and select the document you want to explore. Whether it’s a recent filing or a historical one, everything is at your fingertips, ready to be <b style="color: var(--color-text-positive);">analyzed in seconds.</b></div>
-        </div>
-        <img src="../assets/home/card_index_dividers_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
-      </div>
-      <div class="flex-row switch-row-to-column gap-4 center width-100 fade-in">
-        <div class="flex-column vertical-line gap-2 width-100">
-          <div class="subheading">Step 2: Get Instant Answers with AI</div>
-          <div class="text-2">Ask our advanced AI-powered model any question about the filing and <b style="color: var(--color-text-positive);">get detailed, clear insights immediately.</b> No more sifting through pages—just direct answers to the key information you’re looking for, all in <b style="color: var(--color-text-positive);">real time.</b></div>
-        </div>
-        <img src="../assets/home/bookmark_tabs_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
-      </div>
-      <div class="flex-row switch-row-to-column gap-4 center width-100 fade-in">
-        <div class="flex-column vertical-line gap-2 width-100">
-          <div class="subheading">Why This Works:</div>
-          <ul class="text-2">
-            <li><b style="color: var(--color-text-positive);">Fast Access:</b> No manual searching. Instant results.</li>
-            <li><b style="color: var(--color-text-positive);">Clear Insights:</b> Get precise answers without the overwhelm.</li>
-            <li><b style="color: var(--color-text-positive);">User-Friendly:</b> Navigate filings and interact with AI effortlessly.</li>
-          </ul>
-        </div>
-        <img src="../assets/home/stopwatch_3d 1.png" class="fade-in" style="width: 15rem; height: 15rem;">
-      </div>
-    </div>
-    <div class="flex-column center gap-4 fade-in light-dark-mode" style="padding-top: 20rem; padding-inline: 2rem;">
-      <div class="text-2 text-center">~ We provide access to filings for any public company. No matter which one you're looking for, we have it. ~</div>
-      <div class="flex-row width-100 show-on-large">
-        <div class="flex-row width-100 space-between">
-          <img src="../assets/home/logos/image 6.png" class="fade-in delay-1" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 7.png" class="fade-in delay-2" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 8.png" class="fade-in delay-3" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 9.png" class="fade-in delay-4" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 10.png" class="fade-in delay-1" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 11.png" class="fade-in delay-2" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 14.png" class="fade-in delay-3" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 15.png" class="fade-in delay-4" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 16.png" class="fade-in delay-1" style="object-fit: contain;">
-        </div>
-      </div>
-      <div class="flex-column width-100 show-on-small">
-        <div class="flex-row width-100 space-between">
-          <img src="../assets/home/logos/image 6.png" class="fade-in delay-1" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 7.png" class="fade-in delay-2" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 8.png" class="fade-in delay-1" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 9.png" class="fade-in delay-2" style="object-fit: contain;">
-        </div>
-        <div class="flex-row width-100 space-between">
-          <img src="../assets/home/logos/image 10.png" class="fade-in delay-3" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 11.png" class="fade-in delay-4" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 14.png" class="fade-in delay-3" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 15.png" class="fade-in delay-4" style="object-fit: contain;">
-          <img src="../assets/home/logos/image 16.png" class="fade-in delay-3" style="object-fit: contain;">
-        </div>
-      </div>
-    </div>
-    <div class="flex-column center gap-4" style="max-width: 70rem; padding-top: 20rem; padding-inline: 2rem;">
-      <div class="heading text-center fade-in">Start Your Journey to Smarter Filings</div>
-      <div class="text-1 text-center fade-in">Get more from SEC filings with the plan that fits your workflow.</div>
-      <div class="flex-column gap-2 width-100">
-        <div class="flex-row card width-100 gap-4 fade-in" style="padding: 1rem;">
-          <div class="card-nested width-100 flex-column center" :class="{ active: subscriptionIsYearly }" @click="selectSubscriptionYearly" style="cursor: pointer">
-            <b class="text-1">Yearly</b>
-            <div class="text-2 text-center flex-row gap-05" style="align-items: baseline;"><div class="text-1">20%</div> Off</div>
-          </div>
-          <div class="card-nested width-100 flex-column center" :class="{ active: !subscriptionIsYearly }" @click="selectSubscriptionMonthly" style="cursor: pointer">
-            <b class="text-1">Monthly</b>
-          </div>
-        </div>
-        <div class="flex-row gap-2 width-100 show-on-large fade-in">
-          <div class="flex-column card center gap-1 width-100">
-            <div class="text-2 flex-row" style="align-items: baseline;">
-              <div class="flex-row gap-05" style="align-items: baseline;">
-                <b style="font-size: var(--subheading)">€</b>
-                <b style="font-size: var(--heading);">{{ subscriptionIsYearly ? subscriptionItemsWithAnnual.Basic.priceAnnual : subscriptionItems.Basic.priceMonthly }}</b>
-              </div>/mo
+  <div class="flex-column center width-100 height-100svh" id="dashboard">
+    <div class="flex-column center space-between width-100 height-100svh" style="max-width: 80rem; ">
+
+      <!-- Footer -->
+      <div style="min-height: 1rem;" class="width-100 header" id="header"></div>
+
+      <div class="flex-column width-100 height-100 center">
+
+        <div class="flex-column width-100 gap-1 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
+          <div v-for="(message, index) in chat" :key="index" class="flex-row center gap-1 width-100 chat-message">
+
+            <!-- Assistant message -->
+            <div v-if="message.role === 'assistant'" class="flex-row center gap-1" :class="chat.length === 1 ? 'assistant-message single' : 'assistant-message'">
+              <img v-if="index === chat.length - 1" :src="require('@/assets/dashboard/slightly_smiling_face_3d.png')" class="assistant-image">
+              <img v-if="index !== chat.length - 1" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
+              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
             </div>
-            <div class="text-1">{{ subscriptionItems.Basic.name }}</div>
-            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-            <div class="flex-column gap-1">
-              <div v-for="(feature, index) in subscriptionItems.Basic.features" :key="index">
-                <div class="flex-row gap-1 text-3">
-                  <div class="fa-solid fa-square-check text-2" style="color: var(--color-blue)"></div>
-                  {{ feature }}
+
+            <div v-else-if="message.role === 'widget'" class="widget-container">
+              <div v-if="message.type === 'tradingview'" class="width-100">
+                <TradingViewWidget :ticker=message.metadata.ticker :theme="theme" />
+              </div>
+            </div>
+
+            <!-- User message -->
+            <div v-else class="flex-row center gap-1 width-100 user-message">
+              <div class="chat-text" v-html="markdownify(message.content)"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding-block: 1rem;" class="width-100 footer" id="footer">
+        <!-- Input section -->
+        <div class="flex-column center gap-1 width-100" style="max-width: 80rem; padding-inline: 1rem;">
+
+          <!-- Suggestion section -->
+          <div class="flex-row center gap-1 width-100" style="justify-content: space-between; padding-left: 1rem;" :class="{ 'input-suggestion-disabled': responseIsProcessing }">
+            
+            <!-- Organic suggestions -->
+            <div v-if="premadeSuggestionsShown && isMobile"></div>
+            <div class="flex-row center" v-if="!premadeSuggestionsShown && isMobile || !isMobile" :class="isMobile ? 'gap-1' : 'gap-15'">
+              <div v-for="(prompt, index) in organicSuggestions" :key="index" class="input-suggestion" @click="sendMessage(prompt)">{{ prompt }}</div>
+              <div class="input-suggestion" v-if="inputMode === 'login' || inputMode === 'signup_email'" @click="switchToDefaultInput()">Go back</div>
+            </div>
+
+            <!-- Premade suggestions -->
+            <div class="flex-row gap-2" style="justify-content: right;">
+              <div class="flex-row center" v-if="premadeSuggestionsShown" :class="isMobile ? 'gap-1' : 'gap-15'">
+                <div class="input-suggestion" v-for="(suggestion, index) in premadeSuggestions" :key="index" @click="suggestion.action">
+                  {{ suggestion.label }}
+                </div>
+              </div>
+              <div 
+                v-if="isMobile && userStatus !== 'verified' && inputMode !== 'reset_password'" 
+                class="icon fa-solid fa-ellipsis" 
+                style="width: 4rem; text-align: center; font-size: 1.6rem; cursor: pointer;" 
+                @click="togglePremadeSuggestionsVisibility()"
+                >
+              </div>
+              <div v-else style="width: 4rem;"></div>
+            </div>
+          </div>
+
+          <!-- Inputbox section -->
+          <div class="flex-row center gap-1 width-100">
+
+            <!-- Default input -->
+            <div class="flex-row center gap-1 width-100" v-if="inputMode === 'default'" style="align-items: end;">
+              <textarea
+                class="input-chat" 
+                :class="{ 'input-chat-disabled': responseIsProcessing }"
+                v-model="input" 
+                type="text" 
+                rows="1"
+                id="textarea"
+                placeholder="Ask me anything"
+                @keydown.enter.exact.prevent 
+                @keyup.enter.exact="sendMessage(input)"
+                @input="updateTextareaHeight()"
+              ></textarea>
+              <div class="button-send" v-if="!responseIsProcessing" @click="sendMessage(input)">
+                <div class="icon fa-solid fa-arrow-up"></div>
+              </div>
+              <div class="button-send" v-else @click="stopResponse()">
+                <div class="icon fa-solid fa-square"></div>
+              </div>
+            </div>
+
+            <!-- Signup Email input -->
+            <div class="flex-row center gap-1 width-100" v-if="inputMode === 'signup_email'">
+              <input 
+                class="input-chat" 
+                :class="{ 'input-chat-disabled': responseIsProcessing }"
+                v-model="inputEmail" 
+                type="email" 
+                placeholder="Email"
+                @keydown.enter.exact.prevent 
+                @keyup.enter.exact="signupEmail(inputEmail)"
+              >
+              <div class="flex-row center gap-1">
+                <div class="button-send" :class="{ 'input-chat-disabled': responseIsProcessing }" @click="authenticateWithGoogle()">
+                  <div class="icon fa-brands fa-google"></div>
+                </div>
+                <div class="button-send" v-if="!responseIsProcessing" @click="signupEmail(inputEmail)">
+                  <div class="icon fa-solid fa-arrow-up"></div>
+                </div>
+                <div class="button-send" v-else @click="stopResponse()">
+                  <div class="icon fa-solid fa-square"></div>
                 </div>
               </div>
             </div>
-            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-            <router-link to="/signup" class="button button-secondary">Join {{ subscriptionItems.Basic.name }}</router-link>
-          </div>
-          <div class="flex-column card center gap-1 width-100">
-            <div class="text-2 flex-row" style="align-items: baseline;">
-              <div class="flex-row gap-05" style="align-items: baseline;">
-                <b style="font-size: var(--subheading)">€</b>
-                <b style="font-size: var(--heading);">{{ subscriptionIsYearly ? subscriptionItemsWithAnnual.Premium.priceAnnual : subscriptionItems.Premium.priceMonthly }}</b>
-              </div>/mo
-            </div>
-            <div class="text-1">{{ subscriptionItems.Premium.name }}</div>
-            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-            <div class="flex-column gap-1">
-              <div v-for="(feature, index) in subscriptionItems.Premium.features" :key="index">
-                <div class="flex-row gap-1 text-3">
-                  <div class="fa-solid fa-square-check text-2" style="color: var(--color-blue)"></div>
-                  {{ feature }}
+
+            <!-- Signup Password input -->
+            <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'signup_password'">
+              <div class="flex-row row-to-column center gap-1 width-100">
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputPassword" 
+                  type="password"
+                  placeholder="Password"
+                  @keydown.enter.exact.prevent 
+                >
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputPasswordConfirm" 
+                  type="password" 
+                  placeholder="Confirm Password"
+                  @keydown.enter.exact.prevent 
+                  @keyup.enter.exact="signupPassword(inputPassword, inputPasswordConfirm)"
+                >
+              </div>
+              <div class="flex-row row-to-column center gap-1">
+                <div class="button-send" v-if="!responseIsProcessing" @click="signupPassword(inputPassword, inputPasswordConfirm)">
+                  <div class="icon fa-solid fa-arrow-up"></div>
+                </div>
+                <div class="button-send" v-else @click="stopResponse()">
+                  <div class="icon fa-solid fa-square"></div>
                 </div>
               </div>
             </div>
-            <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-            <router-link to="/signup" class="button button-primary">Join {{ subscriptionItems.Premium.name }}</router-link>
-          </div>
-        </div>
-        <div class="flex-row gap-2 show-on-small fade-in">
-          <div class="flex-row card width-100 gap-4" style="padding: 1rem;">
-            <div class="card-nested width-100 flex-column center" :class="{ active: subscriptionIsBasic }" @click="selectSubscriptionBasic" style="cursor: pointer">
-              <b class="text-1" style="color: var(--color-blue)">{{ subscriptionItems.Basic.name }}</b>
-            </div>
-            <div class="card-nested width-100 flex-column center" :class="{ active: !subscriptionIsBasic }" @click="selectSubscriptionPremium" style="cursor: pointer">
-              <b class="text-1" style="color: var(--color-yellow)">{{ subscriptionItems.Premium.name }}</b>
-            </div>
-          </div>
-        </div>
-        <div class="card flex-column center gap-1 width-100 show-on-small fade-in" style="padding-top: 3rem;">
-          <div class="text-2 flex-row" style="align-items: baseline;">
-              <div class="flex-row gap-05" style="align-items: baseline;">
-                <b style="font-size: var(--heading)">€</b>
-                <b style="font-size: var(--heading);">{{ subscriptionIsBasic ? (subscriptionIsYearly ? subscriptionItemsWithAnnual.Basic.priceAnnual : subscriptionItems.Basic.priceMonthly) : (subscriptionIsYearly ? subscriptionItemsWithAnnual.Premium.priceAnnual : subscriptionItems.Premium.priceMonthly) }}</b>
-              </div>/mo
-            </div>
-          <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-          <div class="flex-column gap-1">
-            <div v-for="(feature, index) in (subscriptionIsBasic ? subscriptionItems.Basic.features : subscriptionItems.Premium.features)" :key="index">
-              <div class="flex-row gap-1 text-2" style="align-items: center;">
-                <div class="fa-solid fa-square-check text-2" style="color: var(--color-blue)"></div>
-                {{ feature }}
+
+            <!-- Sign in input -->
+            <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'login'">
+              <div class="flex-row row-to-column center gap-1 width-100">
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputEmail" 
+                  type="email" 
+                  placeholder="Your Email"
+                  @keydown.enter.exact.prevent
+                >
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputPassword" 
+                  type="password" 
+                  placeholder="Your Password"
+                  @keydown.enter.exact.prevent 
+                  @keyup.enter.exact="login(inputEmail, inputPassword)"
+                >
+              </div>
+              <div class="flex-row row-to-column center gap-1">
+                <div class="button-send" :class="{ 'input-chat-disabled': responseIsProcessing }" @click="authenticateWithGoogle()">
+                  <div class="icon fa-brands fa-google"></div>
+                </div>
+                <div class="button-send" v-if="!responseIsProcessing" @click="login(inputEmail, inputPassword)">
+                  <div class="icon fa-solid fa-arrow-up"></div>
+                </div>
+                <div class="button-send" v-else @click="stopResponse()">
+                  <div class="icon fa-solid fa-square"></div>
+                </div>
               </div>
             </div>
+
+            <!-- Forgot password input -->
+            <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'forgot_password'">
+              <div class="flex-row row-to-column center gap-1 width-100">
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputEmail" 
+                  type="email" 
+                  placeholder="Your Email"
+                  @keydown.enter.exact.prevent 
+                  @keyup.enter.exact="forgotPassword(inputEmail)"
+                >
+              </div>
+              <div class="button-send" v-if="!responseIsProcessing" @click="forgotPassword(inputEmail)">
+                <div class="icon fa-solid fa-arrow-up"></div>
+              </div>
+              <div class="button-send" v-else @click="stopResponse()">
+                <div class="icon fa-solid fa-square"></div>
+              </div>
+            </div>
+
+            <!-- Reset password input -->
+            <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'reset_password'">
+              <div class="flex-row row-to-column center gap-1 width-100">
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputPassword" 
+                  type="password"
+                  placeholder="Password"
+                  @keydown.enter.exact.prevent 
+                >
+                <input 
+                  class="input-chat"
+                  :class="{ 'input-chat-disabled': responseIsProcessing }"
+                  v-model="inputPasswordConfirm" 
+                  type="password" 
+                  placeholder="Confirm Password"
+                  @keydown.enter.exact.prevent 
+                  @keyup.enter.exact="signupPassword(inputPassword, inputPasswordConfirm)"
+                >
+              </div>
+              <div class="button-send" v-if="!responseIsProcessing" @click="resetPassword(inputPassword, inputPasswordConfirm)">
+                <div class="icon fa-solid fa-arrow-up"></div>
+              </div>
+              <div class="button-send" v-else @click="stopResponse()">
+                <div class="icon fa-solid fa-square"></div>
+              </div>
+            </div>
+
           </div>
-          <hr class="width-100" style="border-top: 1px solid var(--color-grey)">
-          <router-link to="/signup" v-if="subscriptionIsBasic" class="button button-secondary">Join {{ subscriptionItems.Basic.name }}</router-link>
-          <router-link to="/signup" v-if="!subscriptionIsBasic" class="button button-primary">Join {{ subscriptionItems.Premium.name }}</router-link>
         </div>
-      </div>
-    </div>
-    <div id="faq" class="flex-column gap-4" style="max-width: 112rem; padding-top: 20rem; padding-inline: 2rem;">
-      <div class="heading text-center fade-in">Frequently Asked Questions</div>
-      <div class="width-100 vertical-line flex-column fade-in">
-        <div v-for="(faq, index) in faqItems" :key="index">
-          <div class="faq-question text-2 flex-row space-between gap-2" :class="{ open: faq.open }" @click="toggleFAQAnswer(index)">
-            {{ faq.question }}<span class="text-2">{{ faq.open ? '-' : '+' }}</span>
-          </div>
-          <div class="faq-answer text-3" :class="{ open: faq.open }" :style="{ maxHeight: faq.open ? faq.height : '0' }">
-            <div class="vertical-line">{{ faq.answer }}</div>
-            <div style="height: 2rem"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="contact" class="flex-column gap-4 text-left width-100" style="max-width: 112rem; padding-top: 20rem; padding-inline: 2rem;">
-      <div class="flex-column gap-2">
-        <div class="heading">Contact Us</div>
-        <div class="text-1">Got a question or a remark? <a href="mailto:secrag.info@gmail.com?subject=Question%20or%20Remark&body=Hi%20there%2C" class="text-link text-bold text-link-accent">Send us a message!</a></div>
-      </div>
-      <div class="flex-column text-4 gap-05" style="padding-bottom: 2rem;">
-        <div style="text-align: justify; color: var(--color-grey-semidark)">The information provided through this platform is for informational and educational purposes only and is not intended as financial, legal, or professional advice. The platform uses AI to retrieve and summarize information from publicly available SEC filings; however, it may not always capture the complete context of the documents. Users are encouraged to review the original filings and consult with a qualified professional for any investment or business decisions. The platform and its creators are not responsible for any inaccuracies, omissions, or actions taken based on the content provided. Use of this platform is at your own risk.</div>
-        <div class="text-4" style="text-align: justify; color: var(--color-grey-semidark)">The complete Terms and Conditions for use of this platform are available <router-link class="text-4 text-link" style="color: var(--color-grey-semidark); text-decoration: underline;" to="/terms-and-conditions">here</router-link>.</div>
-        <div class="text-4" style="text-align: justify; color: var(--color-grey-semidark)">© {{ new Date().getFullYear() }} {{ projectName }}. All rights reserved.</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// import getNavbarInfo from '../main.js'
+import { createClient } from '@supabase/supabase-js'
+import { marked } from 'marked';
+import { socket } from "@/socket";
+import { config } from '@/config';
 import webdata from '../webdata.json'
-import NavbarComp from '../components/NavbarComp.vue';
-import { mapState } from 'vuex';
+import axios from 'axios';
+
+import TradingViewWidget from '@/components/TradingViewWidget.vue'
+
 export default {
-  
   components: {
-    NavbarComp
+    TradingViewWidget,
   },
-  data() { return {
-    // pageLoaded: false,
-    subscription: '',
-    projectName: webdata.projectName,
-    heroHeading: webdata.heroHeading,
-    heroSubheading: webdata.heroSubheading,
-    faqItems: webdata.faqItems,
-    subscriptionItems: webdata.subscriptionItems,
-    subscriptionIsYearly: true,
-    subscriptionIsBasic: true
-  }},
-  computed: {
-    ...mapState(['isAuthenticated', 'isSubscribed']),
-    subscriptionItemsWithAnnual() {
-      return {
-        "Basic": {
-          ...this.subscriptionItems.Basic,
-          priceAnnual: (this.subscriptionItems.Basic.priceMonthly * 0.8)
-        },
-        "Premium": {
-          ...this.subscriptionItems.Premium,
-          priceAnnual: (this.subscriptionItems.Premium.priceMonthly * 0.8)
-        }
-      };
-    }
+  data() {
+    return {
+      isMobile: window.innerWidth <= 796,
+      socketId: null,
+      theme: 'light',
+      userStatus: null,
+      input: '',
+      inputMode: 'default',
+      inputEmail: '',
+      inputPassword: '',
+      inputPasswordConfirm: '',
+      chatContainerHeight: null,
+      chat: [],
+      organicSuggestions: [],
+      premadeSuggestions: [],
+      premadeSuggestionsShown: false,
+      premadeSuggsetionsTopic: '',
+      responseIsProcessing: false,
+      currentAssistantMessage: '',
+    };
   },
   mounted() {
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target); // Once visible, stop observing
+    this.initializeSocket();
+    if (!this.isMobile) {this.premadeSuggestionsShown = true} 
+    this.chatScrollToBottom();
+    this.updateChatHeight();
+    this.updateTextareaHeight();
+    this.observeSize()
+
+    const urlToken = new URLSearchParams(window.location.search).get("token");
+    if (urlToken) {this.processUrlToken(urlToken)}
+
+    const hashParams = new URLSearchParams(window.location.hash.slice(1)); // Remove the # symbol
+    const urlSupabaseAccessToken = hashParams.get('access_token');
+    const urlSupabaseRefreshToken = hashParams.get('refresh_token');
+    if (urlSupabaseAccessToken && urlSupabaseRefreshToken) {
+      this.HandleSupabaseAuth(urlSupabaseAccessToken, urlSupabaseRefreshToken)
+    }
+
+    else if (localStorage.getItem('_q')) {
+      this.chat = [{ role: 'assistant', content: '' }];
+      this.sendManualAssistantMessage(localStorage.getItem('_q'))
+      localStorage.removeItem('_q')
+      this.getPremadeSuggestions()
+    }
+
+    else if (localStorage.getItem('_u')) {
+      this.getUserData(localStorage.getItem('_u')).then(() => {
+        if (this.userStatus === 'anonymous') {
+          this.chat = [{ role: 'assistant', content: '' }];
+          this.sendManualAssistantMessage("Welcome back!")
+          this.organicSuggestions = ['Tell me more']
         }
-      });
-    }, {
-      threshold: 0.2, // 20% of the element is in view
-    });
-
-    // Select all elements that need the fade-in effect
-    const fadeElements = document.querySelectorAll('.fade-in');
-    fadeElements.forEach(el => observer.observe(el));
-
-    // Open the first FAQ
-    this.faqItems[0].open = true;
-    this.$nextTick(() => {
-      const answerElement = this.$el.querySelectorAll('.faq-answer')[0];
-      this.faqItems[0].height = answerElement.scrollHeight + 'px';
-    });
+        else if (this.userStatus === 'verified') {
+          this.chat = [{ role: 'assistant', content: '' }];
+          this.sendManualAssistantMessage("Your email has been confirmed!<br>Let's set up your password now.")
+          this.inputMode = 'signup_password';
+          this.premadeSuggestionsShown = true;
+        }
+        else if (this.userStatus === 'registered') {
+          this.chat = [{ role: 'assistant', content: '' }];
+          this.sendManualAssistantMessage("Welcome back!")
+          this.organicSuggestions = ['Tell me more']
+        }
+        this.getPremadeSuggestions()
+      })
+    }
+    else {
+      this.chat=[{role: 'assistant', content: ''}]
+      this.sendManualAssistantMessage('Welcome to **SECRAG**.<br>We make security analysis easier.')
+      this.organicSuggestions = ['How exactly?', 'Show me an example']
+      this.getPremadeSuggestions()
+    }
+  },
+  beforeUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
   },
   methods: {
-    toggleFAQAnswer(index) {
-      this.faqItems.forEach((faq, i) => {if (i !== index) {faq.open = false; faq.height = '0';}});
-      const faq = this.faqItems[index];
-      faq.open = !faq.open;
-      if (faq.open) {
-        this.$nextTick(() => {
-          const answerElement = this.$el.querySelectorAll('.faq-answer')[index];
-          faq.height = answerElement.scrollHeight + 'px';
-        })} else {faq.height = '0'}
+
+    // SOCKET HANDLING
+    initializeSocket() {
+      socket.connect();
+      socket.on("connect", () => {(this.socketId = socket.id)});
+      socket.on("response_started", () => {this.responseIsProcessing = true; this.chat.push({ role: "assistant", content: "" })});
+      socket.on("response_token", (data) => {this.processResponse(data.word)});
+      socket.on("response_complete", () => {
+        this.responseIsProcessing = false;
+        this.saveAssitantResponse();
+        const textarea = document.getElementById('textarea');
+        if (textarea) textarea.focus();
+      });
+
+      socket.on("signal", (data) => {this.processSignal(data)});
+      socket.on("suggestions", (data) => {this.processOrganicSuggestions(data.suggestions)});
     },
-    selectSubscriptionYearly() {this.subscriptionIsYearly = true;},
-    selectSubscriptionMonthly() {this.subscriptionIsYearly = false;},
-    selectSubscriptionBasic() {this.subscriptionIsBasic = true;},
-    selectSubscriptionPremium() {this.subscriptionIsBasic = false;},
+
+    // SESSION HANDLING
+    async initializeAnonToken() {
+      const result = await axios.get(`${config.apiUrl}/api/init-anon-user`);
+      localStorage.setItem('_u', result.data.token);
+      this.userStatus = 0
+    },
+
+    async processUrlToken(token) { // DEATH LOOP WHEN USING OLD LINK
+      // await this.getUserData(token)
+      // localStorage.setItem('_u', token);
+
+      this.chat = [{ role: 'assistant', content: '' }]
+      const result = await axios.get(`${config.apiUrl}/api/process-url-token?token=` + token);
+      if (result.data.error) {
+        localStorage.setItem('_q', result.data.error);
+        window.location.href = '/'
+      }
+      else {
+        if (result.data.action === 'confirm_email') {
+          window.location.href = '/'
+          this.inputMode = 'signup_password'
+          this.sendManualAssistantMessage("Your email has been confirmed!<br>Let's set up your password now.")
+        }
+        if (result.data.action === 'reset_password') {
+          this.sendManualAssistantMessage('You can now enter your new password.')
+        }
+        this.inputMode = result.data.input_mode;
+      }
+    },
+
+    async getUserData(token) {
+      const response = await axios.get(`${config.apiUrl}/api/get-user-data?token=` + token);
+      if (response.data.critical) {
+        localStorage.removeItem('_u');
+        window.location.reload()
+      }
+      else (this.userStatus = response.data.user_status)
+    },
+
+    // UI HELPERS
+    observeSize() {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateChatHeight();
+        this.checkScreenWidth();
+      });
+      const dashboard = document.getElementById('dashboard');
+      this.resizeObserver.observe(dashboard);
+    },
+
+    markdownify(text) {
+      let formattedText
+      formattedText = text.replace(/\n/g, '<br />');
+      return marked(formattedText);
+    },
+
+    togglePremadeSuggestionsVisibility() {
+      this.premadeSuggestionsShown = !this.premadeSuggestionsShown;
+    },
+
+    updateChatHeight() {
+      const headerHeight = document.getElementById('header').offsetHeight;
+      const footerHeight = document.getElementById('footer').offsetHeight;
+      this.chatContainerHeight = window.innerHeight - footerHeight - headerHeight;
+    },
+
+    checkScreenWidth() {
+      if (window.innerWidth <= 796) {this.isMobile = true; this.premadeSuggestionsShown = false} 
+      else {this.isMobile = false; this.premadeSuggestionsShown = true}
+    },
+
+    chatScrollToBottom() {
+      const chatContainer = document.getElementById('chatContainer');
+      chatContainer.scrollTo({top: chatContainer.scrollHeight, behavior: 'smooth'});
+    },
+
+    updateTextareaHeight() {
+      const textarea = document.getElementById('textarea');
+      if (!textarea) return;
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+      this.updateChatHeight();
+    },
+
+    // CHAT INTERACTION
+    getPremadeSuggestions() {
+      if (!this.premadeSuggestionsShown) {
+        this.premadeSuggestions = [];
+      }
+
+      if (this.premadeSuggsetionsTopic === 'profile') {
+        this.premadeSuggestions =  [
+        ...(!this.userIsSubscribed ? [] : [{ label: 'Manage Subscription', action: () => console.log('Redirect to stripe here') }]),
+          { label: 'Sign Out', action: this.signOut },
+          { label: 'More', action: () => (this.premadeSuggsetionsTopic = 'more_authenticated', this.getPremadeSuggestions()) },
+          { label: 'Back', action: () => (this.premadeSuggsetionsTopic = '', this.getPremadeSuggestions()) },
+        ]
+      } 
+
+      else if (this.premadeSuggsetionsTopic === 'more_authenticated') {
+        this.premadeSuggestions =  [
+          { label: 'Delete Account', action: () => console.log('DELETE ACCOUNT') },
+          { label: 'Back', action: () => (this.premadeSuggsetionsTopic = 'profile', this.getPremadeSuggestions()) },
+        ];
+      }
+
+      else if (this.premadeSuggsetionsTopic === 'more_anonymous') {
+        this.premadeSuggestions =  [
+        { label: 'Pricing', action: () => this.sendMessage("I'd like to know more about the pricing") },
+        { label: 'Contact', action: () => this.sendMessage("I'd like to contact you") },
+        { label: 'T&C', action: () => this.$router.push('/terms-and-conditions') },
+        { label: 'Back', action: () => (this.premadeSuggsetionsTopic = '', this.getPremadeSuggestions()) },
+        ];
+      }
+
+      else if (this.userStatus === 'anonymous' || this.userStatus === null) {
+        this.premadeSuggestions =  [
+          { label: 'Sign Up', action: () => this.sendMessage("I'd like to sign up") },
+          { label: 'Sign In', action: () => this.sendMessage("I'd like to sign in") },
+          { label: 'More', action: () => (this.premadeSuggsetionsTopic = 'more_anonymous', this.getPremadeSuggestions()) },
+        ];
+      }
+
+      else if (this.userStatus === 'verified') {
+        this.premadeSuggestions =  [];
+      }
+
+      else if (this.userStatus === 'registered') {
+        this.premadeSuggestions =  [
+          { label: 'Subscribe', action: () => console.log('Redirect to stripe here') },
+          { label: 'Profile', action: () => (this.premadeSuggsetionsTopic = 'profile', this.getPremadeSuggestions()) },
+        ];
+      }
+
+      else {
+        this.premadeSuggestions =  [
+        ];
+      }
+    },
+
+    async sendMessage(input) {
+      if (input === '') return;
+      if (this.responseIsProcessing) {await this.stopResponse()}
+      const textarea = document.getElementById('textarea');
+      if (textarea) textarea.blur();
+
+      if (!localStorage.getItem('_u')) {
+        await this.initializeAnonToken()
+        await axios.post(`${config.apiUrl}/api/new-chat`, {token: localStorage.getItem('_u'), chat: 'general'});
+      }
+
+      this.chat.push({role: 'user', content: input});
+      this.$nextTick(() => {this.chatScrollToBottom(); this.updateTextareaHeight()});
+      this.input = '';
+
+      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'user', input: input, socketId: this.socketId});
+    },
+
+    processSignal(data) {
+      if (data.signal_type === "signup_email") {this.inputMode = 'signup_email'} 
+      else if (data.signal_type === "login") {this.inputMode = 'login'} 
+      else if (data.signal_type === "forgot_password") {this.inputMode = 'forgot_password'}
+      else if (data.signal_type === "reset_password") {console.log('ass'); this.inputMode = 'reset_password'}
+
+      else if (data.signal_type === "signed_in") {
+        localStorage.setItem('_u', data.token)
+        this.userIsAuthenticated = true
+        if (data.subscription !== 'none') {this.userIsSubscribed = true}
+        this.inputMode = 'default'
+        const lastAssistantMessage = this.chat.slice().reverse().find((message) => message.role === 'assistant');
+        this.chat = lastAssistantMessage ? [lastAssistantMessage] : [];
+        this.getPremadeSuggestions();
+      }
+
+      else {this.inputMode = 'default'}
+
+      if ((data.signal_type === "login" || data.signal_type === "signup_email") && this.isMobile === true) {this.premadeSuggestionsShown = false}
+      this.$nextTick(() => {this.updateChatHeight()});
+    },
+
+    switchToDefaultInput() {
+      this.inputMode = 'default';
+      this.organicSuggestions = ['Tell me more'];
+      this.$nextTick(() => {this.updateChatHeight()});
+    },
+
+    processOrganicSuggestions(organicSuggestions) {
+      this.organicSuggestions = organicSuggestions;
+    },
+
+    processResponse(word) {
+      const newMessageIndex = this.chat.length - 1;
+      const currentMessage = this.chat[newMessageIndex];
+      if (currentMessage && currentMessage.role === 'assistant') {
+        currentMessage.content += (currentMessage.content ? " " : "") + word;
+        this.currentAssistantMessage = currentMessage.content;
+      }
+
+      this.$forceUpdate();
+      this.$nextTick(() => {this.chatScrollToBottom()});
+    },
+
+    async stopResponse() {
+      return new Promise((resolve) => {
+        socket.emit("stop_llm_stream");
+        setTimeout(() => {this.currentAssistantMessage = ''; resolve()}, 100);
+      });
+    },
+
+    sendManualAssistantMessage(message) { // Function in case a manual assistant response is needed
+      const words = message.split(' ');
+      words.forEach((word, index) => {setTimeout(() => {this.processResponse(word);}, index * 100)});
+    },
+
+    async saveAssitantResponse() {
+      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'assistant', input: this.currentAssistantMessage, socketId: this.socketId});
+    },
+
+    // AUTHENTICATION
+    async signupEmail(email) {
+      this.responseIsProcessing = true;
+
+      if (email === '') {this.sendManualAssistantMessage("<br>Please provide your email address.")}
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {this.sendManualAssistantMessage("<br>Please provide a valid email address.")}
+      else {
+        const response = await axios.post(`${config.apiUrl}/api/signup-email`, {token: localStorage.getItem('_u'), email: email, socketId: this.socketId});
+        if (response.data.error) {this.sendManualAssistantMessage('<br>' + response.data.error)}
+        else {this.sendManualAssistantMessage('<br><b>Success!</b> An email has been sent.'); this.inputMode = 'default'}
+      }
+      this.inputEmail = '';
+      this.responseIsProcessing = false;
+    },
+
+    async signupPassword(password, passwordConfirm) {
+      this.responseIsProcessing = true;
+
+      const passwordStrengthRegex = /^(?=.*\d)(?=.*[!@#$%^&*:;_\-.])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+      if (password === '' || passwordConfirm === '') {this.sendManualAssistantMessage("<br>Please provide your password.")}
+      else if (password !== passwordConfirm) {this.sendManualAssistantMessage("<br>Passwords do not match.")}
+      else if (!passwordStrengthRegex.test(password)) {this.sendManualAssistantMessage("<br>This password is not strong enough. Try a different one.")}
+      else {
+        const response = await axios.post(`${config.apiUrl}/api/signup-password`, {token: localStorage.getItem('_u'), password: password, socketId: this.socketId});
+        if (response.data.error) {this.sendManualAssistantMessage('<br>' + response.data.error)}
+        else {
+          this.chat = [{ role: 'assistant', content: '' }];
+          this.sendManualAssistantMessage('Success! Now you can login anytime you want.'); 
+          this.userStatus = 'registered'; 
+          this.inputMode = 'default'
+          this.getPremadeSuggestions()
+        }
+      }
+
+      this.inputPassword = '';
+      this.inputPasswordConfirm = '';
+      this.responseIsProcessing = false;
+    },
+
+    async login(email, password) {
+      this.inputEmail = '';
+      this.inputPassword = '';
+      const response = await axios.post(`${config.apiUrl}/api/login`, {token: localStorage.getItem('_u'), email: email, password: password});
+      if (response.data.error) {this.sendManualAssistantMessage(response.data.error)}
+      else {
+        this.userStatus = response.data.user_status; 
+        this.inputMode = 'default';
+        this.getPremadeSuggestions()
+        this.organicSuggestions = ['Tell me more']
+        this.chat = [{ role: 'assistant', content: '' }];
+        this.sendManualAssistantMessage('Welcome back!');
+        localStorage.setItem('_u', response.data.token);
+      }
+    },
+
+    async authenticateWithGoogle() {
+      const SUPABASE_KEY = webdata.supabaseKey
+      const SUPABASE_URL = webdata.supabaseURL
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+      await supabase.auth.signInWithOAuth({provider: 'google', "options": {"redirectTo": `${config.webUrl}/`}})
+    },
+
+    async HandleSupabaseAuth(urlSupabaseAccessToken, urlSupabaseRefreshToken) {
+      const SUPABASE_KEY = webdata.supabaseKey
+      const SUPABASE_URL = webdata.supabaseURL
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+      await supabase.auth.setSession({access_token: urlSupabaseAccessToken, refresh_token: urlSupabaseRefreshToken,})
+      const { data } = await supabase.auth.getSession()
+      const response = await axios.post(`${config.apiUrl}/api/authenticate-with-supabase`, {
+        token: localStorage.getItem('_u'),
+        supabase_user_id: data.session.user.id,
+        email: data.session.user.email, 
+        name: data.session.user.user_metadata.full_name, 
+        auth_type: data.session.user.app_metadata.provider
+      })
+      if (response.data.error) {
+        this.chat=[{ role: 'assistant', content: '' }];
+        this.sendManualAssistantMessage(response.data.error);
+      }
+      else {
+        this.userStatus = response.data.user_status; 
+        this.inputMode = 'default';
+        this.getPremadeSuggestions()
+        this.organicSuggestions = ['Tell me more']
+        this.chat = [{ role: 'assistant', content: '' }];
+        this.sendManualAssistantMessage('Welcome back!');
+        localStorage.setItem('_u', response.data.token);
+      }
+    },
+
+    async forgotPassword(email) {
+      this.responseIsProcessing = true;
+      const response = await axios.post(`${config.apiUrl}/api/forgot-password`, {email: email, socketId: this.socketId});
+      if (response.data.error) {this.sendManualAssistantMessage(response.data.error)}
+      else {
+        this.inputMode = 'default';
+        this.sendManualAssistantMessage('<br>Success! An email with a password reset link has been sent.');
+      }
+      this.inputEmail = '';
+      this.responseIsProcessing = false;
+    },
+
+    async resetPassword(password, passwordConfirm) {
+      this.responseIsProcessing = true;
+
+      const passwordStrengthRegex = /^(?=.*\d)(?=.*[!@#$%^&*:;_\-.])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+      if (password === '' || passwordConfirm === '') {this.sendManualAssistantMessage("<br>Please provide your new password.")}
+      else if (password !== passwordConfirm) {this.sendManualAssistantMessage("<br>Passwords do not match.")}
+      else if (!passwordStrengthRegex.test(password)) {this.sendManualAssistantMessage("<br>This password is not strong enough. Try a different one.")}
+      else {
+        const urlToken = new URLSearchParams(window.location.search).get("token");
+        const response = await axios.post(`${config.apiUrl}/api/reset-password`, {token: urlToken, password: password});
+        if (response.data.error) {this.sendManualAssistantMessage(response.data.error)}
+        else {
+          localStorage.setItem('_q', 'Success! You can now login with your new password.');
+          localStorage.removeItem('_u');
+          window.location.href = '/'
+        }
+      }
+      this.inputPassword = '';
+      this.inputPasswordConfirm = '';
+      this.responseIsProcessing = false;
+    },
+
+    signOut() {
+      localStorage.removeItem('_u');
+      window.location.reload()
+    },
+
   }
-}
-
-
-
+};
 </script>
 
-<style scoped>
-.fade-in {
-  opacity: 0;
-  transform: translateY(4rem);
-  transition: opacity 1s ease-out, transform 1s ease-out;
-}
+<style>
 
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.fade-in.delay-1 {
-  transition-delay: 0.2s;
-}
-
-.fade-in.delay-2 {
-  transition-delay: 0.4s;
-}
-
-.fade-in.delay-3 {
-  transition-delay: 0.6s;
-}
-
-.fade-in.delay-4 {
-  transition-delay: 0.8s;
-}
 </style>

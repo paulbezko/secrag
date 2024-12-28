@@ -21,8 +21,6 @@ class Mongo:
     def __init__(self):
         self.client = MongoClient(os.getenv('MONGO_URI'))
         self.db = self.client["SECRAG"]
-        self.collection_messages_authenticated = self.db["messages.authenticated"]
-        self.collection_messages_anonymous = self.db["messages.anonymous"]
 
 # Singleton instance
 config = Config()

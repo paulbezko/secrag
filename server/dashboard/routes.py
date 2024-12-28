@@ -114,7 +114,7 @@ async def new_chat_preview_post(request: Request):
 
 
 @routes.get('/get-filing-selection-data')
-def get_list_tickers_get(token: str):
+def get_filing_selection_data_get(token: str):
 
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
@@ -122,7 +122,7 @@ def get_list_tickers_get(token: str):
     with open('database/memory/filings_available.json', 'r') as f: filings_available = json.load(f)
     with open('database/memory/filings_new.json', 'r') as f: filings_new = json.load(f)
 
-    return JSONResponse(content={'tickers': list(filings_available.keys()), 'newFilings': filings_new})
+    return JSONResponse(content={'filingKeys': list(filings_available.keys()), 'newFilings': filings_new})
 
 
 @routes.get('/get-info-by-ticker')
@@ -339,3 +339,183 @@ async def new_message_assistant_preview_post(request: Request):
         return JSONResponse(content={'error': 'Something went wrong with message insertion.'})
 
     return JSONResponse(content={'success': True})
+
+
+
+
+
+
+
+from werkzeug.security import check_password_hash, generate_password_hash
+from ..general.utils import encode_token, get_user_data
+from ..globals import stop_signals
+from fastapi import APIRouter, Request
+import time
+import re
+
+# routes = APIRouter()
+
+async def get_assistant_response_v2(socket_id, input):
+    if input == "I'd like to sign up.":
+        response = "Sure! Enter your email below to start."
+        signal_payload = {'signal_type': 'sign_up'}
+        suggestions = []
+    
+    elif input == "I'd like to sign in.":
+        response = "Of course! Enter your email and password below."
+        signal_payload = {'signal_type': 'sign_in'}
+        suggestions = ['I forgot my password']
+
+    elif input == "I forgot my password":
+        response = "No worries. Enter your email below and we'll send you a reset link."
+        signal_payload = {'signal_type': 'reset_password'}
+        suggestions = ['Assi?']
+
+    elif input == "I'd like to know more about the pricing.":
+        response = "Sure! Here's the pricing plan."
+        signal_payload = {}
+        suggestions = ['Ass?']
+    
+    elif input == "I'd like to contact you.":
+        response = "Of course! Enter your email and message below."
+        signal_payload = {}
+        suggestions = ['Fart?', 'Ass?']
+
+    else: 
+        response = "The likely cause is that this.currentAssistantMessage does not exist as a property on your Vue instance's data object. Vue's reactivity system works on properties declared in the data function, and if a property is not defined there, it won't be reactive and may cause such errors."
+        signal_payload = {}
+        suggestions = ['Fart?', 'Ass?', 'Booba?']
+    
+    await send_assistant_response(socket_id, response, signal_payload, suggestions)
+
+
+async def send_assistant_response(socket_id, response: str, signal_payload: dict, suggestions: list):
+    
+    from app import socketio
+    
+    await socketio.emit('response_started', to=socket_id)
+
+    for word in response.split(' '):
+        time.sleep(0.1)
+        if stop_signals.get(socket_id): 
+            stop_signals.pop(socket_id, None)
+            break
+        await socketio.emit('response_token', {'word': word}, to=socket_id)
+    await socketio.emit('response_complete', to=socket_id)
+
+    if signal_payload: await socketio.emit('signal', signal_payload, to=socket_id)
+    if suggestions: await socketio.emit('suggestions', {'suggestions': suggestions}, to=socket_id)
+
+
+@routes.post('/test-new-message')
+async def test_new_message_post(request: Request):
+
+    data = await request.json()
+    input = data.get("input")
+    socket_id = data.get("socketId")
+    await get_assistant_response_v2(socket_id, input)
+
+    return 200
+
+
+
+@routes.post('/test-authenticate')
+async def test_authenticate_post(request: Request):
+
+    data = await request.json()
+    type = data.get("type")
+    socket_id = data.get("socketId")
+
+    if type == 'sign_up':
+        
+        email = data.get("email")
+
+        if not re.match(r'^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$', email): response = "Please enter a valid email address."
+        # Add a check where user exists already
+        else: response, signal_payload = "An email with a sign up link has been sent to you.", {}
+            # Action to send email
+
+
+
+        data = await request.json()
+        token = data.get("token")
+        email = data.get("email")
+        name = data.get("name")
+        password = data.get("password")
+        # Determining if the user has clicked the email link or not
+        if token:
+            try: 
+                user_info = decode_token(token)
+                stage = 'SignUpAfter'
+            except: return JSONResponse(content={'error': 'Error decoding token'})
+        else:
+            stage = 'SignUpBefore'
+            email = email.lower()
+
+            # The user has not requested an email yet
+            if stage == 'SignUpBefore':
+
+                user = get_user_data(email.lower())
+                if user: return JSONResponse(content={'error': 'User with this email already exists'})
+
+                email_payload = {
+                    'email': email,
+                    'action': 'signUp',
+                    'expiry': (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+                }
+
+                token = encode_token(email_payload)
+                send_email_from_template(email = email, template = 'signUp', payload = token)
+                log('debug', f'Signup email sent to {email}')
+                return JSONResponse(content={'message': 'Confirmation email sent'})
+
+
+
+
+
+    elif type == 'sign_in':
+
+        email = data.get("email")
+        password = data.get("password")
+
+        if not re.match(r'^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$', email): response = "Please enter a valid email address."
+
+        try: 
+            user = get_user_data(email.lower())
+
+            if not user: response, signal_payload, suggestions = "User was not found. Perhaps you would like to sign up?", {}
+            elif user['auth_type'] != 'password': response, signal_payload = "Looks like you signed up with another authentication method. Please sign in with that method.", {}
+            elif not check_password_hash(user['password'], password): response, signal_payload = "Looks like the password is not correct. Please try again.", {}
+            else:
+                user_info = {
+                    'email': user['email'],
+                    'name': user['name'],
+                    'auth_type': user['auth_type'],
+                    'subscription': user['subscription'],
+                    'subscription_tokens_left': user['subscription_tokens_left'],
+                    'stripe_subscription_id': user['stripe_subscription_id'],
+                    'stripe_user_id': user['stripe_user_id'],
+                }
+
+                token = encode_token(user_info)
+                response, signal_payload = "Welcome back!", {'signal_type': 'signed_in', 'token': token, 'subscription': user['subscription']}
+
+        except: response, signal_payload = "Something went wrong with authentication.", {}
+
+    elif type == 'reset_password':
+        
+        email = data.get("email")
+
+        if not re.match(r'^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$', email): response = "Please enter a valid email address."
+        else: response = "A password reset link has been sent to you."
+            # Action to send email
+
+    else: response = "Something went wrong."
+
+    await send_assistant_response(socket_id, response, signal_payload, None)
+
+@routes.get('/test-get-user-data')
+async def test_get_user_data_get(token: str):
+    uuid = decode_token(token)['uuid']
+    user = get_user_data(uuid)
+    return JSONResponse(content={'userStatus': user['status']})
