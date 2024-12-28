@@ -1,37 +1,23 @@
 <template>
-  <div v-if="pageLoaded" class="flex-column width-100" style="height: 100vh; align-items: center">
-    <!-- NavbarComp with ref to target the component -->
-    <NavbarComp ref="navbar" class="navbar" :authenticated="isAuthenticated" :subscribed="isSubscribed" />
-    
-    <!-- Scrollable container with @scroll event -->
-    <div class="flex-column center gap-2 height-100" style="flex-grow: 1; width: 100%; overflow-y: auto; padding-inline: 2rem; ">
-      <div class="no-scrollbar" @scroll="handleScroll" style="background-color: var(--color-grey-light); width: 100%; height: 100%; overflow-y: auto; padding: 2rem;">
-        <div class="text-3 policy" v-html="policy" @click="handleLinkClick" style="a {text-decoration: underline;}"></div>
-      </div>
+  <div v-if="pageLoaded" class="flex-column width-100 height-100vh center" style="font-family: 'Inter', sans-serif; color: var(--black)">
+    <div class="flex-column center gap-2 height-100 width-100" style="flex-grow: 1; padding: 2rem; ">
+      <div class="text-3 policy" v-html="policy" @click="handleLinkClick" style="a {text-decoration: underline;}"></div>
     </div>
   </div>
 </template>
 
 <script>
-import NavbarComp from '../components/NavbarComp.vue';
-import { mapState } from 'vuex';
 import { config } from '@/config';
 import { marked } from 'marked';
 import axios from 'axios';
 
 export default {
-  components: {
-    NavbarComp
-  },
   data() {
     return {
       pageLoaded: false,
       policy: 'terms_and_conditions',
       subscription: ''
     };
-  },
-  computed: {
-    ...mapState(['isAuthenticated', 'isSubscribed']),
   },
   mounted() {
     // Fetch the policy on mount
@@ -66,19 +52,6 @@ export default {
         .catch((error) => {
           console.error('Error getting ticker info:', error);
         });
-    },
-    handleScroll(event) {
-      // Get the container element that is scrolling
-      const scrollContainer = event.target;
-      // Get the navbar reference
-      const navbar = this.$refs.navbar.$el; // Access the DOM element of the NavbarComp
-      
-      // Check if user has scrolled down
-      if (scrollContainer.scrollTop > 0) {
-        navbar.classList.add('shadow');
-      } else {
-        navbar.classList.remove('shadow');
-      }
     }
   }
 };

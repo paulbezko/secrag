@@ -1,0 +1,131 @@
+.input {
+  background-color: var(--color-form-background-empty);
+  color: var(--color-form-text-empty);
+  border: 1px solid var(--color-form-border-empty);
+
+  font-family: "Inter", sans-serif;
+  font-weight: 300;
+  width: 100%;
+  height: 4.2rem;
+  padding-block: 1rem;
+  padding-inline: 2rem;
+  border-radius: 1rem;
+  max-width: 50rem;
+  box-sizing: border-box;
+  font-size: var(--text-3);
+  transition: all 0.2s ease;
+}
+
+::placeholder {
+  color: var(--color-form-text-empty);
+  opacity: 1; /* Firefox */
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  font-size: var(--text-3);
+}
+
+.input:focus,
+.input:hover,
+.input:active {
+  outline: none;
+  font-size: var(--text-3);
+  color: var(--color-form-text-hover);
+  border: 1px solid var(--color-form-border-hover);
+  background-color: var(--color-form-background-hover);
+}
+
+.input-disabled,
+.input-disabled:hover {
+  color: var(--color-disabled-text);
+  border: 1px solid var(--color-disabled-border) !important;
+  background-color: var(--color-disabled-background);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  font-size: var(--text-3) !important;
+  font-family: "Inter", sans-serif !important;
+  -webkit-text-fill-color: var(--color-form-text-filled);
+  border: 1px solid var(--color-form-border-filled);
+  transition: background-color 5000s ease-in-out 0s, box-shadow 0.3s ease !important;
+}
+
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  font-size: var(--text-3);
+  font-family: "Inter", sans-serif !important;
+  background-color: var(--color-input-active-background);
+  -webkit-text-fill-color: var(--color-form-text-hover);
+  border: 1px solid var(--color-form-border-hover);
+  /* border: 1px solid var(--color-yellow); */
+  font-size: var(--text-3);
+}
+
+textarea {
+  color: var(--color-text);
+  background-color: var(--color-background-secondary);
+  transition: all 0.2s ease;
+}
+
+textarea:focus,
+textarea:hover,
+textarea:active {
+  outline: none;
+  border: 1px solid var(--color-form-border-hover);
+  background-color: var(--color-form-background-hover);
+}
+
+textarea:disabled {
+  background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-grey);
+}
+
+select {
+  appearance: none; /* For Chrome, Safari, Edge */
+  -moz-appearance: none; /* For Firefox */
+  -webkit-appearance: none; /* For Safari */
+  width: 100%;
+}
+
+select option {
+  background-color: var(--color-background-secondary);
+  color: var(--color-text);
+}
+
+.selected-option {
+  background: var(--color-form-background-filled);
+  border: 1px solid var(--color-form-border-filled);
+  color: var(--color-form-text-filled);
+}
+
+.suggestions-container {
+  font-family: Inter, sans-serif;
+  font-size: var(--text-3);
+  font-weight: 300;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  z-index: 1000;
+}
+
+.suggestion-item {
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background-color: var(--color-secondary-light-background);
+}

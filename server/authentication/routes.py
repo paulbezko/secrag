@@ -5,7 +5,74 @@ from datetime import datetime, timezone, timedelta
 from ..globals import config
 from fastapi import APIRouter, Request
 
+import string
+import random
+
 routes = APIRouter()
+
+@routes.get('/initialize-anon-user')
+async def get_anon_token_get(): # INCORPORATE MONGO CHECK HERE
+
+    # Generating a random 16 length token
+    uuid = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16))
+
+    # Insert user into database
+    query = f"INSERT INTO users_{config.get('MODE')} (uuid, user_status) VALUES (%s, %s)"
+    execute_query(query, (uuid, 0))
+
+    # Create chat for user
+    
+
+    token = encode_token({'uuid': uuid, 'user_status': 0})
+    return JSONResponse(content={'token': token})
+
+
+@routes.post('/onboarding-start')
+async def onboarding_start_post(request: Request):
+
+    data = await request.json()
+    token = data.get("token")
+    email = data.get("email")
+
+    uuid = decode_token(token)['uuid']
+
+    user = get_user_data(uuid)
+    if user: return JSONResponse(content={'error': 'This user already exists'})
+
+    email_payload = {
+        'uuid': uuid,
+        'email': email,
+        'action': 'onboarding-start',
+        'expiry': (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+    }
+
+    token = encode_token(email_payload)
+    send_email_from_template(email = email, template = 'signUp', payload = token)
+    log('debug', f'Signup email sent to {email}')
+    return JSONResponse(200)
+
+
+@routes.get('/confirm-email')
+def confirm_email_get(token: str):
+
+    try: email_payload = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
+
+    # Compare current time with expiry time
+    if not check_timestamp(email_payload['expiry']): return JSONResponse(content={'error': 'linkExpired'})
+    if get_user_data(email_payload['email']): return JSONResponse(content={'critical': 'userExists'})
+
+    log('debug', f'Signup email confirmed for {email_payload['email']}')
+    query = f"INSERT INTO users_{config.get('MODE')} (uuid, email) VALUES (%s, %s)"
+    execute_query(query, (email_payload['uuid'], email_payload['email']))
+
+    user_info = email_payload
+    user_info['onboarding'] = True
+
+    token = encode_token(user_info)
+    return JSONResponse(content={'token': token})
+
+
 
 
 @routes.post('/signup')
@@ -16,6 +83,7 @@ async def signup_post(request: Request):
     email = data.get("email")
     name = data.get("name")
     password = data.get("password")
+
     # Determining if the user has clicked the email link or not
     if token:
         try: 
@@ -75,8 +143,8 @@ def signup_get(token: str):
     if get_user_data(email_payload['email']): return JSONResponse(content={'critical': 'userExists'})
 
     log('debug', f'Signup email confirmed for {email_payload['email']}')
-    query = f"INSERT INTO users_{config.get('MODE')} (email) VALUES (%s)"
-    execute_query(query, (email_payload['email'],))
+    query = f"INSERT INTO users_{config.get('MODE')} (uuid, email) VALUES (%s, %s)"
+    execute_query(query, (email_payload['uuid'], email_payload['email']))
 
     user_info = email_payload
     user_info['onboarding'] = True
@@ -95,7 +163,7 @@ async def login_post(request: Request):
     try: user = get_user_data(email.lower())
     except: return JSONResponse(content={'error': 'Error retrieving user data'})
 
-    if not user: return JSONResponse(content={'error': 'userNotFound'})
+    if not user: return JSONResponse(content={'error': '<br> **User does not exist.** Sign up instead?'})
     if user['auth_type'] != 'password': return JSONResponse(content={'error': 'authMethodIncorrect'})
     if not check_password_hash(user['password'], password): return JSONResponse(content={'error': 'invalidCredentials'})
 

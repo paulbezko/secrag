@@ -55,21 +55,19 @@
   }
 } */
 
-
-
 @media (prefers-color-scheme: light) {
   :root {
-    --color-background-primary: #F4F6F9;
+    --color-background-primary: #f4f6f9;
     --color-background-secondary: #ffffff;
     --color-background-tertiary: #e4eaf1;
 
-    --color-text: #2D2D2D;
+    --color-text: #2d2d2d;
     --color-text-placeholder: #b3b3b3;
 
-    --color-text-positive: #28A745;
-    --color-text-negative: #D32F2F;
+    --color-text-positive: #28a745;
+    --color-text-negative: #d32f2f;
 
-    --color-primary: #FFB81C;
+    --color-primary: #ffb81c;
     --color-primary-hover: #fcca34;
     --color-primary-accent: #ffe9b3;
     --color-primary-light-background: #fff7df;
@@ -123,7 +121,6 @@
   }
 }
 
-
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background-primary: #161a24;
@@ -133,10 +130,10 @@
     --color-text: #e7e7e7;
     --color-text-placeholder: #858585;
 
-    --color-text-positive: #28A745;
-    --color-text-negative: #D32F2F;
+    --color-text-positive: #28a745;
+    --color-text-negative: #d32f2f;
 
-    --color-primary: #FFC107;
+    --color-primary: #ffc107;
     --color-primary-hover: #fcca34;
     --color-primary-accent: #463c20;
     --color-primary-light-background: #2b281b;
@@ -188,7 +185,6 @@
     --color-shadow: #0a0a0a;
     --shadow: 0 4px 12px var(--color-shadow), 0 8px 20px var(--color-shadow);
 
-    
     .light-dark-mode img {
       filter: brightness(0) invert(1);
     }

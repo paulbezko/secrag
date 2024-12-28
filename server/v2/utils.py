@@ -3,7 +3,7 @@ from email.mime.text import MIMEText
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timezone
 from psycopg2 import OperationalError, InterfaceError
-from ..globals import config
+from ..globals import config, stop_signals
 # from fastapi import logger
 import traceback
 
@@ -20,7 +20,6 @@ import logging
 tracemalloc.start()
 
 logger = logging.Logger("a")
-
 
 def log(level, message):
     if level == 'debug': 
@@ -59,6 +58,74 @@ def decode_token(token):
         logger.debug(str(error))
 
         return error
+
+
+def get_user_data(type, key, retries=3):
+
+    attempt = 0
+    while attempt < retries:
+        try:
+            
+            connection = psycopg2.connect(
+                host        = os.getenv('DB_HOST'),
+                port        = os.getenv('DB_PORT'),
+                database    = os.getenv('DB_NAME'),
+                user        = os.getenv('DB_USER'),
+                password    = os.getenv('DB_PASS'),
+                cursor_factory = RealDictCursor
+            )
+            with connection.cursor() as cursor:
+                query = f"SELECT * FROM users_{config.get('MODE')} WHERE {type} = %s"
+                cursor.execute(query, (key,))
+                return cursor.fetchone()
+        
+        except (OperationalError, InterfaceError) as conn_error:
+            log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
+            attempt += 1
+            time.sleep(1)
+        
+        except Exception as error:
+            log('error', f'Error [Get User Data]: {traceback.format_exc()}')
+            log('error', f'Error [Get User Data]: {error}')
+            break
+
+        finally:
+            connection.close()
+    
+    log('critical', 'Failed to retrieve user data after multiple attempts.')
+    return None
+
+
+def execute_query(query, params, retries=3):
+    attempt = 0
+    while attempt < retries:
+        try:
+            connection = psycopg2.connect(
+                host        = os.getenv('DB_HOST'),
+                port        = os.getenv('DB_PORT'),
+                database    = os.getenv('DB_NAME'),
+                user        = os.getenv('DB_USER'),
+                password    = os.getenv('DB_PASS'),
+                cursor_factory = RealDictCursor
+            )
+            with connection.cursor() as cursor:
+                cursor.execute(query, params)
+                connection.commit()
+            return  # Exit function after successful execution
+        
+        except (OperationalError, InterfaceError) as conn_error:
+            log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
+            attempt += 1
+            time.sleep(2)  # Optional delay before retrying
+        
+        except Exception as error:
+            log('error', f'Error [Execute Query]: {error}')
+            break  # Exit loop on unexpected exceptions
+
+        finally:
+            connection.close()
+
+    log('critical', 'Failed to execute query after multiple attempts.')
 
 
 def send_email_from_template(email, template, payload):
@@ -138,7 +205,7 @@ def send_email_from_template(email, template, payload):
                                 To proceed with setting up your account, please confirm by clicking the button below.
                             </div>
                             <div class="button-container">
-                                <a class="button" href="{config.get('REDIRECT_URL')}/signup?token={payload}">Confirm Email</a>
+                                <a class="button" href="{config.get('REDIRECT_URL')}?token={payload}">Confirm Email</a>
                             </div>
                             <div class="signature">Warm regards,<br>SECRAG Team</div>
                             <div class="footer">If you did not sign up for this account, please disregard this message.</div>
@@ -159,7 +226,7 @@ def send_email_from_template(email, template, payload):
                                 To complete your request to reset your password, please confirm by clicking the button below.
                             </div>
                             <div class="button-container">
-                                <a class="button" href="{config.get('REDIRECT_URL')}/reset-password?token={payload}">Confirm Email</a>
+                                <a class="button" href="{config.get('REDIRECT_URL')}?token={payload}">Reset Password</a>
                             </div>
                             <div class="signature">Warm regards,<br>SECRAG Team</div>
                             <div class="footer">If you did not request this change, please disregard this message.</div>
@@ -274,118 +341,106 @@ def send_email_from_template(email, template, payload):
         log('error', f'Error [Send Email]: {error}')
 
 
-def get_user_data(uuid, retries=3):
-
-    attempt = 0
-    while attempt < retries:
-        try:
-            
-            connection = psycopg2.connect(
-                host        = os.getenv('DB_HOST'),
-                port        = os.getenv('DB_PORT'),
-                database    = os.getenv('DB_NAME'),
-                user        = os.getenv('DB_USER'),
-                password    = os.getenv('DB_PASS'),
-                cursor_factory = RealDictCursor
-            )
-            with connection.cursor() as cursor:
-                query = f"SELECT * FROM users_{config.get('MODE')} WHERE uuid = %s"
-                cursor.execute(query, (uuid,))
-                return cursor.fetchone()
-        
-        except (OperationalError, InterfaceError) as conn_error:
-            log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
-            attempt += 1
-            time.sleep(1)
-        
-        except Exception as error:
-            log('error', f'Error [Get User Data]: {traceback.format_exc()}')
-            log('error', f'Error [Get User Data]: {error}')
-            break
-    
-        finally:
-            connection.close()
-    
-    log('critical', 'Failed to retrieve user data after multiple attempts.')
-    return None
-
-
-def execute_query(query, params, retries=3):
-    attempt = 0
-    while attempt < retries:
-        try:
-            connection = psycopg2.connect(
-                host        = os.getenv('DB_HOST'),
-                port        = os.getenv('DB_PORT'),
-                database    = os.getenv('DB_NAME'),
-                user        = os.getenv('DB_USER'),
-                password    = os.getenv('DB_PASS'),
-                cursor_factory = RealDictCursor
-            )
-            with connection.cursor() as cursor:
-                cursor.execute(query, params)
-                connection.commit()
-            return  # Exit function after successful execution
-        
-        except (OperationalError, InterfaceError) as conn_error:
-            log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
-            attempt += 1
-            time.sleep(2)  # Optional delay before retrying
-        
-        except Exception as error:
-            log('error', f'Error [Execute Query]: {error}')
-            break  # Exit loop on unexpected exceptions
-
-        finally:
-            connection.close()
-
-    log('critical', 'Failed to execute query after multiple attempts.')
-
-
-
 def check_timestamp(timestamp):
 
     if datetime.now(timezone.utc) > datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc): return False
     else: return True
 
 
-def try_except(func, default=None, expected_exc=(Exception,)):
-    """
-    Tries to execute a given function, and if it fails with one of the specified
-    exceptions, returns a default value instead.
 
-    :param func: The function to try to execute
-    :param default: The value to return if an exception is raised
-    :param expected_exc: A tuple of exception types that are expected to be raised
-    :return: The result of the function, or the default value if an exception was
-             raised
-    """
-    try: return func()
-    except expected_exc: 
-        return default
+async def get_assistant_response(socket_id, input):
+    if input == "I'd like to sign up":
+        response = "Sure! Enter your email below to start."
+        signal_payload = {'signal_type': 'signup_email'}
+        suggestions = []
+    
+    elif input == "I'd like to sign in":
+        response = "Of course! Enter your email and password below."
+        signal_payload = {'signal_type': 'login'}
+        suggestions = ['I forgot my password']
 
-async def atry_except(func, default=None, expected_exc=(Exception,)):
-    """
-    Tries to execute a given function, and if it fails with one of the specified
-    exceptions, returns a default value instead.
+    elif input == "I forgot my password":
+        response = "No worries. Enter your email below and we'll send you a reset link."
+        signal_payload = {'signal_type': 'forgot_password'}
+        suggestions = []
 
-    :param func: The function to try to execute
-    :param default: The value to return if an exception is raised
-    :param expected_exc: A tuple of exception types that are expected to be raised
-    :return: The result of the function, or the default value if an exception was
-             raised
-    """
-    try: return await func()
-    except expected_exc: 
-        return default
+    elif input == "I'd like to know more about the pricing":
+        response = "Sure! Here's the pricing plan."
+        signal_payload = {}
+        suggestions = ['Ass?']
+    
+    elif input == "I'd like to contact you":
+        response = "Of course! Enter your email and message below."
+        signal_payload = {}
+        suggestions = ['Fart?', 'Ass?']
+
+    else: 
+        response = "The likely cause is that this.currentAssistantMessage does not exist as a property on your Vue instance's data object. Vue's reactivity system works on properties declared in the data function, and if a property is not defined there, it won't be reactive and may cause such errors."
+        signal_payload = {}
+        suggestions = ['Fart?', 'Ass?', 'Booba?']
+    
+    await send_assistant_response(socket_id, response, signal_payload, suggestions)
 
 
-def send_autoupdate_log():
-    with open("autoupdate.log", "r") as f:
 
-        autoupdate_log = f.read()
-        # with current_app.app_context():
-        log("info", "Server booted up...")
-        log("debug", "Latest autoupdate log:")
-        log("debug", autoupdate_log)
+async def send_assistant_response(socket_id, response: str, signal_payload: dict, suggestions: list):
+    
+    from app import socketio
+    
+    await socketio.emit('response_started', to=socket_id)
 
+    for word in response.split(' '):
+        time.sleep(0.1)
+        if stop_signals.get(socket_id): 
+            stop_signals.pop(socket_id, None)
+            break
+        await socketio.emit('response_token', {'word': word}, to=socket_id)
+    await socketio.emit('response_complete', to=socket_id)
+
+    if signal_payload: await socketio.emit('signal', signal_payload, to=socket_id)
+    await socketio.emit('suggestions', {'suggestions': suggestions}, to=socket_id)
+
+
+
+
+
+
+
+def mongo_log_response(response):
+    if 'error' in response:
+        print(response['error'])
+    elif 'message' in response:
+        print(response['message'])
+
+
+def mongo_insert_chat(collection, uuid, chat_id):
+    try:
+        result = collection.update_one(
+            {"_id": uuid},
+            {"$set": {f"chats.{chat_id}": {
+                "messages": []
+            }}},
+            upsert=True
+        )
+        if result.modified_count > 0: 
+            return {"message": f"Chat '{chat_id}' added or updated for user '{uuid}'."}
+        elif result.upserted_id: 
+            return {"message": f"User '{uuid}' created with chat '{chat_id}'."}
+        else:
+            return {"message": f"Chat '{chat_id}' already exists for user '{uuid}'."}
+    except Exception as e: 
+        return {"error": f"Error creating chat for '{uuid}' and chat '{chat_id}': {str(e)}"}
+
+
+def mongo_insert_message(collection, uuid, chat_id, role, content):
+    try:
+        result = collection.update_one(
+            {"_id": uuid},
+            {"$push": {f"chats.{chat_id}.messages": {"role": role, "content": content}}}
+        )
+        if result.modified_count > 0: 
+            return {"message": f"Message added to chat '{chat_id}' for user '{uuid}'."}
+        else: 
+            return {"error": f"Chat '{chat_id}' not found for user '{uuid}'."}
+    except Exception as e:
+        return {"error": f"Error inserting message for '{uuid}' and chat '{chat_id}' and message '{content}': {str(e)}"}
