@@ -7,33 +7,45 @@
 
       <div class="flex-column width-100 height-100 center">
 
+        <!-- Chat container section -->
         <div class="flex-column width-100 gap-1 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
           <div v-for="(message, index) in chat" :key="index" class="flex-row center gap-1 width-100 chat-message">
 
             <!-- Assistant message -->
             <div v-if="message.role === 'assistant'" class="flex-row center gap-1" :class="chat.length === 1 ? 'assistant-message single' : 'assistant-message'">
-              <img v-if="index === chat.length - 1" :src="require('@/assets/dashboard/slightly_smiling_face_3d.png')" class="assistant-image">
-              <img v-if="index !== chat.length - 1" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
-              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
+              <img
+                v-if="isLatestAssistantMessage(message)" 
+                :src="input !== '' 
+                  ? require('@/assets/dashboard/face_with_monocle_3d.png')
+                  : (responseIsProcessing
+                    ? require('@/assets/dashboard/thinking_face_3d.png')
+                    : require('@/assets/dashboard/slightly_smiling_face_3d.png'))"
+                class="assistant-image"
+              >
+              <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
+              <div class="chat-text" :class="isLatestAssistantMessage(message) ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
             </div>
 
             <div v-else-if="message.role === 'widget'" class="widget-container">
-              <div v-if="message.type === 'tradingview'" class="width-100">
-                <TradingViewWidget :ticker=message.metadata.ticker :theme="theme" />
-              </div>
+              <TradingViewWidget :ticker="message.content.ticker" :theme="theme" />
             </div>
 
             <!-- User message -->
             <div v-else class="flex-row center gap-1 width-100 user-message">
               <div class="chat-text" v-html="markdownify(message.content)"></div>
             </div>
+
+            <!-- <TradingViewWidget :ticker="'AAPL'" :theme="theme" /> -->
+
           </div>
 
         </div>
+
       </div>
 
       <!-- Footer -->
       <div style="padding-block: 1rem;" class="width-100 footer" id="footer">
+
         <!-- Input section -->
         <div class="flex-column center gap-1 width-100" style="max-width: 80rem; padding-inline: 1rem;">
 
@@ -93,7 +105,7 @@
             <!-- Signup Email input -->
             <div class="flex-row center gap-1 width-100" v-if="inputMode === 'signup_email'">
               <input 
-                class="input-chat" 
+                class="input-chat input-chat-highlighted" 
                 :class="{ 'input-chat-disabled': responseIsProcessing }"
                 v-model="inputEmail" 
                 type="email" 
@@ -118,7 +130,7 @@
             <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'signup_password'">
               <div class="flex-row row-to-column center gap-1 width-100">
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputPassword" 
                   type="password"
@@ -126,7 +138,7 @@
                   @keydown.enter.exact.prevent 
                 >
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputPasswordConfirm" 
                   type="password" 
@@ -149,7 +161,7 @@
             <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'login'">
               <div class="flex-row row-to-column center gap-1 width-100">
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputEmail" 
                   type="email" 
@@ -157,7 +169,7 @@
                   @keydown.enter.exact.prevent
                 >
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputPassword" 
                   type="password" 
@@ -183,7 +195,7 @@
             <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'forgot_password'">
               <div class="flex-row row-to-column center gap-1 width-100">
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputEmail" 
                   type="email" 
@@ -204,7 +216,7 @@
             <div class="flex-row gap-1 width-100" style="align-items: end;" v-if="inputMode === 'reset_password'">
               <div class="flex-row row-to-column center gap-1 width-100">
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputPassword" 
                   type="password"
@@ -212,7 +224,7 @@
                   @keydown.enter.exact.prevent 
                 >
                 <input 
-                  class="input-chat"
+                  class="input-chat input-chat-highlighted"
                   :class="{ 'input-chat-disabled': responseIsProcessing }"
                   v-model="inputPasswordConfirm" 
                   type="password" 
@@ -230,6 +242,7 @@
             </div>
 
           </div>
+
         </div>
       </div>
     </div>
@@ -254,7 +267,7 @@ export default {
     return {
       isMobile: window.innerWidth <= 796,
       socketId: null,
-      theme: 'light',
+      theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       userStatus: null,
       input: '',
       inputMode: 'default',
@@ -282,7 +295,7 @@ export default {
     const urlToken = new URLSearchParams(window.location.search).get("token");
     if (urlToken) {this.processUrlToken(urlToken)}
 
-    const hashParams = new URLSearchParams(window.location.hash.slice(1)); // Remove the # symbol
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
     const urlSupabaseAccessToken = hashParams.get('access_token');
     const urlSupabaseRefreshToken = hashParams.get('refresh_token');
     if (urlSupabaseAccessToken && urlSupabaseRefreshToken) {
@@ -346,6 +359,7 @@ export default {
       });
 
       socket.on("signal", (data) => {this.processSignal(data)});
+      socket.on("widget", (data) => {this.processWidget(data)});
       socket.on("suggestions", (data) => {this.processOrganicSuggestions(data.suggestions)});
     },
 
@@ -356,9 +370,7 @@ export default {
       this.userStatus = 0
     },
 
-    async processUrlToken(token) { // DEATH LOOP WHEN USING OLD LINK
-      // await this.getUserData(token)
-      // localStorage.setItem('_u', token);
+    async processUrlToken(token) {
 
       this.chat = [{ role: 'assistant', content: '' }]
       const result = await axios.get(`${config.apiUrl}/api/process-url-token?token=` + token);
@@ -432,6 +444,11 @@ export default {
       this.updateChatHeight();
     },
 
+    isLatestAssistantMessage(message) {
+    const assistantMessages = this.chat.filter(msg => msg.role === 'assistant');
+    return assistantMessages.length > 0 && assistantMessages[assistantMessages.length - 1] === message;
+  },
+
     // CHAT INTERACTION
     getPremadeSuggestions() {
       if (!this.premadeSuggestionsShown) {
@@ -445,7 +462,7 @@ export default {
           { label: 'More', action: () => (this.premadeSuggsetionsTopic = 'more_authenticated', this.getPremadeSuggestions()) },
           { label: 'Back', action: () => (this.premadeSuggsetionsTopic = '', this.getPremadeSuggestions()) },
         ]
-      } 
+      }
 
       else if (this.premadeSuggsetionsTopic === 'more_authenticated') {
         this.premadeSuggestions =  [
@@ -510,7 +527,7 @@ export default {
       if (data.signal_type === "signup_email") {this.inputMode = 'signup_email'} 
       else if (data.signal_type === "login") {this.inputMode = 'login'} 
       else if (data.signal_type === "forgot_password") {this.inputMode = 'forgot_password'}
-      else if (data.signal_type === "reset_password") {console.log('ass'); this.inputMode = 'reset_password'}
+      else if (data.signal_type === "reset_password") {this.inputMode = 'reset_password'}
 
       else if (data.signal_type === "signed_in") {
         localStorage.setItem('_u', data.token)
@@ -528,6 +545,23 @@ export default {
       this.$nextTick(() => {this.updateChatHeight()});
     },
 
+    async processWidget(data) {
+      let widgetParams = data.params;
+      if (typeof data.params === 'string') {widgetParams = JSON.parse(data.params);}
+      
+      const processAfterResponse = () => {
+        this.chat.push({ role: 'widget', content: widgetParams });
+        this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)});
+      };
+
+      if (this.responseIsProcessing) {
+        const checkResponseComplete = () => {
+          if (!this.responseIsProcessing) {processAfterResponse()} 
+          else {setTimeout(checkResponseComplete, 50)}
+        }; checkResponseComplete()}
+      else {processAfterResponse()}
+    },
+
     switchToDefaultInput() {
       this.inputMode = 'default';
       this.organicSuggestions = ['Tell me more'];
@@ -542,8 +576,7 @@ export default {
       const newMessageIndex = this.chat.length - 1;
       const currentMessage = this.chat[newMessageIndex];
       if (currentMessage && currentMessage.role === 'assistant') {
-        currentMessage.content += (currentMessage.content ? " " : "") + word;
-        this.currentAssistantMessage = currentMessage.content;
+        currentMessage.content += word
       }
 
       this.$forceUpdate();
@@ -558,8 +591,12 @@ export default {
     },
 
     sendManualAssistantMessage(message) { // Function in case a manual assistant response is needed
-      const words = message.split(' ');
-      words.forEach((word, index) => {setTimeout(() => {this.processResponse(word);}, index * 100)});
+      const words = message.match(/\S+|\s+/g); 
+      words.forEach((part, index) => {
+        setTimeout(() => { 
+          this.processResponse(part); 
+        }, index * 20);
+      });
     },
 
     async saveAssitantResponse() {
