@@ -50,3 +50,4 @@ database/filings/*
 database/markdowns/*
 database/logs/*
 autoupdate.log
+.github

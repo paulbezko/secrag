@@ -37,21 +37,18 @@ def create_app(mode: str):
 
     #######################################################################
     ###                         LOAD ROUTES                             ###
-    from server.general.routes import routes as general_routes
-    from server.authentication.routes import routes as auth_routes
-    from server.dashboard.routes import routes as dashboard_routes
-    from server.subscription.routes import routes as subscription_routes
-    from server.github.routes import routes as github_routes
+    from server.core.general.routes import routes as general_routes
+    from server.core.authentication.routes import routes as auth_routes
+    from server.core.dashboard.routes import routes as dashboard_routes
+    from server.core.subscription.routes import routes as subscription_routes
+    from server.core.github.routes import routes as github_routes
 
-    from server.v2.routes import routes as v2_routes
-
-    # app.include_router(general_routes, prefix="/api")
-    # app.include_router(auth_routes, prefix="/api")
+    app.include_router(general_routes, prefix="/api")
+    app.include_router(auth_routes, prefix="/api")
     # app.include_router(subscription_routes, prefix="/api")
-    # app.include_router(dashboard_routes, prefix="/api")
+    app.include_router(dashboard_routes, prefix="/api")
     # app.include_router(github_routes, prefix="/gh")
 
-    app.include_router(v2_routes, prefix="/api")
 
     #######################################################################
     ###                         SERVE INDEX                             ### 

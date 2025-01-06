@@ -1,6 +1,8 @@
 <template>
-  <div class="tradingview-widget-container" ref="container">
-    <div class="tradingview-widget-container__widget"></div>
+  <div class="widget-container">
+    <div class="widget-container-child" ref="container">
+      <div class="tradingview-widget-container__widget"></div>
+    </div>
   </div>
 </template>
 
@@ -36,14 +38,16 @@ export default {
         "width": "100%",
         "height": "400",
         "locale": "en",
+        "backgroundColor": ${props.theme === 'dark' ? '"#1a1a1b"' : '"#F4F6F9"'},
+        "gridColor": ${props.theme === 'dark' ? '"#2d2d30"' : '"#D1D5DB"'},
         "colorTheme": ${props.theme === 'dark' ? '"dark"' : '"light"'},
         "autosize": true,
         "showVolume": true,
         "showMA": false,
         "hideDateRanges": false,
         "hideMarketStatus": false,
-        "hideSymbolLogo": false,
-        "scalePosition": "right",
+        "hideSymbolLogo": true,
+        "scalePosition": "left",
         "scaleMode": "Normal",
         "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
         "fontSize": "10",
@@ -81,10 +85,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.tradingview-widget-container {
-  width: 100%;
-  height: 100%;
-}
-</style>

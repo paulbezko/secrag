@@ -96,6 +96,15 @@ input:-webkit-autofill:active {
   opacity: 0.5;
 }
 
+.input-chat-highlighted {
+  border: 1px solid var(--yellow-dark);
+  background-color: var(--yellow-highlight);
+}
+
+.input-chat-highlighted::placeholder {
+  color: var(--yellow-dark);
+}
+
 .button-send {
   display: flex;
   align-items: center;
@@ -210,9 +219,13 @@ input:-webkit-autofill:active {
 
 .widget-container {
   width: 100%;
-  border: 1px solid var(--grey-semilight);
-  border-radius: 1rem; 
+  border-radius: 1rem;
   overflow: hidden;
+}
+
+.widget-container-child {
+  position: relative;
+  margin: -1px;
 }
 
 .user-message {
