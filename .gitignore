@@ -51,3 +51,4 @@ database/markdowns/*
 database/logs/*
 autoupdate.log
 .github
+client/src/config.js
