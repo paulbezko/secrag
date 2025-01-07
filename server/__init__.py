@@ -73,8 +73,6 @@ def create_app(*args):
         @app.get("/sitemap.xml")
         async def serve_sitemap():
             return FileResponse(sitemap_file_path)
-        
-        app.mount("/styles", StaticFiles(directory="client/dist/styles"), name="styles")
 
         config['MODE'] = 'prod'
         config['REDIRECT_URL'] = os.getenv('REDIRECT_URL', 'http://localhost:5000')
