@@ -4,8 +4,8 @@ import uvicorn
 
 load_dotenv('.env', override=True)
 
-mode = 'dev' # Controls whether the server will use built client static files or not (prod or dev)
-app, socketio = create_app(mode)
+# Mode is specified by the environmental variable 'APP_MODE' now. (dev or prod)
+app, socketio = create_app()
 
 
 # Handle stop signal. Could not seem to make it work inside routes or init.
