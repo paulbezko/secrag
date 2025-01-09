@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
-from .globals import State, llm
-from .user_profile_model import InvestorTraderProfile
+from globals import State, llm
+from user_profile_model import InvestorTraderProfile
 import json
 
 user_profiler_prompt = """
