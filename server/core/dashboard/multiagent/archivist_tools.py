@@ -5,7 +5,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 from langchain_core.tools import tool
-from .globals import llm
+from globals import llm
 
 
 years = []

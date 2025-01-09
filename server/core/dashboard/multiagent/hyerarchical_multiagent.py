@@ -1,14 +1,20 @@
 import io
+import sys
 import json
 import asyncio
 import traceback
 
+from dotenv import load_dotenv
+
+sys.path.append("server/core/dashboard/multiagent")
+sys.path.append("")
+
 from PIL import Image
 
 # Various project-related imports
-from .globals import State
-from .helpers import add_message, get_chats_by_key, create_file_if_not_exists
-from .user_profile_model import profile_template
+from globals import State
+from helpers import add_message, get_chats_by_key, create_file_if_not_exists
+from user_profile_model import profile_template
 
 # LangGraph
 from langgraph.graph import StateGraph, START
@@ -18,34 +24,37 @@ from langgraph.graph.state import CompiledStateGraph
 from langchain_core.messages import HumanMessage, ToolMessage
 
 # Agents
-from .agent_supervisor import supervisor_node
-from .agent_profiler import profiler_node
-from .agent_concierge import concierge_node
-from .agent_archivist import archivist_node
-from .agent_prompt_suggestions import prompt_suggestions_node, prompt_suggestions_tool
+from agent_supervisor import supervisor_node
+from agent_profiler import profiler_node
+from agent_concierge import concierge_node
+from agent_archivist import archivist_node
+from agent_filing_guy import filing_guy_node
+from agent_prompt_suggestions import prompt_suggestions_node, prompt_suggestions_tool
 
 # Global Stop Signals
 from server.globals import stop_signals
 
-DISPLAY_GRAPH = True
+DISPLAY_GRAPH = False
 
 def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder = StateGraph(State)
     builder.add_node("supervisor", supervisor_node)
     builder.add_node("profiler", profiler_node)
     builder.add_node("concierge", concierge_node)
-    builder.add_node("archivist", archivist_node)
-    # builder.add_node("prompt_suggestions", prompt_suggestions_node)
+    builder.add_node("archivist", filing_guy_node)
+
 
     builder.add_edge(START, "supervisor")
     builder.add_edge(START, "profiler")
     graph = builder.compile()
-    # image = Image.open(io.BytesIO(graph.get_graph().draw_mermaid_png()))
-    # if display_graph: image.show() 
+
+    if display_graph:
+        image = Image.open(io.BytesIO(graph.get_graph().draw_mermaid_png()))
+        image.show() 
 
     return graph
 
-async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id,debug = False) -> str:
+async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id = "",debug = False) -> str:
     with open("server/memory/trader_profiles.json", "r") as f:
         profiles = json.load(f)
         # print(profiles.keys())
@@ -64,14 +73,16 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
         prompt_suggestions = []
 
         await socketio.emit('response_started', to=socket_id)
-        async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":10}, stream_mode="messages"):
+        print(socket_id)
+        async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
             if debug:
                 print(f"-----------------\n[MSG] {type(msg)}: \n{msg}\n\n[METADATA]:\n{metadata}\n")
-            if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "concierge": 
+            if msg.content and not isinstance(msg, HumanMessage) and (metadata["langgraph_node"] == "concierge" or metadata["langgraph_node"] == "filing_guy"): 
                 if stop_signals.get(socket_id): 
                     stop_signals.pop(socket_id, None)
                     break
                 await socketio.emit('response_token', {'word': msg.content}, to=socket_id)
+                
                 buffer += msg.content
 
             if type(msg) == ToolMessage:
@@ -97,6 +108,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
 
 # Main asynchronous loop
 async def main():
+    load_dotenv(".env")
     """
     Main loop to interact with the LangGraph agent.
     """
@@ -117,8 +129,8 @@ async def main():
             print("Exiting...")
             break
 
-        await invoke_graph(agent, user_id, user_input, debug=True)
-
+        output, _ = await invoke_graph(agent, user_id, user_input, debug=False)
+        print(f"Assistant: \n {output}")
 
 if __name__ == "__main__":
     asyncio.run(main())
