@@ -23,6 +23,7 @@
                 class="assistant-image"
               >
               <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
+              <!-- <div v-if="responseIsProcessing" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div> -->
               <div class="chat-text" :class="isLatestAssistantMessage(message) ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
             </div>
 
@@ -281,6 +282,7 @@ export default {
       premadeSuggestionsShown: false,
       premadeSuggsetionsTopic: '',
       responseIsProcessing: false,
+      responseFlowstep: '',
       currentAssistantMessage: '',
     };
   },
@@ -349,7 +351,7 @@ export default {
     initializeSocket() {
       socket.connect();
       socket.on("connect", () => {(this.socketId = socket.id)});
-      socket.on("response_started", () => {this.responseIsProcessing = true; this.chat.push({ role: "assistant", content: "" })});
+      socket.on("response_started", () => {this.responseIsProcessing = true; this.responseFlowstep = 'Responding...'; this.chat.push({ role: "assistant", content: "" })});
       socket.on("response_token", (data) => {this.processResponse(data.word)});
       socket.on("response_complete", () => {
         this.responseIsProcessing = false;
@@ -359,6 +361,7 @@ export default {
       });
 
       socket.on("signal", (data) => {this.processSignal(data)});
+      socket.on("flowstep", (data) => {this.responseFlowstep = data.flowstep});
       socket.on("widget", (data) => {this.processWidget(data)});
       socket.on("suggestions", (data) => {this.processOrganicSuggestions(data.suggestions)});
     },
@@ -543,6 +546,10 @@ export default {
 
       if ((data.signal_type === "login" || data.signal_type === "signup_email") && this.isMobile === true) {this.premadeSuggestionsShown = false}
       this.$nextTick(() => {this.updateChatHeight()});
+    },
+
+    async processFlowstep(data) {
+      console.log(data)
     },
 
     async processWidget(data) {
