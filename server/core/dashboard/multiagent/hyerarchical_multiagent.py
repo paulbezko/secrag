@@ -6,6 +6,7 @@ import traceback
 
 from dotenv import load_dotenv
 
+# Adds directories to PATH to avoid relative imports
 sys.path.append("server/core/dashboard/multiagent")
 sys.path.append("")
 
