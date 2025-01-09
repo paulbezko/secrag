@@ -14,3 +14,5 @@ class State(TypedDict):
     user_profile: dict
     user_id: str
     
+
+supported_form_types = ["10-Q", "10-K", "8-K", "4", "3", "144", "SC 13", "DEF 14"]

@@ -1,7 +1,7 @@
-from .globals import llm
+from globals import llm
 from langchain.tools import StructuredTool
 
-from .archivist_tools import vectorstore
+from archivist_tools import vectorstore
 
 import asyncio
 import json
@@ -12,7 +12,7 @@ from typing import Literal, List, Optional, Type, Annotated
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from datetime import datetime
-from .user_profile_model import InvestorTraderProfile
+from user_profile_model import InvestorTraderProfile
 
 from langchain_core.tools import BaseTool, Tool
 from langchain.callbacks.manager import (
