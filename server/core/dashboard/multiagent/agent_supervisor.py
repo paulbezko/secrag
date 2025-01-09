@@ -10,7 +10,7 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
         f" following workers: {members}. Given the following user request,"
         " respond with the worker to act next. Each worker will perform a"
         " task and respond with their results and status."
-        " **concierge** is meant for conversational interactions. It has access to no news data."
+        " **concierge** is meant for conversational interactions. It has access to news data."
         " **archivist** knows about the company filings and is meant for navigating through SECRAG company filing database."
         " Call the **archivist** only if you need to search for available company filings or retrieve data from available filings."
         " Call the **archivist** only for queries about Apple Inc (AAPL) filings or if query is about available filings in general. For other companies, call concierge. "
