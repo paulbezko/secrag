@@ -28,9 +28,8 @@ from langchain_core.messages import HumanMessage, ToolMessage
 from agent_supervisor import supervisor_node
 from agent_profiler import profiler_node
 from agent_concierge import concierge_node
-from agent_archivist import archivist_node
-from agent_filing_guy import filing_guy_node
-from agent_prompt_suggestions import prompt_suggestions_node, prompt_suggestions_tool
+from server.core.dashboard.multiagent.agent_archivist import archivist_node
+from agent_prompt_suggestions import prompt_suggestions_tool
 
 # Global Stop Signals
 from server.globals import stop_signals
@@ -42,7 +41,7 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder.add_node("supervisor", supervisor_node)
     builder.add_node("profiler", profiler_node)
     builder.add_node("concierge", concierge_node)
-    builder.add_node("archivist", filing_guy_node)
+    builder.add_node("archivist", archivist_node)
 
 
     builder.add_edge(START, "supervisor")
@@ -78,7 +77,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
         async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
             if debug:
                 print(f"-----------------\n[MSG] {type(msg)}: \n{msg}\n\n[METADATA]:\n{metadata}\n")
-            if msg.content and not isinstance(msg, HumanMessage) and (metadata["langgraph_node"] == "concierge" or metadata["langgraph_node"] == "filing_guy"): 
+            if msg.content and not isinstance(msg, HumanMessage) and (metadata["langgraph_node"] == "concierge" or metadata["langgraph_node"] == "archivist"): 
                 if stop_signals.get(socket_id): 
                     stop_signals.pop(socket_id, None)
                     break

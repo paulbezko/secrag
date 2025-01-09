@@ -1,7 +1,7 @@
 from globals import llm
 from langchain.tools import StructuredTool
 
-from archivist_tools import vectorstore
+from server.core.dashboard.multiagent.archivist_tools import ticker_vectorstore
 
 import asyncio
 import json
@@ -60,7 +60,7 @@ class TickerNewsTool(BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool asynchronously."""
-        results = await vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
+        results = await ticker_vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
 
         ticker = json.loads(results[0].page_content)["ticker"]
         return Ticker(ticker).news
@@ -126,7 +126,7 @@ class TickerBalanceSheetTool(BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool asynchronously."""
-        results = await vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
+        results = await ticker_vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
 
         ticker = json.loads(results[0].page_content)["ticker"]
         return Ticker(ticker).get_balance_sheet(as_dict=True, freq="quarterly")
@@ -154,7 +154,7 @@ class TickerIncomeStatementTool(BaseTool):
     ) -> str:
         """Use the tool asynchronously."""
         await asyncio.sleep(0.5)
-        results = await vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
+        results = await ticker_vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
 
         ticker = json.loads(results[0].page_content)["ticker"]
         return Ticker(ticker).get_income_stmt(as_dict=True, freq="quarterly")
@@ -182,7 +182,7 @@ class TickerCashFlowStatementTool(BaseTool):
     ) -> str:
         """Use the tool asynchronously."""
         await asyncio.sleep(0.5)
-        results = await vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
+        results = await ticker_vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
 
         ticker = json.loads(results[0].page_content)["ticker"]
         return Ticker(ticker).get_cash_flow(as_dict=True, freq="quarterly")
@@ -211,7 +211,7 @@ class TickerAnalystPriceTargetsTool(BaseTool):
     ) -> str:
         """Use the tool asynchronously."""
         await asyncio.sleep(0.5)
-        results = await vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
+        results = await ticker_vectorstore.asimilarity_search(query, k=1, fetch_k=100000)
 
         ticker = json.loads(results[0].page_content)["ticker"]
         return Ticker(ticker).get_analyst_price_targets()
