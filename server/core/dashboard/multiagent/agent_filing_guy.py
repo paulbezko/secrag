@@ -9,7 +9,7 @@ from filing_guy_tools import filing_guy_tools
 
 filing_guy_agent = create_react_agent_with_node_name(llm, node_name="filing_guy", tools=filing_guy_tools, state_modifier=(
         """
-Current year: {current_year}        
+Current date: {current_date}        
 You are Fred, a conversational financial assistant. You are given a user's message history and it's latest message.
 
 Your main task is to help user learn about the contents of the SEC filings that are currently available in the database.
@@ -32,7 +32,7 @@ retrieve_data_from_filing - Use filing_date and filing_type you found using get_
     ),)
 
 async def filing_guy_node(state: State) -> Command[Literal["__end__"]]:
-    result = await filing_guy_agent.ainvoke({"messages": state["messages"][-10:], "current_year": datetime.now().strftime("%Y")})
+    result = await filing_guy_agent.ainvoke({"messages": state["messages"][-10:], "current_date": datetime.now().strftime("%Y-%m-%d")})
     return Command(
         graph="filing_guy",
         update={
