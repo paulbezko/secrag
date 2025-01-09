@@ -49,7 +49,7 @@ concierge_agent = create_react_agent_with_node_name(llm, node_name="concierge", 
 
         You are given a user's investor profile that might be incomplete. **Ask profile-related questions casually and sparingly, as part of natural conversation, rather than in a structured or persistent way.**
         
-        Current year: {current_year}  
+        Current year: {current_date}  
 
         user_profile: {user_profile}
         
@@ -58,7 +58,7 @@ concierge_agent = create_react_agent_with_node_name(llm, node_name="concierge", 
 
 async def concierge_node(state: State) -> Command[Literal["__end__"]]:
     print(state["messages"][-1], type(state["messages"][-1]))
-    result = await concierge_agent.ainvoke({"messages": state["messages"], "user_profile": state["user_profile"], "user_message": state["latest_user_message"], "current_year": datetime.now().strftime("%Y-%m-%d")})
+    result = await concierge_agent.ainvoke({"messages": state["messages"], "user_profile": state["user_profile"], "user_message": state["latest_user_message"], "current_date": datetime.now().strftime("%Y-%m-%d")})
     return Command(
         graph="concierge",
         update={
