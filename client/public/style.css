@@ -217,6 +217,15 @@ input:-webkit-autofill:active {
   width: 100%;
 }
 
+.assistant-text-flowstep {
+  animation: flash .6s infinite alternate;
+}
+
+@keyframes flash {
+  from {color: var(--black); opacity: 0.5;}
+  to {color: var(--black); opacity: 0.25;}
+}
+
 .widget-container {
   width: 100%;
   border-radius: 1rem;

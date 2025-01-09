@@ -78,7 +78,6 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
                 await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
 
             if type(msg) == ToolMessage and 'widget' in msg.name:
-                print(msg.name, msg.content)
                 await socketio.emit('widget', {'params': msg.content}, to=socket_id)
 
             # if isinstance(msg, ToolMessage) and msg.name == "SignUp" or msg.name == "SignIn":

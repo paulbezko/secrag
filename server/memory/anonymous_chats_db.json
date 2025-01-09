@@ -830,5 +830,63 @@
             "role": "assistant",
             "content": "I've generated the stock price chart for Apple Inc. (AAPL). You can view it now! If there's anything else you need or any specific details you're looking for, just let me know!"
         }
+    ],
+    "9n2CG2mPWmvyuArH": [
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "Please enter your email to sign up, and I'll send you a confirmation email."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've initiated the sign-up process. Please check your email for a confirmation message and follow the instructions provided. Let me know if you need any help!"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've initiated the sign-up process for you. Please check your email for a confirmation message and follow the instructions provided. Let me know if you need any assistance!"
+        },
+        {
+            "role": "user",
+            "content": "give me stock chart of tesla"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock chart for Tesla (TSLA). You can analyze the price trends and movements. If you need more information or specific data about Tesla, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock chart for Tesla (TSLA). You can check out the price trends and movements. If you have any other questions or need further analysis, just let me know!"
+        }
     ]
 }
