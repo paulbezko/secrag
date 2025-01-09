@@ -43,6 +43,7 @@ cython_debug/
 *.pkl
 
 client/dist
+client/src/config.js
 crons/logs/*
 database/bulk/*
 database/memory/chats.json
@@ -51,4 +52,4 @@ database/markdowns/*
 database/logs/*
 autoupdate.log
 .github
-client/src/config.js
+
