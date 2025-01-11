@@ -55,7 +55,7 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
 
     return graph
 
-async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_input, socket_id = "", debug = True) -> str:
+async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_input, socket_id = "", debug = False) -> str:
     # with open("server/memory/trader_profiles.json", "r") as f:
     #     profiles = json.load(f)
     #     # print(profiles.keys())

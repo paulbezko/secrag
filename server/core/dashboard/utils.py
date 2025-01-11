@@ -61,7 +61,7 @@ graph = create_graph()
 
 async def get_assistant_response(socket_id, uuid, input):
     profile = mongo_get_user_profile(mongo.db[f"chats_{config.get('MODE')}"], uuid)
-    llm_response = await invoke_graph(graph, uuid, profile, input, socket_id, debug=False)
+    llm_response = await invoke_graph(graph, uuid, profile, input, socket_id)
     response = mongo_update_user_profile(mongo.db[f"chats_{config.get('MODE')}"], uuid, llm_response['profile'])
     mongo_log_response(response)
 

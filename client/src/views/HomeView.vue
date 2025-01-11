@@ -28,7 +28,12 @@
             </div>
 
             <div v-else-if="message.role === 'widget'" class="widget-container">
-              <TradingViewWidget :ticker="message.content.ticker" :theme="theme" />
+              <div v-if="message.content.type === 'basic_treemap'">
+                <ApexChartsWidget :params="message.content.params" :theme="theme" />
+              </div>
+              <div v-else-if="message.content.type === 'tradingview'">
+                <TradingViewWidget :ticker="message.content.ticker" :theme="theme" />
+              </div>
             </div>
 
             <!-- User message -->
@@ -112,6 +117,9 @@
                 <div class="icon fa-solid fa-arrow-up"></div>
               </div>
               <div class="button-send" v-else @click="stopResponse()">
+                <div class="icon fa-solid fa-square"></div>
+              </div>
+              <div class="button-send" @click="processWidget('e')">
                 <div class="icon fa-solid fa-square"></div>
               </div>
             </div>
@@ -272,10 +280,12 @@ import webdata from '../webdata.json'
 import axios from 'axios';
 
 import TradingViewWidget from '@/components/TradingViewWidget.vue'
+import ApexChartsWidget from '@/components/ApexChartsWidget.vue';
 
 export default {
   components: {
     TradingViewWidget,
+    ApexChartsWidget
   },
   data() {
     return {
@@ -433,15 +443,15 @@ export default {
 
     // UI HELPERS
     observeSize() {
-  this.resizeObserver = new ResizeObserver(() => {
-    requestAnimationFrame(() => {
-      this.updateChatHeight();
-      this.checkScreenWidth();
-    });
-  });
-  const dashboard = document.getElementById('dashboard');
-  this.resizeObserver.observe(dashboard);
-},
+      this.resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => {
+          this.updateChatHeight();
+          this.checkScreenWidth();
+        });
+      });
+      const dashboard = document.getElementById('dashboard');
+      this.resizeObserver.observe(dashboard);
+    },
 
     markdownify(text) {
       if (typeof text !== 'string') {return '';}
@@ -588,25 +598,55 @@ export default {
     },
 
     async processWidget(data) {
-      let widgetMetadata = data.metadata;
-      if (typeof data.metadata === 'string') {widgetMetadata = JSON.parse(data.metadata);}
+      console.log(data)
+      // let widgetMetadata = data.metadata;
+      // if (typeof data.metadata === 'string') {widgetMetadata = JSON.parse(data.metadata);}
       
-      console.log(widgetMetadata.type)
-      console.log(widgetMetadata.params)
+      // console.log(widgetMetadata.type)
+      // console.log(widgetMetadata.params)
 
-      // const processAfterResponse = () => {
-      //   this.chat.push({ role: 'widget', content: widgetParams });
-      //   this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)});
-      // };
+      let widgetType = "basic_treemap"
+      let widgetParams = {
+        name: "Apple Inc. Revenue by Sector (2024)",
+        data: [
+          { x: "iPhone", y: 205.52 },
+          { x: "Mac", y: 41.68 },
+          { x: "iPad", y: 20.47 },
+          { x: "Wearables, Home, and Accessories", y: 42.35 },
+          { x: "Services", y: 103.34 },
+          { x: "Software", y: 15.72 },
+          { x: "Apple TV", y: 10.58 },
+          { x: "iCloud", y: 12.40 },
+          { x: "Apple Music", y: 25.00 },
+          { x: "Apple Pay", y: 7.15 },
+          { x: "App Store", y: 18.25 },
+          { x: "iWatch", y: 28.50 },
+          { x: "AirPods", y: 33.90 },
+          { x: "MacBook Pro", y: 40.00 },
+          { x: "MacBook Air", y: 35.20 }
+        ]
+      }
 
-      // if (this.responseIsProcessing) {
-      //   const checkResponseComplete = () => {
-      //     if (!this.responseIsProcessing) {processAfterResponse()} 
-      //     else {setTimeout(checkResponseComplete, 50)}
-      //   }; checkResponseComplete()}
-      // else {processAfterResponse()}
+      let widgetMetadata = {
+        type: widgetType,
+        params: widgetParams
+      }
 
-      // await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'widget', input: widgetParams, socketId: this.socketId});
+      const processAfterResponse = () => {
+        this.chat.push({ role: 'widget', content: widgetMetadata });
+        this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)});
+      };
+
+      if (this.responseIsProcessing) {
+        const checkResponseComplete = () => {
+          if (!this.responseIsProcessing) {processAfterResponse()} 
+          else {setTimeout(checkResponseComplete, 50)}
+        }; checkResponseComplete()}
+      else {processAfterResponse()}
+
+      
+
+      // await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'widget', input: widgetMetadata, socketId: this.socketId});
     },
 
     switchToDefaultInput() {
