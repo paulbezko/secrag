@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Literal
-from langchain_core.prompts import ChatPromptTemplate
 from custom_langgraph_methods import create_react_agent_with_node_name
 from globals import State, llm
 from langgraph.types import Command
 from langchain_core.messages import AIMessage
 from concierge_tools import concierge_tools
+from helpers import should_call_plotter
 
 concierge_agent = create_react_agent_with_node_name(llm, node_name="concierge", tools=concierge_tools, state_modifier=(
         """You are Fred, a financial conversational agent. You are working for SECRAG
@@ -56,9 +56,14 @@ concierge_agent = create_react_agent_with_node_name(llm, node_name="concierge", 
         latest_user_message: {user_message}"""
     ),)
 
-async def concierge_node(state: State) -> Command[Literal["__end__"]]:
+async def concierge_node(state: State) -> Command[Literal["__end__", "plotter"]]:
     print(state["messages"][-1], type(state["messages"][-1]))
     result = await concierge_agent.ainvoke({"messages": state["messages"], "user_profile": state["user_profile"], "user_message": state["latest_user_message"], "current_date": datetime.now().strftime("%Y-%m-%d")})
+    
+    goto = "__end__"
+    if should_call_plotter(result["messages"]):
+        goto = "plotter"
+    
     return Command(
         graph="concierge",
         update={
@@ -68,5 +73,5 @@ async def concierge_node(state: State) -> Command[Literal["__end__"]]:
                 )
             ]
         },
-        goto="__end__"
+        goto=goto
     )
