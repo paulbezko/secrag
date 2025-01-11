@@ -9,7 +9,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.types import Command
 from langchain_core.messages import AIMessage
 
-llm_plotter = ChatOpenAI(model="gpt-4o-mini")
+llm_plotter = ChatOpenAI(model="gpt-4o")
 # sankey_chart_plotter - plot hyerarchical series with it e.g. income statement\
 plotter_agent = create_react_agent_with_node_name(llm_plotter, node_name="plotter", tools=plotter_tools, state_modifier=(
         """
@@ -30,7 +30,7 @@ Respond by telling why you did or did not plot the data.
 
 async def plotter_node(state: State) -> Command[Literal["__end__"]]:
     result = await plotter_agent.ainvoke({"messages": [get_last_message(state["messages"], "user"), get_last_message(state["messages"], "ai")]})
-
+    print(f"\n\n\n[PLOTTER NODE]\n{result}\n\n\n\n")
     return Command(
         graph="plotter",
         update={
