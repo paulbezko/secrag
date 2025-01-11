@@ -22,5 +22,5 @@ profiler_prompt = ChatPromptTemplate.from_messages(
 
 async def profiler_node(state: State):
     profiler = profiler_prompt | llm
-
+    # print("[PROFILER] PROFILE IN:\n", json.dumps(state["user_profile"], indent=2))
     result = await profiler.ainvoke({"user_prompt": state["messages"][-1], "user_profile": state["user_profile"]})

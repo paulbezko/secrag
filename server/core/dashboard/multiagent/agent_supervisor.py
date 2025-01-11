@@ -15,7 +15,6 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
         " Call the **archivist** only if you need to search for available company filings or retrieve data from available filings."
         " Call the **archivist** only for queries about Apple Inc (AAPL) filings or if query is about available filings in general. For other companies, call concierge. "
         " You also need to provide a reason behind you calling a specific worker"
-        
     )
 
     class Router(TypedDict):
@@ -30,10 +29,7 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
             {"role": "system", "content": system_prompt},
         ] + state["messages"]
         response = llm.with_structured_output(Router).invoke(messages)
-        print("[SUPERVISOR NEXT]", response["next"], "REASON:", response["reason"])
         goto = response["next"]
-        # if goto == "FINISH":
-        #     goto = END
 
         return Command(goto=goto)
 
