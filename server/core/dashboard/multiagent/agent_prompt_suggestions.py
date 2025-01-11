@@ -29,9 +29,7 @@ class PromptSuggestions(BaseModel):
 
 async def prompt_suggestions_node(state: State) -> Command[Literal["__end__"]]:
     prompt_suggestions = prompt_suggestions_prompt | llm.with_structured_output(PromptSuggestions)
-    # print("[PROFILER] PROFILE IN:\n", json.dumps(state["user_profile"], indent=2))
     result = await prompt_suggestions.ainvoke({"input": state["messages"][-1]})
-    # print("[PROMPT SUGGESTIONS]", result)
     prompts = [result.prompt_one, result.prompt_two, result.prompt_three]
     return Command(
         graph="prompt_suggestions",
@@ -47,8 +45,6 @@ async def prompt_suggestions_node(state: State) -> Command[Literal["__end__"]]:
 
 async def prompt_suggestions_tool(input: str) -> List[StopIteration]:
     prompt_suggestions = prompt_suggestions_prompt | llm.with_structured_output(PromptSuggestions)
-    # print("[PROFILER] PROFILE IN:\n", json.dumps(state["user_profile"], indent=2))
     result = await prompt_suggestions.ainvoke({"input": input})
-    # print("[PROMPT SUGGESTIONS]", result)
     prompts = [result.prompt_one, result.prompt_two, result.prompt_three]
     return prompts
