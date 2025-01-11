@@ -18,7 +18,8 @@ import stripe
 import os
 
 load_dotenv('.env', override=True)
-flask_key_secret = os.getenv('flask_key_secret')
+
+mode = os.getenv('APP_MODE')
 
 log_filename = os.path.join("database/logs", f"{datetime.now().strftime('%d-%m-%Y')}.log")
 handler = TimedRotatingFileHandler(log_filename, when='midnight', interval=1, backupCount=90)
@@ -28,12 +29,9 @@ handler.setFormatter(formatter)
 
 config = {}
 
-def create_app(mode: str):
-
+def create_app(*args):
     app = FastAPI()
     socketio = SocketManager(app, cors_allowed_origins="*", mount_location="/socket.io")
-
-
 
     #######################################################################
     ###                         LOAD ROUTES                             ###
@@ -75,8 +73,6 @@ def create_app(mode: str):
         @app.get("/sitemap.xml")
         async def serve_sitemap():
             return FileResponse(sitemap_file_path)
-        
-        # app.mount("/style", StaticFiles(directory="client/dist/style"), name="style")
 
         config['MODE'] = 'prod'
         config['REDIRECT_URL'] = os.getenv('REDIRECT_URL', 'http://localhost:5000')
@@ -91,7 +87,6 @@ def create_app(mode: str):
     
     #######################################################################
     ###                 LOAD ENVIRONMENTAL VARIABLES                    ###
-    config['FLASK_KEY_SECRET'] = os.getenv('FLASK_KEY_SECRET')
     config['JWT_SECRET'] = os.getenv('JWT_SECRET')
     config['MAIL_SENDER_USER'] = os.getenv('MAIL_SENDER_USER')
     config['MAIL_SENDER_PASS'] = os.getenv('MAIL_SENDER_PASS')
