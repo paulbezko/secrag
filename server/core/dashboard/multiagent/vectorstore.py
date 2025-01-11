@@ -44,65 +44,7 @@ class VectorstoreManager:
             init_document_list = [Document(page_content="", metadata={"chunk_description":"init"})]
             vectorstore = FAISS.from_documents(init_document_list, embedding=embeddings)
             vectorstore.save_local(self.vectorstore_dir)
-            # print('info', f"Created Vectorstore")
+
         return vectorstore
     
-    # async def new_chat(
-    #     self,
-    #     filing : FilingObject, 
-    #     # Optional args
-    #     chunk_size = 10000, 
-    #     chunk_overlap = 3, 
-    #     table_prepend_k = 3,
-    #     ):
-
-    #     chunk_metadata_model = {
-    #         "ticker": filing.ticker.lower(), 
-    #         "date": filing.filing_date,
-    #         "form": filing.filing_type,
-    #         "year": filing.filing_year,
-    #         # "chunk_description": "",
-    #         # "chunk_size": chunk_size,
-    #         # "chunk_overlap": chunk_overlap,
-    #         # "table_prepend_k": table_prepend_k
-    #     }
-    #     print(chunk_metadata_model)
-    #     check_for_existing_embeddings = self.vectorstore.similarity_search("", k=3, filter=chunk_metadata_model, fetch_k=100000)
-    #     print(check_for_existing_embeddings)
-    #     # Case when embedding does not exist
-    #     if len(check_for_existing_embeddings) == 0:
-    #         # Filing identifier for the queue
-    #         queue_id = filing.ticker+filing.filing_type+filing.filing_date
-            
-    #         if queue_id not in embeddings_queue:
-    #             # Anounce filing in the queue
-    #             embeddings_queue.append(queue_id)
-    #             try:
-    #                 await self._perform_embedding(filing.to_dict(), chunk_size, chunk_overlap, table_prepend_k)
-    #             except Exception as e:
-    #                 embeddings_queue.remove(queue_id)
-    #                 raise e
-    #             # Release from queue
-    #             embeddings_queue.remove(queue_id)
-
-    #             log('debug', f"Updated Vectorstore for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
-    #         else:
-    #             # Loop until the filing is released from the queue
-    #             while queue_id in embeddings_queue:
-    #                 await asyncio.sleep(0)
-
-    #     # Case when embedding already exists       
-    #     else:
-    #         log('debug', f"Embedding already exists for {filing.ticker}-{filing.filing_date}, {chunk_size}, {chunk_overlap}, {table_prepend_k}")
-
-
-    # async def _perform_embedding(self, filing_data, chunk_size, chunk_overlap, table_prepend_k):
-    #     filing = FilingObject.from_dict(filing_data)
-    #     sec_filing_object = await get_sec_filing_object(filing)
-    #     chunks = await sec_filing_object.get_documents(chunk_size, chunk_overlap, table_prepend_k)
-    #     print(chunks)
-    #     await self.vectorstore.aadd_documents(chunks)
-
-    #     self.vectorstore.save_local(self.vectorstore_dir)
-
 vectorstore_manager = VectorstoreManager()

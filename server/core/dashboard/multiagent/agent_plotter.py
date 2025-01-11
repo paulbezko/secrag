@@ -30,7 +30,7 @@ Respond by telling why you did or did not plot the data.
 
 async def plotter_node(state: State) -> Command[Literal["__end__"]]:
     result = await plotter_agent.ainvoke({"messages": [get_last_message(state["messages"], "user"), get_last_message(state["messages"], "ai")]})
-    print(result["messages"][-1].content)
+
     return Command(
         graph="plotter",
         update={
