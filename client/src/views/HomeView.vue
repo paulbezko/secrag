@@ -2,13 +2,13 @@
   <div class="flex-column center width-100 height-100svh" id="dashboard">
     <div class="flex-column center space-between width-100 height-100svh" style="max-width: 80rem; ">
 
-      <!-- Footer -->
+      <!-- Header -->
       <div style="min-height: 1rem;" class="width-100 header" id="header"></div>
 
       <div class="flex-column width-100 height-100 center">
 
         <!-- Chat container section -->
-        <div class="flex-column width-100 gap-1 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
+        <div v-if="view === 'chat'" class="flex-column width-100 gap-1 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
           <div v-for="(message, index) in chat" :key="index" class="flex-row center gap-1 width-100 chat-message">
 
             <!-- Assistant message -->
@@ -23,7 +23,7 @@
                 class="assistant-image"
               >
               <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
-              <!-- <div v-if="responseIsProcessing" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div> -->
+              <div v-if="isLatestAssistantMessage(message) && responseFlowstep !== ''" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div>
               <div class="chat-text" :class="isLatestAssistantMessage(message) ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
             </div>
 
@@ -40,6 +40,19 @@
 
           </div>
 
+        </div>
+
+        <div v-if="view === 'profile'" class="flex-column width-100 gap-1 center" style="padding-inline: 1rem">
+          <div class="flex-row center gap-1 assistant-message single">
+            <img
+              :src="input !== '' 
+                ? require('@/assets/dashboard/face_with_monocle_3d.png')
+                : require('@/assets/dashboard/slightly_smiling_face_3d.png')"
+              class="assistant-image"
+            >
+            <div class="chat-text assistant-text single" v-html="markdownify('This is what I know about you.\nFeel free to adjust!')"></div>
+          </div>
+          <textarea class="input-profile" v-model="userProfile"></textarea>
         </div>
 
       </div>
@@ -85,7 +98,7 @@
             <div class="flex-row center gap-1 width-100" v-if="inputMode === 'default'" style="align-items: end;">
               <textarea
                 class="input-chat" 
-                :class="{ 'input-chat-disabled': responseIsProcessing }"
+                :class="{ 'input-chat-disabled': responseIsProcessing || view !== 'chat' }"
                 v-model="input" 
                 type="text" 
                 rows="1"
@@ -95,7 +108,7 @@
                 @keyup.enter.exact="sendMessage(input)"
                 @input="updateTextareaHeight()"
               ></textarea>
-              <div class="button-send" v-if="!responseIsProcessing" @click="sendMessage(input)">
+              <div class="button-send" :class="{ 'button-send-disabled': view !== 'chat' }" v-if="!responseIsProcessing" @click="sendMessage(input)">
                 <div class="icon fa-solid fa-arrow-up"></div>
               </div>
               <div class="button-send" v-else @click="stopResponse()">
@@ -270,6 +283,8 @@ export default {
       socketId: null,
       theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       userStatus: null,
+      userProfile: '',
+      view: 'chat',
       input: '',
       inputMode: 'default',
       inputEmail: '',
@@ -292,7 +307,7 @@ export default {
     this.chatScrollToBottom();
     this.updateChatHeight();
     this.updateTextareaHeight();
-    this.observeSize()
+    this.observeSize();
 
     const urlToken = new URLSearchParams(window.location.search).get("token");
     if (urlToken) {this.processUrlToken(urlToken)}
@@ -312,9 +327,11 @@ export default {
     }
 
     else if (localStorage.getItem('_u')) {
-      this.getUserData(localStorage.getItem('_u')).then(() => {
+      const token = localStorage.getItem('_u');
+      this.getChatHistory(token);
+      this.getUserData(token).then(() => {
         if (this.userStatus === 'anonymous') {
-          this.chat = [{ role: 'assistant', content: '' }];
+          // this.chat = [{ role: 'assistant', content: '' }];
           this.sendManualAssistantMessage("Welcome back!")
           this.organicSuggestions = ['Tell me more']
         }
@@ -351,8 +368,8 @@ export default {
     initializeSocket() {
       socket.connect();
       socket.on("connect", () => {(this.socketId = socket.id)});
-      socket.on("response_started", () => {this.responseIsProcessing = true; this.responseFlowstep = 'Responding...'; this.chat.push({ role: "assistant", content: "" })});
-      socket.on("response_token", (data) => {this.processResponse(data.word)});
+      socket.on("response_started", () => {this.responseIsProcessing = true; this.responseFlowstep = 'Thinking...'; this.chat.push({ role: "assistant", content: "" })});
+      socket.on("response_token", (data) => {this.processResponse(data.word), this.responseFlowstep = ''});
       socket.on("response_complete", () => {
         this.responseIsProcessing = false;
         this.saveAssitantResponse();
@@ -360,7 +377,7 @@ export default {
         if (textarea) textarea.focus();
       });
 
-      socket.on("signal", (data) => {this.processSignal(data)});
+      socket.on("tool", (data) => {this.processTool(data)});
       socket.on("flowstep", (data) => {this.responseFlowstep = data.flowstep});
       socket.on("widget", (data) => {this.processWidget(data)});
       socket.on("suggestions", (data) => {this.processOrganicSuggestions(data.suggestions)});
@@ -403,19 +420,37 @@ export default {
       else (this.userStatus = response.data.user_status)
     },
 
+    async getChatHistory(token) {
+      const result = await axios.get(`${config.apiUrl}/api/get-chat-history?token=` + token);
+      this.chat = result.data.chat.messages;
+    },
+
+    async getUserProfile(token) {
+      const result = await axios.get(`${config.apiUrl}/api/get-user-profile?token=` + token);
+      this.userProfile = result.data.profile
+      console.log(result.data)
+    },
+
     // UI HELPERS
     observeSize() {
       this.resizeObserver = new ResizeObserver(() => {
         this.updateChatHeight();
         this.checkScreenWidth();
+
+        this.resizeObserver.disconnect();
+        setTimeout(() => {
+          const dashboard = document.getElementById('dashboard');
+          this.resizeObserver.observe(dashboard);
+        }, 0);
       });
+
       const dashboard = document.getElementById('dashboard');
       this.resizeObserver.observe(dashboard);
     },
 
     markdownify(text) {
-      let formattedText
-      formattedText = text.replace(/\n/g, '<br />');
+      if (typeof text !== 'string') {return '';}
+      let formattedText = text.replace(/\n/g, '<br />');
       return marked(formattedText);
     },
 
@@ -454,11 +489,17 @@ export default {
 
     // CHAT INTERACTION
     getPremadeSuggestions() {
-      if (!this.premadeSuggestionsShown) {
-        this.premadeSuggestions = [];
+      if (this.view === 'profile') {
+        this.inputMode = 'default';
+        this.organicSuggestions = [];
+        this.premadeSuggestionsShown = true;
+        this.premadeSuggestions = [
+          { label: 'Save changes', action: () => (console.log('User profile saved')) },
+          { label: 'Back', action: () => (this.view = 'chat', this.getPremadeSuggestions(), this.chatScrollToBottom()) },
+        ];
       }
-
-      if (this.premadeSuggsetionsTopic === 'profile') {
+      
+      else if (this.premadeSuggsetionsTopic === 'profile') {
         this.premadeSuggestions =  [
         ...(!this.userIsSubscribed ? [] : [{ label: 'Manage Subscription', action: () => console.log('Redirect to stripe here') }]),
           { label: 'Sign Out', action: this.signOut },
@@ -485,6 +526,7 @@ export default {
 
       else if (this.userStatus === 'anonymous' || this.userStatus === null) {
         this.premadeSuggestions =  [
+          { label: 'Profile', action: async () => (await this.getUserProfile(localStorage.getItem('_u')), console.log(this.userProfile), this.view = 'profile', this.getPremadeSuggestions()) },
           { label: 'Sign Up', action: () => this.sendMessage("I'd like to sign up") },
           { label: 'Sign In', action: () => this.sendMessage("I'd like to sign in") },
           { label: 'More', action: () => (this.premadeSuggsetionsTopic = 'more_anonymous', this.getPremadeSuggestions()) },
@@ -498,7 +540,8 @@ export default {
       else if (this.userStatus === 'registered') {
         this.premadeSuggestions =  [
           { label: 'Subscribe', action: () => console.log('Redirect to stripe here') },
-          { label: 'Profile', action: () => (this.premadeSuggsetionsTopic = 'profile', this.getPremadeSuggestions()) },
+          // { label: 'Profile', action: () => (this.premadeSuggsetionsTopic = 'profile', this.getPremadeSuggestions()) },
+          { label: 'Profile', action: async () => (await this.getUserProfile(localStorage.getItem('_u')), this.view = 'profile', this.getPremadeSuggestions()) },
         ];
       }
 
@@ -526,13 +569,14 @@ export default {
       await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'user', input: input, socketId: this.socketId});
     },
 
-    processSignal(data) {
-      if (data.signal_type === "signup_email") {this.inputMode = 'signup_email'} 
-      else if (data.signal_type === "login") {this.inputMode = 'login'} 
-      else if (data.signal_type === "forgot_password") {this.inputMode = 'forgot_password'}
-      else if (data.signal_type === "reset_password") {this.inputMode = 'reset_password'}
+    processTool(data) {
+      this.responseFlowstep = data.flowstep;
+      if (data.name === "tool_signup_email") {this.inputMode = 'signup_email'} 
+      else if (data.name === "tool_login") {this.inputMode = 'login'} 
+      else if (data.name === "tool_forgot_password") {this.inputMode = 'forgot_password'}
+      else if (data.name === "tool_reset_password") {this.inputMode = 'reset_password'}
 
-      else if (data.signal_type === "signed_in") {
+      else if (data.name === "tool_signed_in") {
         localStorage.setItem('_u', data.token)
         this.userIsAuthenticated = true
         if (data.subscription !== 'none') {this.userIsSubscribed = true}
@@ -544,12 +588,8 @@ export default {
 
       else {this.inputMode = 'default'}
 
-      if ((data.signal_type === "login" || data.signal_type === "signup_email") && this.isMobile === true) {this.premadeSuggestionsShown = false}
+      if ((data.name === "tool_login" || data.name === "tool_signup_email") && this.isMobile === true) {this.premadeSuggestionsShown = false}
       this.$nextTick(() => {this.updateChatHeight()});
-    },
-
-    async processFlowstep(data) {
-      console.log(data)
     },
 
     async processWidget(data) {
@@ -567,6 +607,8 @@ export default {
           else {setTimeout(checkResponseComplete, 50)}
         }; checkResponseComplete()}
       else {processAfterResponse()}
+
+      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'widget', input: widgetParams, socketId: this.socketId});
     },
 
     switchToDefaultInput() {
@@ -607,7 +649,7 @@ export default {
     },
 
     async saveAssitantResponse() {
-      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'assistant', input: this.currentAssistantMessage, socketId: this.socketId});
+      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'assistant', input: this.chat[this.chat.length - 1].content, socketId: this.socketId});
     },
 
     // AUTHENTICATION

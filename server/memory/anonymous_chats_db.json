@@ -829,6 +829,38 @@
         {
             "role": "assistant",
             "content": "I've generated the stock price chart for Apple Inc. (AAPL). You can view it now! If there's anything else you need or any specific details you're looking for, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! I'm Fred, your financial conversational agent for SECRAG. How can I assist you today? If you have any questions about stocks, SEC filings, or anything else related to financial analysis, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It looks like you're testing the system. If you have any questions or need assistance with something specific, feel free to ask! I'm here to help."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the sign-in interface. Please enter your email and password to log in. If you need any help, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the sign-in interface. Please enter your email and password to log in. If you need any help, just let me know!"
         }
     ],
     "9n2CG2mPWmvyuArH": [
@@ -887,6 +919,596 @@
         {
             "role": "assistant",
             "content": "Here's the stock chart for Tesla (TSLA). You can check out the price trends and movements. If you have any other questions or need further analysis, just let me know!"
+        }
+    ],
+    "YUexIDqUpreAOgSs": [
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! I'm Fred, your financial conversational agent here at SECRAG. How can I assist you today?"
+        },
+        {
+            "role": "user",
+            "content": "i want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "You're all set to sign in! Please enter your email and password to continue."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "Great! I've initiated the sign-up process for you. Please check your email for a confirmation link to complete your registration. If you have any questions, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've initiated the sign-up process for you! Please check your email for a confirmation link to complete your registration. If you have any questions, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "user",
+            "content": "i want to sign in"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "where"
+        },
+        {
+            "role": "user",
+            "content": "sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "sign up instead"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "i wanna login"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "input where"
+        },
+        {
+            "role": "assistant",
+            "content": "I can't process your email directly. You should see an input field on your screen where you can enter your email for signing up. Please type your email there!"
+        },
+        {
+            "role": "user",
+            "content": "use the tool"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "I want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "i want to sign up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "I want to login"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "sign up instead"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "I want to signup"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "login"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to login"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I want to join"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "Sign Up"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the signup input. Please enter your email to get started!"
+        },
+        {
+            "role": "user",
+            "content": "sign in "
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I'd like to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        },
+        {
+            "role": "user",
+            "content": "I'd like to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input. Please enter your email and password to sign in."
+        }
+    ],
+    "hc26FluITY7LB9tD": [
+        {
+            "role": "user",
+            "content": "I'd like to sign in"
+        },
+        {
+            "role": "assistant",
+            "content": "I've switched to the login input for you. Please enter your email and password to sign in."
+        }
+    ],
+    "vAPo4knuJLx7ccxC": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! I'm Fred, your financial conversational agent here at SECRAG. How can I assist you today?"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It seems like you're testing the chat. If you have any questions or need assistance with financial data or company information, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It looks like you're still testing. If you have any specific questions or topics you'd like to discuss, just let me know! I'm here to help."
+        },
+        {
+            "role": "user",
+            "content": "tset"
+        },
+        {
+            "role": "assistant",
+            "content": "It seems like you might be trying to test the chat again. If there's something specific you'd like to know or discuss, feel free to share! I'm here to assist you with any financial queries."
+        },
+        {
+            "role": "user",
+            "content": "send me a long message"
+        },
+        {
+            "role": "assistant",
+            "content": "Sure! Here's a longer message for you:\n\n---\n\nWelcome to SECRAG, your go-to platform for streamlined fundamental analysis of US-listed companies. We provide users with access to SEC filings and relevant company data, helping you make informed investment decisions. \n\nWith our service, you can explore a wealth of information about various companies, including their financial statements, insider trading activities, and regulatory filings. Our user-friendly interface allows you to navigate through this information seamlessly.\n\nAdditionally, we offer alerts to notify you when new filings are published, ensuring you stay updated on the companies you're interested in. \n\nOur subscription plan is affordable, priced at just $10 per month or $100 for a full year. You can cancel anytime without any refunds, but your access will continue until the end of the current billing period.\n\nIf you have any questions about specific companies or if you'd like assistance with your investor profile, feel free to ask! I'm here to help you get the most out of your experience with SECRAG.\n\n--- \n\nLet me know if there's anything specific you'd like to know about!"
+        },
+        {
+            "role": "user",
+            "content": "balance sheet of AAPL"
+        },
+        {
+            "role": "assistant",
+            "content": "It appears that there are currently no available filings for Apple Inc. (AAPL) for the years 2023, 2024, or 2025 in the database. This may be due to various reasons, including the timing of recent filings.\n\nIf you're looking for a specific balance sheet or need information from a previous year, please let me know, and I can assist you further!"
+        },
+        {
+            "role": "user",
+            "content": "give me aapl balance sheet"
+        },
+        {
+            "role": "assistant",
+            "content": "It seems that there are currently no available balance sheet filings for Apple Inc. (AAPL) for the years 2022, 2023, or 2024 in the database. This may be due to various reasons, including the timing of recent filings or updates.\n\nIf you have any other specific years in mind or if there's anything else you would like to know about Apple Inc. or any other company, please let me know!"
+        },
+        {
+            "role": "user",
+            "content": "I want apple balance sheet"
+        },
+        {
+            "role": "assistant",
+            "content": "It appears that there are currently no available balance sheet filings for Apple Inc. (AAPL) for the years 2022, 2023, or 2024 in the database. This might be due to timing or update issues with the filings.\n\nIf you have any other specific years in mind or if there's another aspect of Apple's financials you're interested in, please let me know, and I'll do my best to assist you!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It looks like you're testing the chat. If you have any questions or need assistance with something specific, just let me know! I'm here to help."
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It seems you're still testing! If you have any questions or need assistance with something, feel free to ask. I'm here to help you!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "I see you're continuing to test! If there's anything specific you'd like to know or discuss, just let me know. I'm here to assist you!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It seems we're in a bit of a testing loop!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "Looks like we're still in test mode! If you have any questions or need assistance, just let me know. I'm here to help!"
+        },
+        {
+            "role": "user",
+            "content": "balance sheet of aapl"
+        },
+        {
+            "role": "assistant",
+            "content": "It looks like there are currently no available filings for Apple Inc. (AAPL) in the database for the years 2023, 2024, or 2025, including their balance sheet. \n\nIf you have any other questions or need information on a different company or topic, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "I see we're still testing! If you have any questions or there's something specific you want to discuss, just let me know. I'm here to help!"
+        }
+    ],
+    "URR9kDii8W6h9w19": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi there! I'm Fred, your financial conversational agent with SECRAG. How can I assist you today?"
+        }
+    ],
+    "x5KfNHzSLQC05Yoa": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! I'm Fred, your financial conversational agent at SECRAG. How can I assist you today?"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi there! I'm Fred, your financial conversational agent for SECRAG. How can I assist you today?"
+        }
+    ],
+    "tgJLGZHGLekgKrD4": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi there! I'm Fred, your financial conversational agent here to help you with SECRAG. How can I assist you today?"
+        }
+    ],
+    "wBH1LdtBsqDX0ZqH": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi there! I'm Fred, your financial assistant here at SECRAG. How can I help you today?"
+        }
+    ],
+    "DaMiVhjtBuTyWivQ": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi there! I'm Fred, your financial conversational agent here at SECRAG. How can I assist you today?"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "It looks like you're testing things out! If you have any questions or need assistance with anything related to company data or SEC filings, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "show me aapl stock"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock price chart for Apple Inc. (AAPL). If you need more information or have any specific questions about AAPL, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "send me tsla stock"
+        },
+        {
+            "role": "assistant",
+            "content": "I can provide information for Apple (AAPL) only. For details about Tesla (TSLA) or any other company, you'll need a subscription. Would you like to know more about subscribing?"
+        },
+        {
+            "role": "user",
+            "content": "then show aapl"
+        },
+        {
+            "role": "assistant",
+            "content": "Here is the stock price chart for Apple Inc. (AAPL). If you have any specific questions or need further information, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "show aapl chart"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock price chart for Apple Inc. (AAPL): [SP_PLT]. If you have any other questions or need further analysis, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "show me aapl stock chart"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock price chart for Apple Inc. (AAPL): [SP_PLT]. If you have any other questions or need further analysis, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "test"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! I'm Fred, your financial conversational agent for SECRAG. How can I assist you today?"
+        },
+        {
+            "role": "user",
+            "content": "aapl balance sheet"
+        },
+        {
+            "role": "assistant",
+            "content": "It appears that there are currently no available balance sheet filings for Apple Inc. (AAPL) for the years 2023, 2024, or 2025. If you have any other questions or if there's something specific you'd like to know, please let me know!"
+        },
+        {
+            "role": "user",
+            "content": "aapl stock price"
+        },
+        {
+            "role": "assistant",
+            "content": "I can provide you with the latest stock price chart for Apple Inc. (AAPL). Would you like me to display that for you?"
+        },
+        {
+            "role": "user",
+            "content": "sure"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock price chart for Apple Inc. (AAPL): [SP_PLT]. If you have any other questions or need further analysis, just let me know!"
+        },
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello again! How can I assist you today? If you have any questions about stocks or financial information, feel free to ask!"
+        }
+    ],
+    "VhGMSslGFWbeGWXT": [
+        {
+            "role": "user",
+            "content": "hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! I'm Fred, your financial conversational agent here to help you with SECRAG. How can I assist you today?"
+        },
+        {
+            "role": "user",
+            "content": "I want to analyze aapl"
+        },
+        {
+            "role": "assistant",
+            "content": "It seems that there are currently no SEC filings available for Apple Inc. (AAPL) for the years 2023, 2024, or 2025.\n\nIs there anything specific you would like to analyze about Apple, or would you like to look at another company?"
+        },
+        {
+            "role": "user",
+            "content": "show me stock chart of aapl"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the stock chart for Apple Inc. (AAPL). You can analyze the price trends and movements over time. If you have any specific questions or need further analysis, feel free to ask!"
+        },
+        {
+            "role": "user",
+            "content": "what other stocks can we discuss"
+        },
+        {
+            "role": "assistant",
+            "content": "I can provide information about any US-listed company, but detailed financials and analysis are available only to subscribers. If you're interested in exploring a specific company, just let me know their name or ticker symbol, and I'll be happy to help!"
+        },
+        {
+            "role": "user",
+            "content": "my name is paul"
+        },
+        {
+            "role": "assistant",
+            "content": "Nice to meet you, Paul! If you need assistance with anything specific, feel free to ask. Whether it's analyzing a stock or exploring SEC filings, I'm here to help!"
+        },
+        {
+            "role": "user",
+            "content": "I'd like to know more about the pricing"
+        },
+        {
+            "role": "assistant",
+            "content": "SECRAG offers a subscription for $10 per month or $100 per year. You can cancel anytime, and there are no refunds, but your access will continue until the end of your billing period.\n\nIf you have any other questions or if you're ready to sign up, just let me know!"
         }
     ]
 }

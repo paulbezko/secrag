@@ -23,19 +23,19 @@ from langchain.callbacks.manager import (
 from yfinance import Ticker
 
 def sign_up(*args) -> str:
-    # print("     [SIGN UP] Sign Up tool invoked.")
-    return "Sign Up tool executed."
+    # print("Switching to Signup input...")
+    return {'status': 'success', 'message': 'Switching to Signup input...'}
 
 def sign_in(*args) -> str:
-    # print("     [SIGN IN] Sign In tool invoked.")
-    return "Sign In tool executed."
+    # print("Switching to Login input...")
+    return {'status': 'success', 'message': 'Switching to Login input...'}
 
 def forgot_password(*args) -> str:
-    # print("     [FORGOT PASSWORD] Forgot Password tool invoked.")
-    return "Forgot Password tool executed."
+    # print("Switching to Password Reset input...")
+    return {'status': 'success', 'message': 'Switching to Password Reset input...'}
 
 def widget_tradingview(ticker: Annotated[str, "Company ticker"],) -> str:
-    print(f"     [TRADINGVIEW] {ticker.upper()}")
+    # print("Switching to Tradingview widget...")
     return {'name': 'tradingview', 'ticker': ticker.upper()}
 
 class TickerNews(BaseModel):
@@ -219,9 +219,9 @@ class TickerAnalystPriceTargetsTool(BaseTool):
 
 
 
-tool_sign_in = StructuredTool.from_function(func=sign_in, name="login", description="Login tool. This tool adjusts the frontend so that the user could input his email and password.", return_direct=False)
-tool_sign_up = StructuredTool.from_function(func=sign_up, name="signup_email", description="Signup tool. This tool adjusts the frontend so that the user could input his email, after which a confirmation email will be sent.", return_direct=False)
-tool_forgot_password = StructuredTool.from_function(func=forgot_password, name="forgot_password", description="Forgot Password tool. This tool adjusts the frontend so that the user could input his email, after which a confirmation email with password reset link will be sent.", return_direct=False)
+tool_sign_in = StructuredTool.from_function(func=sign_in, name="tool_login", description="Login tool. This tool adjusts the frontend so that the user could input his email and password. Invoke if user asks to login or sign in.", return_direct=False)
+tool_sign_up = StructuredTool.from_function(func=sign_up, name="tool_signup_email", description="Signup tool. This tool adjusts the frontend so that the user could input his email, after which a confirmation email will be sent. Invoke if user asks to create account or sign up.", return_direct=False)
+tool_forgot_password = StructuredTool.from_function(func=forgot_password, name="tool_forgot_password", description="Forgot Password tool. This tool adjusts the frontend so that the user could input his email, after which a confirmation email with password reset link will be sent.", return_direct=False)
 tool_widget_tradingview = StructuredTool.from_function(func=widget_tradingview, name="widget_tradingview", description="Use this to plot the stock price for the user. Returns a plot label ([SP_PLT]) if successful.", return_direct=False)
 
 concierge_tools = [

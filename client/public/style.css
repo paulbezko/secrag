@@ -105,6 +105,17 @@ input:-webkit-autofill:active {
   color: var(--yellow-dark);
 }
 
+.input-profile {
+  width: 100%;
+  min-height: 70dvh;
+  padding: 1rem;
+  border: 1px solid var(--grey-semilight);
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  background-color: var(--white);
+  transition: all 0.2s ease;
+}
+
 .button-send {
   display: flex;
   align-items: center;
@@ -132,6 +143,11 @@ input:-webkit-autofill:active {
   border: 1px solid var(--yellow-dark);
   color: var(--yellow-dark);
   background-color: var(--yellow-highlight)
+}
+
+.button-send-disabled {
+  pointer-events:none;
+  opacity: 0.5;
 }
 
 .input-suggestion {
