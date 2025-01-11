@@ -43,7 +43,7 @@
         </div>
 
         <div v-if="view === 'profile'" class="flex-column width-100 gap-1 center" style="padding-inline: 1rem">
-          <div class="flex-row center gap-1 assistant-message single">
+          <div class="flex-row center gap-1 assistant-message single" style="height: 4rem">
             <img
               :src="input !== '' 
                 ? require('@/assets/dashboard/face_with_monocle_3d.png')
@@ -52,7 +52,7 @@
             >
             <div class="chat-text assistant-text single" v-html="markdownify('This is what I know about you.\nFeel free to adjust!')"></div>
           </div>
-          <textarea class="input-profile" v-model="userProfile"></textarea>
+          <div class="input-profile" contenteditable="true" v-html="markdownify(userProfile)"></div>
         </div>
 
       </div>
@@ -433,20 +433,15 @@ export default {
 
     // UI HELPERS
     observeSize() {
-      this.resizeObserver = new ResizeObserver(() => {
-        this.updateChatHeight();
-        this.checkScreenWidth();
-
-        this.resizeObserver.disconnect();
-        setTimeout(() => {
-          const dashboard = document.getElementById('dashboard');
-          this.resizeObserver.observe(dashboard);
-        }, 0);
-      });
-
-      const dashboard = document.getElementById('dashboard');
-      this.resizeObserver.observe(dashboard);
-    },
+  this.resizeObserver = new ResizeObserver(() => {
+    requestAnimationFrame(() => {
+      this.updateChatHeight();
+      this.checkScreenWidth();
+    });
+  });
+  const dashboard = document.getElementById('dashboard');
+  this.resizeObserver.observe(dashboard);
+},
 
     markdownify(text) {
       if (typeof text !== 'string') {return '';}
@@ -483,9 +478,9 @@ export default {
     },
 
     isLatestAssistantMessage(message) {
-    const assistantMessages = this.chat.filter(msg => msg.role === 'assistant');
-    return assistantMessages.length > 0 && assistantMessages[assistantMessages.length - 1] === message;
-  },
+      const assistantMessages = this.chat.filter(msg => msg.role === 'assistant');
+      return assistantMessages.length > 0 && assistantMessages[assistantMessages.length - 1] === message;
+    },
 
     // CHAT INTERACTION
     getPremadeSuggestions() {
@@ -495,7 +490,7 @@ export default {
         this.premadeSuggestionsShown = true;
         this.premadeSuggestions = [
           { label: 'Save changes', action: () => (console.log('User profile saved')) },
-          { label: 'Back', action: () => (this.view = 'chat', this.getPremadeSuggestions(), this.chatScrollToBottom()) },
+          { label: 'Back', action: () => (this.view = 'chat', this.getPremadeSuggestions(), this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)})) },
         ];
       }
       
@@ -593,22 +588,25 @@ export default {
     },
 
     async processWidget(data) {
-      let widgetParams = data.params;
-      if (typeof data.params === 'string') {widgetParams = JSON.parse(data.params);}
+      let widgetMetadata = data.metadata;
+      if (typeof data.metadata === 'string') {widgetMetadata = JSON.parse(data.metadata);}
       
-      const processAfterResponse = () => {
-        this.chat.push({ role: 'widget', content: widgetParams });
-        this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)});
-      };
+      console.log(widgetMetadata.type)
+      console.log(widgetMetadata.params)
 
-      if (this.responseIsProcessing) {
-        const checkResponseComplete = () => {
-          if (!this.responseIsProcessing) {processAfterResponse()} 
-          else {setTimeout(checkResponseComplete, 50)}
-        }; checkResponseComplete()}
-      else {processAfterResponse()}
+      // const processAfterResponse = () => {
+      //   this.chat.push({ role: 'widget', content: widgetParams });
+      //   this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)});
+      // };
 
-      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'widget', input: widgetParams, socketId: this.socketId});
+      // if (this.responseIsProcessing) {
+      //   const checkResponseComplete = () => {
+      //     if (!this.responseIsProcessing) {processAfterResponse()} 
+      //     else {setTimeout(checkResponseComplete, 50)}
+      //   }; checkResponseComplete()}
+      // else {processAfterResponse()}
+
+      // await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'widget', input: widgetParams, socketId: this.socketId});
     },
 
     switchToDefaultInput() {

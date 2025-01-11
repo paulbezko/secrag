@@ -1,11 +1,14 @@
 from datetime import datetime
 from typing import Literal
-from langchain_core.prompts import ChatPromptTemplate
+
 from custom_langgraph_methods import create_react_agent_with_node_name
 from globals import State, llm
+from helpers import should_call_plotter
+from archivist_tools import archivist_tools
+
 from langgraph.types import Command
-from langchain_core.messages import AIMessage, SystemMessage
-from server.core.dashboard.multiagent.archivist_tools import archivist_tools
+from langchain_core.messages import AIMessage
+
 
 archivist_agent = create_react_agent_with_node_name(llm, node_name="archivist", tools=archivist_tools, state_modifier=(
         """
@@ -27,12 +30,18 @@ get_available_filings - Use ticker that you found using search_tickers or from t
 
 retrieve_data_from_filing - Use filing_date and filing_type you found using get_available_filings or from the message history.\
     Use ticker that you found using search_tickers or from the message history.\
-    Returns chunks of data from the database on specific filing.
+    Returns chunks of data from the database on specific filing. \
+
         """
     ),)
 
-async def archivist_node(state: State) -> Command[Literal["__end__"]]:
+async def archivist_node(state: State) -> Command[Literal["__end__", "plotter"]]:
     result = await archivist_agent.ainvoke({"messages": state["messages"][-10:], "current_date": datetime.now().strftime("%Y-%m-%d")})
+
+    goto = "__end__"
+    if should_call_plotter(result["messages"]):
+        goto = "plotter"
+
     return Command(
         graph="archivist",
         update={
@@ -42,20 +51,5 @@ async def archivist_node(state: State) -> Command[Literal["__end__"]]:
                 )
             ]
         },
-        goto="__end__"
-    )
-
-async def get_current_time_node(state: State) -> Command[Literal["archivist"]]:
-    print(state["messages"][-1], type(state["messages"][-1]))
-    result = datetime.now().strftime("%Y-%m-%d")
-    return Command(
-        graph="get_current_time",
-        update={
-            "messages": [
-                SystemMessage(
-                    content=result
-                )
-            ]
-        },
-        goto="archivist"
+        goto=goto
     )
