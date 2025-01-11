@@ -14,8 +14,8 @@ from langchain_core.tools import tool
 ticker_vectorstore = FAISS.load_local("server/core/dashboard/multiagent/tickers_json_vectorstore", embeddings=OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 DEBUG = True
 
-def debug_print(any):
-    if DEBUG: print(any)
+def debug_print(*args):
+    if DEBUG: print(*args)
 
 @tool
 def get_current_time(*args) -> str:
@@ -49,24 +49,28 @@ async def get_available_filings(
     year: int = Field("Year. Example: 2024")
 ) -> List[List[str]]:
     """Use ticker that you found using search_tickers or from the message history, and a year to search for metadata on the filings that are available in the database for the input ticker and input year."""
-    metadata = {"ticker": ticker.lower(), "year":str(year)}
-    debug_print("[get_available_filings] Metadata:", metadata)
-    chunks = await vectorstore_manager.vectorstore.asimilarity_search("", k=1000, fetch_k=1000, filter=metadata) 
-    if len(chunks) == 0:
-        debug_print("[get_available_filings]","No filings available for this ticker")
-        return "No filings available for this ticker"
-    else:
-        debug_print("[get_available_filings] chunks:",len(chunks))
-    available_filings = []
-    header = ["ticker", "filing_date", "filing_type"]
-    
-    for chunk in chunks:
-        data = [chunk.metadata["ticker"], chunk.metadata["date"], chunk.metadata["form"]]
-        if data not in available_filings:
-            available_filings.append(data)
-            
-    sorted_filings = sorted(available_filings, key=lambda x: x[1], reverse=True)
-    return header + sorted_filings
+    try:
+        metadata = {"ticker": ticker.lower(), "year":str(year)}
+        debug_print("[get_available_filings] Metadata:", metadata)
+        chunks = await vectorstore_manager.vectorstore.asimilarity_search("", k=1000, fetch_k=1000, filter=metadata) 
+        if len(chunks) == 0:
+            debug_print("[get_available_filings]","No filings available for this ticker")
+            return "No filings available for this ticker"
+        else:
+            debug_print("[get_available_filings] chunks:",len(chunks))
+        available_filings = []
+        header = ["ticker", "filing_date", "filing_type"]
+        
+        for chunk in chunks:
+            data = [chunk.metadata["ticker"], chunk.metadata["date"], chunk.metadata["form"]]
+            if data not in available_filings:
+                available_filings.append(data)
+                
+        sorted_filings = sorted(available_filings, key=lambda x: x[1], reverse=True)
+        return header + sorted_filings
+    except Exception as e:
+        print(traceback.format_exc())
+        raise e
 
 @tool
 async def get_current_time(*args) -> str:
@@ -123,13 +127,16 @@ async def retrieve_data_from_filing(
         "date": tool_input.filing_date,
         "form": tool_input.filing_type,
     }
-
-    debug_print("[FilingDataRetriever] Metadata:", metadata)
-    debug_print("[FilingDataRetriever] Query:", tool_input.query)
-    chunks = await vectorstore_manager.vectorstore.asimilarity_search(tool_input.query, k=10, fetch_k=1000, filter=metadata) 
-    debug_print(f"[FilingDataRetriever] Found {len(chunks)} chunks...")
-    return "\n\n".join([chunk.page_content for chunk in chunks])
-
+    try:
+        debug_print("[FilingDataRetriever] Metadata:", metadata)
+        debug_print("[FilingDataRetriever] Query:", tool_input.query)
+        chunks = await vectorstore_manager.vectorstore.asimilarity_search(tool_input.query, k=10, fetch_k=1000, filter=metadata) 
+        debug_print(f"[FilingDataRetriever] Found {len(chunks)} chunks...")
+        return "\n\n".join([chunk.page_content for chunk in chunks])
+    except Exception as e:
+        debug_print(traceback.format_exc())
+        debug_print(str(e))
+        raise e
 
 archivist_tools = [
     retrieve_data_from_filing,
