@@ -1,6 +1,8 @@
 import json
 import os
-from typing import Dict, List
+from typing import Dict, List, Literal
+from langchain_core.messages import ToolMessage, HumanMessage, AIMessage
+from globals import tools_triggering_plotter
 
 JSON_FILE_PATH = "server/memory/anonymous_chats_db.json"
 
@@ -32,3 +34,20 @@ def create_file_if_not_exists(file_path):
         print(f"File '{file_path}' created.")
     else:
         print(f"File '{file_path}' already exists.")
+
+def should_call_plotter(messages: list) -> bool:
+    for message in messages:
+        if isinstance(message, ToolMessage):
+            if message.name in tools_triggering_plotter:
+                return True
+    return False
+
+def get_last_message(messages: list, type: Literal["user", "ai"]) -> bool:
+    last_message = None
+    for message in messages:
+        if (type == "user" and isinstance(message, HumanMessage)) or (type == "ai" and isinstance(message, AIMessage)):
+            last_message = message
+    if last_message:
+        return last_message
+    
+    raise Exception(f"No {type} message found")

@@ -1,20 +1,17 @@
-from globals import llm
 from langchain.tools import StructuredTool
+import sys
+
+sys.path.append("")
 
 from server.core.dashboard.multiagent.archivist_tools import ticker_vectorstore
 
 import asyncio
 import json
 
-from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
-from typing import Literal, List, Optional, Type, Annotated
-from langchain.agents import AgentExecutor, create_openai_tools_agent
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from datetime import datetime
-from user_profile_model import InvestorTraderProfile
+from typing import Optional, Type, Annotated
 
-from langchain_core.tools import BaseTool, Tool
+from langchain_core.tools import BaseTool
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
@@ -235,3 +232,8 @@ concierge_tools = [
     tool_forgot_password,
     tool_widget_tradingview
 ]
+
+concierge_toolnames = [tool.name for tool in concierge_tools]
+
+if __name__ == "__main__":
+    print(concierge_toolnames)

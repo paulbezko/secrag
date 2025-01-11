@@ -3,14 +3,12 @@ import traceback
 from vectorstore import vectorstore_manager 
 
 from pydantic import BaseModel, Field
-from typing import Annotated, Literal, List, Optional, Type
+from typing import Annotated, List, Optional, Type
 
 from datetime import datetime
-from user_profile_model import InvestorTraderProfile
 
 from langchain.tools import StructuredTool
 from langchain_openai import OpenAIEmbeddings
-
 from langchain_community.vectorstores import FAISS
 from langchain_core.tools import tool
 from langchain_core.tools import BaseTool
@@ -164,6 +162,23 @@ class FilingDataRetrieverTool(BaseTool):
     query: str = Field("Ticker")
 
 
+class DataPoint(BaseModel):
+    x: str = Field("The label for the data point")
+    y: float
+
+class TreeMapSeries(BaseModel):
+    name: str = Field("The name of the series (provide data units (e.g. $ million) in brackets )")
+    data: List[DataPoint]
+
+class TreemapInputData(BaseModel):
+    series: List[TreeMapSeries]
+
+@tool 
+async def basic_treemap_plotter(
+    treemap_input_data: Annotated[TreeMapSeries, "Treemap series"],
+):
+    """Use this to plot the basic treemap for the user. Returns treemap json data if successful."""
+    return str({"basic_treemap": treemap_input_data.model_dump()})
 
 
 archivist_tools = [
@@ -175,3 +190,8 @@ archivist_tools = [
     stock_price_plotter,
     get_current_time
 ]
+
+archivist_toolnames = [tool.name for tool in archivist_tools]
+
+if __name__ == "__main__":
+    print(archivist_toolnames)
