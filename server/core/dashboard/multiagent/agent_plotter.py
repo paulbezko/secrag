@@ -9,22 +9,17 @@ from langchain_openai import ChatOpenAI
 from langgraph.types import Command
 from langchain_core.messages import AIMessage
 
-llm_plotter = ChatOpenAI(model="gpt-4o")
+llm_plotter = ChatOpenAI(model="gpt-4o-mini")
 # sankey_chart_plotter - plot hyerarchical series with it e.g. income statement\
 plotter_agent = create_react_agent_with_node_name(llm_plotter, node_name="plotter", tools=plotter_tools, state_modifier=(
         """
 You are given the latest Human and AI messages. Your task is to plot data from the latest AI message if it makes sense to do so.  \
 You are given the following tools to plot data:\
-
-
-time_series_plotter\
-basic_treemap_plotter\
-multi_dimentional_treemap_plotter - you can use it for visualizing profits and losses hyerarchically\
-
-
-You can use only one of the tools once. The tools will automatically trigger the plot renderer, so no need to include any plot metadata in the response.\
-
-Respond by telling why you did or did not plot the data.
+time_series_plotter;\
+basic_treemap_plotter;\
+multi_dimentional_treemap_plotter - you can use it for visualizing profits and losses hyerarchically;\
+Use these tools. The tools will automatically trigger the plot renderer, so no need to include any plot metadata in the response.\
+Respond with either the plotter tool output or by telling why you did not plot the data.
         """
     ),)
 
