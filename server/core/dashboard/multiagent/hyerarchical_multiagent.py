@@ -28,7 +28,8 @@ from langchain_core.messages import HumanMessage, ToolMessage
 from agent_supervisor import supervisor_node
 from agent_profiler import profiler_node
 from agent_concierge import concierge_node
-from server.core.dashboard.multiagent.agent_archivist import archivist_node
+from agent_archivist import archivist_node
+from agent_plotter import plotter_node
 from agent_prompt_suggestions import prompt_suggestions_tool
 
 # Global Stop Signals
@@ -42,7 +43,7 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder.add_node("profiler", profiler_node)
     builder.add_node("concierge", concierge_node)
     builder.add_node("archivist", archivist_node)
-
+    builder.add_node("plotter", plotter_node)
 
     builder.add_edge(START, "supervisor")
     builder.add_edge(START, "profiler")
@@ -72,6 +73,8 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
         buffer = ""
         prompt_suggestions = []
 
+        plotter_buffer = ""
+
         await socketio.emit('response_started', to=socket_id)
         print(socket_id)
         async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
@@ -85,15 +88,19 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
                 
                 buffer += msg.content
 
-            if type(msg) == ToolMessage:
-                await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
+            elif type(msg) == ToolMessage and '_plotter' in msg.name:
+                plotter_buffer += msg.content
 
-            if type(msg) == ToolMessage and 'widget' in msg.name:
+            elif type(msg) == ToolMessage and 'widget' in msg.name:
                 print(msg.name, msg.content)
                 await socketio.emit('widget', {'params': msg.content}, to=socket_id)
 
-            # if isinstance(msg, ToolMessage) and msg.name == "SignUp" or msg.name == "SignIn":
-            #     buffer += f"\n[{msg.name}]\n"
+            elif type(msg) == ToolMessage:
+                await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
+
+        if plotter_buffer:
+            await socketio.emit('response_token', {'word': plotter_buffer}, to=socket_id)
+            buffer += plotter_buffer
 
         add_message(user_id, {"role": "assistant", "content": buffer})
 
