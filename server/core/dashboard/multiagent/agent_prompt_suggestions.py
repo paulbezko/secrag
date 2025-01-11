@@ -1,8 +1,8 @@
 from typing import List, Literal
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel
-from .globals import State, llm
-from .user_profile_model import InvestorTraderProfile
+from globals import State, llm
+from user_profile_model import InvestorTraderProfile
 import json
 
 from langgraph.types import Command
