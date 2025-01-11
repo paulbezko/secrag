@@ -19,16 +19,18 @@ profiler_prompt = ChatPromptTemplate.from_messages(
 
 async def profiler_node(state: State):
     profiler = profiler_prompt | llm.with_structured_output(InvestorTraderProfile)
-    # print("[PROFILER] PROFILE IN:\n", json.dumps(state["user_profile"], indent=2))
+
     result = await profiler.ainvoke({"user_prompt": state["messages"][-1], "user_profile": state["user_profile"]})
     
     with open("server/memory/trader_profiles.json", "r") as f:
         profiles = json.load(f)
-    # print("[PROFILER] PROFILE OUT:\n", json.dumps(result.to_dict(), indent=2))
+
     output_profile = result.to_dict()
+
     for i in output_profile.keys():
         if output_profile[i] is None:
             output_profile[i] = state["user_profile"][i]
     profiles[state["user_id"]] = output_profile
+    
     with open("server/memory/trader_profiles.json", "w") as f:
         json.dump(profiles, f, indent=2)

@@ -58,7 +58,7 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
 async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id = "",debug = False) -> str:
     with open("server/memory/trader_profiles.json", "r") as f:
         profiles = json.load(f)
-        # print(profiles.keys())
+
     if str(user_id) not in list(profiles.keys()):
         profiles[str(user_id)] = json.loads(profile_template) 
 
@@ -76,7 +76,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
         plotter_buffer = ""
 
         await socketio.emit('response_started', to=socket_id)
-        print(socket_id)
+
         async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
             if debug:
                 print(f"-----------------\n[MSG] {type(msg)}: \n{msg}\n\n[METADATA]:\n{metadata}\n")

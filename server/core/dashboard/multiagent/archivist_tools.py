@@ -3,26 +3,24 @@ import traceback
 from vectorstore import vectorstore_manager 
 
 from pydantic import BaseModel, Field
-from typing import Annotated, List, Optional, Type
+from typing import Annotated, List
 
 from datetime import datetime
 
-from langchain.tools import StructuredTool
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.tools import tool
-from langchain_core.tools import BaseTool
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
-)
 
 ticker_vectorstore = FAISS.load_local("server/core/dashboard/multiagent/tickers_json_vectorstore", embeddings=OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+DEBUG = False
 
+def debug_print(any):
+    if DEBUG: print(any)
+
+@tool
 def get_current_time(*args) -> str:
+    """Returns the current time in YYYY-MM-DD format"""
     return datetime.now().strftime("%Y-%m-%d")
-tool_get_current_time = StructuredTool.from_function(func=get_current_time, name="get_current_time", description="Returns the current time in YYYY-MM-DD format", return_direct=False)
-
 
 @tool 
 async def search_tickers(
@@ -52,13 +50,13 @@ async def get_available_filings(
 ) -> List[List[str]]:
     """Use ticker that you found using search_tickers or from the message history, and a year to search for metadata on the filings that are available in the database for the input ticker and input year."""
     metadata = {"ticker": ticker.lower(), "year":str(year)}
-    print("[get_available_filings] Metadata:", metadata)
+    debug_print("[get_available_filings] Metadata:", metadata)
     chunks = await vectorstore_manager.vectorstore.asimilarity_search("", k=1000, fetch_k=1000, filter=metadata) 
     if len(chunks) == 0:
-        print("[get_available_filings]","No filings available for this ticker")
+        debug_print("[get_available_filings]","No filings available for this ticker")
         return "No filings available for this ticker"
     else:
-        print("[get_available_filings] chunks:",len(chunks))
+        debug_print("[get_available_filings] chunks:",len(chunks))
     available_filings = []
     header = ["ticker", "filing_date", "filing_type"]
     
@@ -74,7 +72,7 @@ async def get_available_filings(
 async def get_current_time(*args) -> str:
     """Returns the current time in YYYY-MM-DD format."""
     current_time = datetime.now().strftime("%Y-%m-%d")
-    print("[get_current_time]",current_time)
+    debug_print("[get_current_time]",current_time)
     return current_time
 
 @tool
@@ -85,10 +83,10 @@ async def get_all_available_filings_tickers_and_years(
 
     chunks = await vectorstore_manager.vectorstore.asimilarity_search("", k=1000, fetch_k=1000) 
     if len(chunks) == 0:
-        print("[get_available_filings]","No filings available for this ticker")
+        debug_print("[get_available_filings]","No filings available for this ticker")
         return "No filings available for this ticker"
     else:
-        print("[get_available_filings] chunks:",len(chunks))
+        debug_print("[get_available_filings] chunks:",len(chunks))
     available_filings = []
     available_filings.append(["ticker", "year"])
     try:
@@ -98,10 +96,10 @@ async def get_all_available_filings_tickers_and_years(
             data = [chunk.metadata["ticker"], chunk.metadata["year"]]
             if data not in available_filings:
                 available_filings.append(data)
-                print("[get_available_filings] data:",data)
+                debug_print("[get_available_filings] data:",data)
     except Exception as e:
-        print(traceback.format_exc())
-        print(str(e))
+        debug_print(traceback.format_exc())
+        debug_print(str(e))
         raise e
     return available_filings
 
@@ -112,81 +110,33 @@ class FilingDataRetrieverModel(BaseModel):
     filing_date: str = Field("Filing date. Format YYYY-MM-DD")
     filing_type: str = Field("Filing type") # type: ignore
 
-class FilingDataRetrieverTool(BaseTool):
-    name: str = "retrieve_data_from_filing"
-    description: str = "Use filing_date and filing_type you found using get_available_filings or from the message history.\
+@tool
+async def retrieve_data_from_filing(
+    tool_input: FilingDataRetrieverModel    
+) -> List[str]:
+    """Use filing_date and filing_type you found using get_available_filings or from the message history.\
     Use ticker that you found using search_tickers or from the message history.\
-    Input\
-    Returns chunks of data from the database on specific filing."
-    args_schema: Type[BaseModel] = FilingDataRetrieverModel
-    return_direct: bool = False
-    
-    def _run(
-        self, 
-        query: str, 
-        ticker: str, filing_date: str, filing_type: str, 
-        run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
-        
-        metadata = {
-            "ticker": ticker.lower(), 
-            "date": filing_date,
-            "form": filing_type,
-        }
-        """Use the tool."""
-        print("[FilingDataRetriever] Metadata:", metadata)
-        print("[FilingDataRetriever] Query:", query)
-        chunks = vectorstore_manager.vectorstore.similarity_search(query, k=10, fetch_k=1000, filter=metadata)
-        return "\n\n".join([chunk.page_content for chunk in chunks])
+    Input.\
+    Returns chunks of data from the database on specific filing."""
+    metadata = {
+        "ticker": tool_input.ticker.lower(), 
+        "date": tool_input.filing_date,
+        "form": tool_input.filing_type,
+    }
 
-    async def _arun(
-        self,
-        query: str,
-        ticker: str, filing_date: str, filing_type: str,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
-    ) -> List[str]:
-        """Use the tool asynchronously."""
-        metadata = {
-            "ticker": ticker.lower(), 
-            "date": filing_date,
-            "form": filing_type,
-        }
-        """Use the tool."""
-        print("[FilingDataRetriever] Metadata:", metadata)
-        print("[FilingDataRetriever] Query:", query)
-        chunks = await vectorstore_manager.vectorstore.asimilarity_search(query, k=10, fetch_k=1000, filter=metadata) 
-        print(f"[FilingDataRetriever] Found {len(chunks)} chunks...")
-        return "\n\n".join([chunk.page_content for chunk in chunks])
-
-
-    query: str = Field("Ticker")
-
-
-class DataPoint(BaseModel):
-    x: str = Field("The label for the data point")
-    y: float
-
-class TreeMapSeries(BaseModel):
-    name: str = Field("The name of the series (provide data units (e.g. $ million) in brackets )")
-    data: List[DataPoint]
-
-class TreemapInputData(BaseModel):
-    series: List[TreeMapSeries]
-
-@tool 
-async def basic_treemap_plotter(
-    treemap_input_data: Annotated[TreeMapSeries, "Treemap series"],
-):
-    """Use this to plot the basic treemap for the user. Returns treemap json data if successful."""
-    return str({"basic_treemap": treemap_input_data.model_dump()})
+    debug_print("[FilingDataRetriever] Metadata:", metadata)
+    debug_print("[FilingDataRetriever] Query:", tool_input.query)
+    chunks = await vectorstore_manager.vectorstore.asimilarity_search(tool_input.query, k=10, fetch_k=1000, filter=metadata) 
+    debug_print(f"[FilingDataRetriever] Found {len(chunks)} chunks...")
+    return "\n\n".join([chunk.page_content for chunk in chunks])
 
 
 archivist_tools = [
-    FilingDataRetrieverTool(),
+    retrieve_data_from_filing,
     get_available_filings,
     get_all_available_filings_tickers_and_years,
     search_tickers,
-    tool_get_current_time,
+    get_current_time,
     stock_price_plotter,
     get_current_time
 ]
