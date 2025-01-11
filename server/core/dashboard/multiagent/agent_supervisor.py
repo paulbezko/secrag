@@ -30,10 +30,7 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
             {"role": "system", "content": system_prompt},
         ] + state["messages"]
         response = llm.with_structured_output(Router).invoke(messages)
-        print("[SUPERVISOR NEXT]", response["next"], "REASON:", response["reason"])
         goto = response["next"]
-        # if goto == "FINISH":
-        #     goto = END
 
         return Command(goto=goto)
 
