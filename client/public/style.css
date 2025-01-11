@@ -107,13 +107,35 @@ input:-webkit-autofill:active {
 
 .input-profile {
   width: 100%;
-  min-height: 70dvh;
+  height: 70dvh;
   padding: 1rem;
   border: 1px solid var(--grey-semilight);
   border-radius: 0.8rem;
   font-size: 1.4rem;
+  font-family: 'Inter', sans-serif;
+  line-height: 150%;
+  color: var(--black);
   background-color: var(--white);
   transition: all 0.2s ease;
+  overflow-y: scroll;
+}
+
+.input-profile * {
+  margin: 0;
+}
+
+.input-profile::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.input-profile::-webkit-scrollbar-thumb {
+  background: var(--grey-semilight);
+  border-radius: 4px;
+}
+
+.input-profile::-webkit-scrollbar-thumb:hover {
+  background: var(--grey-semilight);
 }
 
 .button-send {

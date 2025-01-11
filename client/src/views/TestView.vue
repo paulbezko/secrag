@@ -1,62 +1,33 @@
 <template>
-  <div id="svg-sankey" style="display: flex; justify-content: center;"></div>
+  <div></div>
 </template>
 
 <script>
-import { onMounted } from 'vue';
-
-// Import the ApexSankey library from the local path
-import ApexSankey from '../../libraries/apexsankey-main/apexsankey.es.min.js';
-
 export default {
-name: 'SankeyChart',
-setup() {
-  // Define the chart data using your provided JSON
-  const data = {
-    nodes: [
-      { id: 'Net Sales', title: 'Net Sales' },
-      { id: 'Cost of Sales', title: 'Cost of Sales' },
-      { id: 'Gross Margin', title: 'Gross Margin' },
-      { id: 'Operating Expenses', title: 'Operating Expenses' },
-      { id: 'Operating Income', title: 'Operating Income' },
-      { id: 'Other Income', title: 'Other Income/(Expense), Net' },
-      { id: 'Income Before Taxes', title: 'Income Before Provision for Income Taxes' },
-      { id: 'Provision for Taxes', title: 'Provision for Income Taxes' },
-      { id: 'Net Income', title: 'Net Income' }
-    ],
-    edges: [
-      { source: 'Net Sales', target: 'Cost of Sales', value: 46099.0 },
-      { source: 'Net Sales', target: 'Gross Margin', value: 39678.0 },
-      { source: 'Gross Margin', target: 'Operating Expenses', value: 14326.0 },
-      { source: 'Gross Margin', target: 'Operating Income', value: 25352.0 },
-      { source: 'Operating Income', target: 'Other Income', value: 142.0 },
-      { source: 'Operating Income', target: 'Income Before Taxes', value: 25494.0 },
-      { source: 'Income Before Taxes', target: 'Provision for Taxes', value: 4046.0 },
-      { source: 'Income Before Taxes', target: 'Net Income', value: 21448.0 }
-    ]
-  };
+  data() {
+    return {
+      chartData: ` {'type': 'multi_dimentional_treemap', 'params': {'series': [{'name': 'Assets 2024 (in millions)', 'data': [{'x': 'Current Assets', 'y': 152987.0}, {'x': 'Non-Current Assets', 'y': 211993.0}]}, {'name': 'Liabilities 2024 (in millions)', 'data': [{'x': 'Current Liabilities', 'y': 176392.0}, {'x': 'Non-Current Liabilities', 'y': 131638.0}]}, {'name': "Shareholders' Equity 2024 (in millions)", 'data': [{'x': 'Common stock and additional paid-in capital', 'y': 83276.0}, {'x': 'Accumulated deficit', 'y': -19154.0}, {'x': 'Accumulated other comprehensive loss', 'y': -7172.0}]}]}}`
+    };
+  },
+  mounted() {
+    let correctedData = ""; // Define correctedData outside the try block
+    try {
+      // 1. Replace single quotes with double quotes
+      correctedData = this.chartData.replace(/'/g, '"');
 
-  const graphOptions = {
-    nodeWidth: 20,
-    fontFamily: 'Quicksand, sans-serif',
-    fontWeight: 600,
-    height: 600,
-  };
+      // 2. Fix embedded single quotes (e.g., Shareholders' Equity)
+      correctedData = correctedData.replace(/"([a-zA-Z\s]+)'([a-zA-Z\s]+)"/g, '"$1\'$2"');
 
-  // Render the Sankey chart after the component is mounted
-  onMounted(() => {
-    // Initialize the ApexSankey chart
-    const s = new ApexSankey(document.getElementById('svg-sankey'), graphOptions);
-    s.render(data);
-  });
+      // 3. Parse the JSON
+      const parsedData = JSON.parse(correctedData);
 
-  return {
-    data,
-    graphOptions,
-  };
-},
+      // Log the result
+      console.log(parsedData);
+    } catch (error) {
+      // Log the specific error and the corrected string for debugging
+      console.error("Error parsing chartData:", error);
+      console.error("Corrected JSON string:", correctedData); // correctedData is now accessible here
+    }
+  }
 };
 </script>
-
-<style scoped>
-</style>
