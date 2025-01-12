@@ -85,3 +85,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.widget-container-child {
+  position: relative;
+  margin: -1px;
+}
+</style>

@@ -117,9 +117,9 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
         return {"buffer": buffer, "prompt_suggestions": prompt_suggestions, "profile": profile}
 
     except Exception as e:
-        print('\n\n\n\n', e, '\n\n\n\n')
-        return f"An error occurred: \n{traceback.format_exc()}"
-
+        print(f"An error occurred: \n{traceback.format_exc()}")
+        raise e
+    
 # Main asynchronous loop
 async def main():
     load_dotenv(".env")

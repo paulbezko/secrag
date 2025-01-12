@@ -8,11 +8,11 @@
       <div class="flex-column width-100 height-100 center">
 
         <!-- Chat container section -->
-        <div v-if="view === 'chat'" class="flex-column width-100 gap-1 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
+        <div v-if="view === 'chat'" class="flex-column width-100 gap-2 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
           <div v-for="(message, index) in chat" :key="index" class="flex-row center gap-1 width-100 chat-message">
 
             <!-- Assistant message -->
-            <div v-if="message.role === 'assistant'" class="flex-row center gap-1" :class="chat.length === 1 ? 'assistant-message single' : 'assistant-message'">
+            <div v-if="message.role === 'assistant'" class="flex-row center gap-1 row-to-column" :class="chat.length === 1 ? 'assistant-message single' : 'assistant-message'">
               <img
                 v-if="isLatestAssistantMessage(message)" 
                 :src="input !== '' 
@@ -24,11 +24,11 @@
               >
               <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
               <div v-if="isLatestAssistantMessage(message) && responseFlowstep !== ''" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div>
-              <div class="chat-text" :class="isLatestAssistantMessage(message) ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
+              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
             </div>
 
             <div v-else-if="message.role === 'widget'" class="widget-container">
-              <div v-if="message.content.type === 'basic_treemap'">
+              <div v-if="message.content.type === 'treemap'">
                 <ApexChartsWidget :params="message.content.params" :theme="theme" />
               </div>
               <div v-else-if="message.content.type === 'tradingview'">
@@ -41,12 +41,10 @@
               <div class="chat-text" v-html="markdownify(message.content)"></div>
             </div>
 
-            <!-- <TradingViewWidget :ticker="'AAPL'" :theme="theme" /> -->
-
           </div>
-
         </div>
 
+        <!-- Profile container section -->
         <div v-if="view === 'profile'" class="flex-column width-100 gap-1 center" style="padding-inline: 1rem">
           <div class="flex-row center gap-1 assistant-message single" style="height: 4rem">
             <img
@@ -55,9 +53,15 @@
                 : require('@/assets/dashboard/slightly_smiling_face_3d.png')"
               class="assistant-image"
             >
-            <div class="chat-text assistant-text single" v-html="markdownify('This is what I know about you.\nFeel free to adjust!')"></div>
+            <div v-if="userProfileUpdated === false" class="chat-text assistant-text single" v-html="markdownify('This is what I know about you.<br>Feel free to adjust!')"></div>
+            <div v-else class="chat-text assistant-text single" v-html="markdownify('Thanks for correcting!<br>Your profile has been updated successfully.')"></div>
           </div>
-          <div class="input-profile" contenteditable="true" v-html="markdownify(userProfile)"></div>
+          <div 
+            ref="profileDiv"
+            class="input-profile" 
+            contenteditable="true" 
+            :innerHTML="markdownify(userProfile)"
+          ></div>
         </div>
 
       </div>
@@ -117,9 +121,6 @@
                 <div class="icon fa-solid fa-arrow-up"></div>
               </div>
               <div class="button-send" v-else @click="stopResponse()">
-                <div class="icon fa-solid fa-square"></div>
-              </div>
-              <div class="button-send" @click="processWidget('e')">
                 <div class="icon fa-solid fa-square"></div>
               </div>
             </div>
@@ -278,6 +279,7 @@ import { socket } from "@/socket";
 import { config } from '@/config';
 import webdata from '../webdata.json'
 import axios from 'axios';
+import TurndownService from 'turndown';
 
 import TradingViewWidget from '@/components/TradingViewWidget.vue'
 import ApexChartsWidget from '@/components/ApexChartsWidget.vue';
@@ -294,6 +296,7 @@ export default {
       theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       userStatus: null,
       userProfile: '',
+      userProfileUpdated: false,
       view: 'chat',
       input: '',
       inputMode: 'default',
@@ -307,90 +310,111 @@ export default {
       premadeSuggestionsShown: false,
       premadeSuggsetionsTopic: '',
       responseIsProcessing: false,
+      responseIsSaved: true,
       responseFlowstep: '',
       currentAssistantMessage: '',
     };
   },
   mounted() {
+    const promises = [];
     this.initializeSocket();
-    if (!this.isMobile) {this.premadeSuggestionsShown = true} 
-    this.chatScrollToBottom();
-    this.updateChatHeight();
-    this.updateTextareaHeight();
-    this.observeSize();
+    if (!this.isMobile) {this.premadeSuggestionsShown = true;}
 
     const urlToken = new URLSearchParams(window.location.search).get("token");
-    if (urlToken) {this.processUrlToken(urlToken)}
+    if (urlToken) {promises.push(this.processUrlToken(urlToken))}
 
     const hashParams = new URLSearchParams(window.location.hash.slice(1));
     const urlSupabaseAccessToken = hashParams.get('access_token');
     const urlSupabaseRefreshToken = hashParams.get('refresh_token');
-    if (urlSupabaseAccessToken && urlSupabaseRefreshToken) {
-      this.HandleSupabaseAuth(urlSupabaseAccessToken, urlSupabaseRefreshToken)
-    }
-
+    if (urlSupabaseAccessToken && urlSupabaseRefreshToken) {promises.push(this.HandleSupabaseAuth(urlSupabaseAccessToken, urlSupabaseRefreshToken))} 
+    
     else if (localStorage.getItem('_q')) {
       this.chat = [{ role: 'assistant', content: '' }];
-      this.sendManualAssistantMessage(localStorage.getItem('_q'))
-      localStorage.removeItem('_q')
-      this.getPremadeSuggestions()
-    }
+      this.sendManualAssistantMessage(localStorage.getItem('_q'));
+      localStorage.removeItem('_q');
+    } 
 
     else if (localStorage.getItem('_u')) {
       const token = localStorage.getItem('_u');
-      this.getChatHistory(token);
-      this.getUserData(token).then(() => {
-        if (this.userStatus === 'anonymous') {
-          // this.chat = [{ role: 'assistant', content: '' }];
-          this.sendManualAssistantMessage("Welcome back!")
-          this.organicSuggestions = ['Tell me more']
-        }
-        else if (this.userStatus === 'verified') {
-          this.chat = [{ role: 'assistant', content: '' }];
-          this.sendManualAssistantMessage("Your email has been confirmed!<br>Let's set up your password now.")
-          this.inputMode = 'signup_password';
-          this.premadeSuggestionsShown = true;
-        }
-        else if (this.userStatus === 'registered') {
-          this.chat = [{ role: 'assistant', content: '' }];
-          this.sendManualAssistantMessage("Welcome back!")
-          this.organicSuggestions = ['Tell me more']
-        }
-        this.getPremadeSuggestions()
-      })
-    }
+      promises.push(
+        this.getChatHistory(token),
+        this.getUserData(token).then(() => {
+          if (this.userStatus === 'anonymous') {
+            this.sendManualAssistantMessage("Welcome back!");
+            this.organicSuggestions = ['Tell me more'];
+          } else if (this.userStatus === 'verified') {
+            this.chat = [{ role: 'assistant', content: '' }];
+            this.sendManualAssistantMessage("Your email has been confirmed!<br>Let's set up your password now.");
+            this.inputMode = 'signup_password';
+            this.premadeSuggestionsShown = true;
+          } else if (this.userStatus === 'registered') {
+            this.chat = [{ role: 'assistant', content: '' }];
+            this.sendManualAssistantMessage("Welcome back!");
+            this.organicSuggestions = ['Tell me more'];
+          }
+        })
+      )
+    } 
+    
     else {
-      this.chat=[{role: 'assistant', content: ''}]
-      this.sendManualAssistantMessage('Welcome to **SECRAG**.<br>We make security analysis easier.')
-      this.organicSuggestions = ['How exactly?', 'Show me an example']
-      this.getPremadeSuggestions()
+      this.chat = [{ role: 'assistant', content: '' }];
+      this.sendManualAssistantMessage('Welcome to **SECRAG**.<br>We make security analysis easier.');
+      this.organicSuggestions = ['How exactly?', 'Show me an example'];
     }
+
+    Promise.all(promises).finally(() => {
+      this.chatScrollToBottom();
+      this.updateChatHeight();
+      this.updateTextareaHeight();
+      this.observeSize();
+      this.getPremadeSuggestions();
+    });
   },
+
   beforeUnmount() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
     }
   },
+
   methods: {
 
     // SOCKET HANDLING
     initializeSocket() {
       socket.connect();
-      socket.on("connect", () => {(this.socketId = socket.id)});
-      socket.on("response_started", () => {this.responseIsProcessing = true; this.responseFlowstep = 'Thinking...'; this.chat.push({ role: "assistant", content: "" })});
-      socket.on("response_token", (data) => {this.processResponse(data.word), this.responseFlowstep = ''});
+      socket.on("connect", () => {
+        (this.socketId = socket.id)
+      });
+      socket.on("response_started", () => {
+        this.responseIsProcessing = true; 
+        this.responseIsSaved = false; 
+        this.responseFlowstep = 'Thinking...'; 
+        this.chat.push({ role: "assistant", content: "" })
+      });
+      socket.on("response_token", (data) => {
+        this.processResponse(data.word), 
+        this.responseFlowstep = ''
+      });
       socket.on("response_complete", () => {
         this.responseIsProcessing = false;
         this.saveAssitantResponse();
+        this.responseIsSaved = true; 
         const textarea = document.getElementById('textarea');
         if (textarea) textarea.focus();
       });
-
-      socket.on("tool", (data) => {this.processTool(data)});
-      socket.on("flowstep", (data) => {this.responseFlowstep = data.flowstep});
-      socket.on("widget", (data) => {this.processWidget(data)});
-      socket.on("suggestions", (data) => {this.processOrganicSuggestions(data.suggestions)});
+      socket.on("tool", (data) => {
+        this.processTool(data)
+      });
+      socket.on("flowstep", (data) => {
+        this.responseFlowstep = data.flowstep
+      });
+      socket.on("widget", (data) => {
+        this.processWidget(data)
+      });
+      socket.on("suggestions", (data) => {
+        this.processOrganicSuggestions(data.suggestions)
+      });
     },
 
     // SESSION HANDLING
@@ -438,7 +462,16 @@ export default {
     async getUserProfile(token) {
       const result = await axios.get(`${config.apiUrl}/api/get-user-profile?token=` + token);
       this.userProfile = result.data.profile
-      console.log(result.data)
+    },
+
+    async updateUserProfile() {
+      const userProfileHTML = this.$refs.profileDiv.innerHTML;
+      const turndownService = new TurndownService();
+      const userProfileMarkdown = turndownService.turndown(userProfileHTML);
+      
+      const result = await axios.post(`${config.apiUrl}/api/update-user-profile`, {token: localStorage.getItem('_u'), profile: userProfileMarkdown, socketId: this.socketId});
+      if (result.data.error) {console.log(result.data.error)}
+      else {this.userProfileUpdated = true; this.userProfile = userProfileMarkdown}
     },
 
     // UI HELPERS
@@ -455,8 +488,7 @@ export default {
 
     markdownify(text) {
       if (typeof text !== 'string') {return '';}
-      let formattedText = text.replace(/\n/g, '<br />');
-      return marked(formattedText);
+      return marked(text, { breaks: false });
     },
 
     togglePremadeSuggestionsVisibility() {
@@ -496,10 +528,11 @@ export default {
     getPremadeSuggestions() {
       if (this.view === 'profile') {
         this.inputMode = 'default';
+        this.userProfileUpdated = false;
         this.organicSuggestions = [];
         this.premadeSuggestionsShown = true;
         this.premadeSuggestions = [
-          { label: 'Save changes', action: () => (console.log('User profile saved')) },
+          { label: 'Save changes', action: () => (this.updateUserProfile()) },
           { label: 'Back', action: () => (this.view = 'chat', this.getPremadeSuggestions(), this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)})) },
         ];
       }
@@ -531,7 +564,7 @@ export default {
 
       else if (this.userStatus === 'anonymous' || this.userStatus === null) {
         this.premadeSuggestions =  [
-          { label: 'Profile', action: async () => (await this.getUserProfile(localStorage.getItem('_u')), console.log(this.userProfile), this.view = 'profile', this.getPremadeSuggestions()) },
+          { label: 'Profile', action: async () => (await this.getUserProfile(localStorage.getItem('_u')), this.view = 'profile', this.getPremadeSuggestions()) },
           { label: 'Sign Up', action: () => this.sendMessage("I'd like to sign up") },
           { label: 'Sign In', action: () => this.sendMessage("I'd like to sign in") },
           { label: 'More', action: () => (this.premadeSuggsetionsTopic = 'more_anonymous', this.getPremadeSuggestions()) },
@@ -598,56 +631,49 @@ export default {
     },
 
     async processWidget(data) {
-      console.log(data)
-      // let widgetMetadata = data.metadata;
-      // if (typeof data.metadata === 'string') {widgetMetadata = JSON.parse(data.metadata);}
-      
-      // console.log(widgetMetadata.type)
-      // console.log(widgetMetadata.params)
-
-      let widgetType = "basic_treemap"
-      let widgetParams = {
-        name: "Apple Inc. Revenue by Sector (2024)",
-        data: [
-          { x: "iPhone", y: 205.52 },
-          { x: "Mac", y: 41.68 },
-          { x: "iPad", y: 20.47 },
-          { x: "Wearables, Home, and Accessories", y: 42.35 },
-          { x: "Services", y: 103.34 },
-          { x: "Software", y: 15.72 },
-          { x: "Apple TV", y: 10.58 },
-          { x: "iCloud", y: 12.40 },
-          { x: "Apple Music", y: 25.00 },
-          { x: "Apple Pay", y: 7.15 },
-          { x: "App Store", y: 18.25 },
-          { x: "iWatch", y: 28.50 },
-          { x: "AirPods", y: 33.90 },
-          { x: "MacBook Pro", y: 40.00 },
-          { x: "MacBook Air", y: 35.20 }
-        ]
+      console.log(data);
+      let widgetMetadata = data.metadata;
+      if (typeof data.metadata === 'string') {
+        widgetMetadata = JSON.parse(data.metadata);
       }
 
-      let widgetMetadata = {
-        type: widgetType,
-        params: widgetParams
-      }
-
-      const processAfterResponse = () => {
+      const processAfterResponse = async () => {
         this.chat.push({ role: 'widget', content: widgetMetadata });
-        this.$nextTick(() => {setTimeout(() => {this.chatScrollToBottom();}, 100)});
+
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.chatScrollToBottom();
+          }, 100);
+        });
+
+        if (this.responseIsSaved) {
+          try {
+            await axios.post(`${config.apiUrl}/api/new-message`, {
+              token: localStorage.getItem('_u'),
+              role: 'widget',
+              input: widgetMetadata,
+              socketId: this.socketId,
+            });
+          } catch (error) {
+            console.error("Error sending message:", error);
+          }
+        }
       };
 
       if (this.responseIsProcessing) {
         const checkResponseComplete = () => {
-          if (!this.responseIsProcessing) {processAfterResponse()} 
-          else {setTimeout(checkResponseComplete, 50)}
-        }; checkResponseComplete()}
-      else {processAfterResponse()}
-
-      
-
-      // await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'widget', input: widgetMetadata, socketId: this.socketId});
+          if (!this.responseIsProcessing) {
+            processAfterResponse();
+          } else {
+            setTimeout(checkResponseComplete, 50);
+          }
+        };
+        checkResponseComplete();
+      } else {
+        processAfterResponse();
+      }
     },
+
 
     switchToDefaultInput() {
       this.inputMode = 'default';
@@ -677,7 +703,7 @@ export default {
       });
     },
 
-    sendManualAssistantMessage(message) { // Function in case a manual assistant response is needed
+    sendManualAssistantMessage(message) {
       const words = message.match(/\S+|\s+/g); 
       words.forEach((part, index) => {
         setTimeout(() => { 
@@ -822,7 +848,3 @@ export default {
   }
 };
 </script>
-
-<style>
-
-</style>
