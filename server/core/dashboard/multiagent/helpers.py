@@ -51,3 +51,11 @@ def get_last_message(messages: list, type: Literal["user", "ai"]) -> bool:
         return last_message
     
     raise Exception(f"No {type} message found")
+
+def get_last_node_message(messages: list, node_name: Literal["concierge", "archivist", "plotter"]) -> bool:
+    last_message = AIMessage(content="")
+    for message in messages:
+        if isinstance(message, AIMessage) and message.name == node_name:
+            last_message = message
+
+    return last_message
