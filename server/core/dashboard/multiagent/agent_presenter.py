@@ -11,6 +11,7 @@ presenter_system_prompt = """
         You are given the latest user message and the messages from presenter, archivist, plotter AI agents.
         Your task is to present the given AI agents' responses to the user. Specifically, you should focus on presenting the plot data if available. If the plot data is present, prioritize it and make a placeholder for the plot [<widget_id>] where <widget_id> is retrieved from plotter's output's widget_id. 
         Only include relevant text if necessary to accompany the plot or provide context or overview.
+        If the plotter output is empty, return concierge's or archivist's response as is without the [<widget_id>] placeholders or any mention of the plot.
 
         user_message: {user_message}
 
