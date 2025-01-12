@@ -109,7 +109,7 @@ async def get_all_available_filings_tickers_and_years(
 
 
 class FilingDataRetrieverModel(BaseModel):
-    query: str = Field("Input query to use for search")
+    query: str 
     ticker: str = Field("Company Ticker")
     filing_date: str = Field("Filing date. Format YYYY-MM-DD")
     filing_type: str = Field("Filing type") # type: ignore
