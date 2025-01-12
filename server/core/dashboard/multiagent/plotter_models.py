@@ -5,6 +5,10 @@ from typing import Annotated, Literal, List, Optional, Type, Union
 
 from langchain_core.tools import tool
 
+# Stock price plot
+class StockPricePlotData(BaseModel):
+    ticker: Annotated[str, "Company ticker"]
+
 # Time series plot models
 class TimeSeriesTimeDataPoint(BaseModel):
     year: int
@@ -51,9 +55,9 @@ class SankeyChart(BaseModel):
 # Master model
 class PlotterOutputModel(BaseModel):
     widget_id: str
-    plot_type: Literal["time_series", "treemap", "None"]
+    plot_type: Literal["time_series", "treemap", "stock_price", "None"]
     plot_data: Optional[Union[
-        TimeSeriesPlotData,TreemapPlotData, Literal["None"]
+        TimeSeriesPlotData,TreemapPlotData, StockPricePlotData, Literal["None"]
         ]] = Field("Selected plot type data or None if not plotting")
-    reason: str
+    reason: Optional[str]
 
