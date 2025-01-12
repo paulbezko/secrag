@@ -56,10 +56,10 @@ concierge_agent = create_react_agent_with_node_name(llm, node_name="concierge", 
         latest_user_message: {user_message}"""
     ),)
 
-async def concierge_node(state: State) -> Command[Literal["__end__", "plotter"]]:
+async def concierge_node(state: State) -> Command[Literal["presenter", "plotter"]]:
     result = await concierge_agent.ainvoke({"messages": state["messages"], "user_profile": state["user_profile"], "user_message": state["latest_user_message"], "current_date": datetime.now().strftime("%Y-%m-%d")})
     
-    goto = "__end__"
+    goto = "presenter"
     if should_call_plotter(result["messages"]):
         goto = "plotter"
     

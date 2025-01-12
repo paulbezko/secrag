@@ -120,7 +120,6 @@ def mongo_insert_message(collection, uuid, chat_id, role, content):
         return {"error": f"Error inserting message for '{uuid}' and chat '{chat_id}' and message '{content}': {str(e)}"}
 
 
-
 def mongo_get_user_profile(collection, uuid):
     try:
         user_data = collection.find_one({"_id": uuid})
