@@ -35,10 +35,10 @@ retrieve_data_from_filing - Use filing_date and filing_type you found using get_
         """
     ),)
 
-async def archivist_node(state: State) -> Command[Literal["__end__", "plotter"]]:
+async def archivist_node(state: State) -> Command[Literal["presenter", "plotter"]]:
     result = await archivist_agent.ainvoke({"messages": state["messages"][-10:], "current_date": datetime.now().strftime("%Y-%m-%d")})
 
-    goto = "__end__"
+    goto = "presenter"
     if should_call_plotter(result["messages"]):
         goto = "plotter"
 
