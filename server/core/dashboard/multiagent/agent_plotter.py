@@ -31,7 +31,6 @@ plotter_prompt = ChatPromptTemplate.from_messages(
 plotter_chain = plotter_prompt | llm_plotter.with_structured_output(PlotterOutputModel)
 
 async def plotter_node(state: State) -> Command[Literal["presenter"]]:
-    retry_count = 0
     try:
         result = await plotter_chain.ainvoke({"messages": [get_last_message(state["messages"], "user"), get_last_message(state["messages"], "ai")]})
         print("[PLOTTER] ", json.dumps(result.model_dump(), indent=2))
