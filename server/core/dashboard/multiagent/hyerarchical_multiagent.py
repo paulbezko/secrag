@@ -90,9 +90,11 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
                 
                 buffer += msg.content
 
-            elif msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter":
-                await socketio.emit('widget', {'params': msg.content}, to=socket_id)
-                plotter_buffer += msg.content
+            elif  not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and not msg.response_metadata:
+                plotter_buffer += msg.additional_kwargs["tool_calls"][0]["function"]["arguments"]
+
+            elif not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and msg.response_metadata:
+                print("[PLOTTER_BUFFER]",plotter_buffer)
 
             elif type(msg) == ToolMessage and 'widget' in msg.name:
                 print(msg.name, msg.content)
@@ -101,9 +103,9 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
             elif type(msg) == ToolMessage:
                 await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
 
-        if plotter_buffer:
-            await socketio.emit('response_token', {'word': plotter_buffer}, to=socket_id)
-            buffer += plotter_buffer
+        # if plotter_buffer:
+        #     await socketio.emit('response_token', {'word': plotter_buffer}, to=socket_id)
+        #     buffer += plotter_buffer
 
         add_message(user_id, {"role": "assistant", "content": buffer})
 
