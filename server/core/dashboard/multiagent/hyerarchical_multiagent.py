@@ -90,7 +90,8 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
                 
                 buffer += msg.content
 
-            elif type(msg) == ToolMessage and '_plotter' in msg.name:
+            elif msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter":
+                await socketio.emit('widget', {'params': msg.content}, to=socket_id)
                 plotter_buffer += msg.content
 
             elif type(msg) == ToolMessage and 'widget' in msg.name:
