@@ -1,5 +1,5 @@
 from fastapi.responses import JSONResponse
-from .utils import get_assistant_response, mongo_get_chat,mongo_insert_chat, mongo_log_response, mongo_insert_message, mongo_get_user_profile
+from .utils import get_assistant_response, mongo_get_chat,mongo_insert_chat, mongo_log_response, mongo_insert_message, mongo_get_user_profile, mongo_update_user_profile
 from ..general.utils import log, decode_token
 from ...globals import config, mongo
 from fastapi import APIRouter, Request
@@ -24,6 +24,20 @@ async def get_user_profile_get(token: str):
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
     profile = mongo_get_user_profile(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'])
+
+    return JSONResponse(content={'profile': profile})
+
+
+@routes.post('/update-user-profile')
+async def update_user_profile_get(request: Request):
+    data = await request.json()
+    token = data.get("token")
+    profile = data.get("profile")
+    
+    try: user_info = decode_token(token)
+    except: return JSONResponse(content={'error': 'Error decoding token'})
+
+    profile = mongo_update_user_profile(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'], profile)
 
     return JSONResponse(content={'profile': profile})
 

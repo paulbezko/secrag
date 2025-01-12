@@ -270,11 +270,6 @@ input:-webkit-autofill:active {
   overflow: hidden;
 }
 
-.widget-container-child {
-  position: relative;
-  margin: -1px;
-}
-
 .user-message {
   max-width: 80rem;
   justify-content: end;
@@ -294,13 +289,25 @@ input:-webkit-autofill:active {
   line-height: 150%;
   color: var(--black);
   font-size: 1.4rem;
-  height: 100%;
   font-family: 'Inter', sans-serif;
+}
+
+table {
+  border-top: 2px solid var(--black);
+  border-bottom: 2px solid var(--black);
+  border-collapse: collapse;
+}
+
+thead {
+  border-bottom: 1px dotted var(--black);
 }
 
 @media (max-width: 796px) {
   .row-to-column {
     flex-direction: column;
+  }
+  .assistant-text {
+    width: 100%;
   }
 }
 
@@ -316,7 +323,7 @@ input:-webkit-autofill:active {
     
     --blue-highlight: #e5eef7;
     --blue-dark: #1f4a75;
-    --test: #0b2e52;
+    --test: #2f4d6b;
   }
 }
 
@@ -332,5 +339,6 @@ input:-webkit-autofill:active {
 
     --blue-highlight: #1b1c22;
     --blue-dark: #2a3b54;
+    --test: #685000;
   }
 }
