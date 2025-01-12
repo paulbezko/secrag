@@ -17,7 +17,7 @@ export default {
   name: "ApexChartsWidget",
   props: {
     params: {
-      type: Object,
+      type: [Object, String],
       required: true,
     },
     theme: {
@@ -104,14 +104,16 @@ export default {
           width: 5,
         },
         colors: this.theme === "dark" 
-  ? ["#2a3b54", "#404045", "#8a7300"] // Blue, Grey, Yellow for dark background
-  : ["#4a90e2", "#D1D5DB", "#ffd54f"], // Blue, Grey, Yellow for light background
+          ? ["#2a3b54", "#404045", "#8a7300"] 
+          : ["#4a90e2", "#D1D5DB", "#ffd54f"],
       },
     };
   },
   computed: {
     chartSeries() {
-      return this.params.series;
+      const parsedParams = typeof this.params === "string" ? JSON.parse(this.params) : this.params;
+      console.log(parsedParams.series)
+      return parsedParams.series;
     },
   },
 };

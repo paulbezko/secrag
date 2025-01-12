@@ -5,7 +5,51 @@
         "messages": [
           {
             "role": "assistant",
-            "content": "Hello Paul Bezkorovainij! AAPL-2010-10K is embedded and ready for discussion. How can I help you today?"
+            "content": "Hello Paul!<br>[SP_PLT]<br>How can I help you today?",
+            "widgets": [
+              {
+                "id": "SP_PLT",
+                "type": "treemap",
+                "params": {
+                  "series": [
+                    {
+                      "name": "TICKERS",
+                      "data": [
+                        {
+                          "x": "AAPL",
+                          "y": 100
+                        },
+                        {
+                          "x": "MSFT",
+                          "y": 50
+                        },
+                        {
+                          "x": "GOOG",
+                          "y": 25
+                        }
+                      ]
+                    },
+                    {
+                      "name": "PRICE",
+                      "data": [
+                        {
+                          "x": "AAPL",
+                          "y": 100
+                        },
+                        {
+                          "x": "MSFT",
+                          "y": 50
+                        },
+                        {
+                          "x": "GOOG",
+                          "y": 25
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
           }
         ]
       }

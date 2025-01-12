@@ -24,16 +24,12 @@
               >
               <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
               <div v-if="isLatestAssistantMessage(message) && responseFlowstep !== ''" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div>
-              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'" v-html="markdownify(message.content)"></div>
+              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'" v-html="renderedContent(message)"></div>
             </div>
 
-            <div v-else-if="message.role === 'widget'" class="widget-container">
-              <div v-if="message.content.type === 'treemap'">
-                <ApexChartsWidget :params="message.content.params" :theme="theme" />
-              </div>
-              <div v-else-if="message.content.type === 'tradingview'">
-                <TradingViewWidget :ticker="message.content.ticker" :theme="theme" />
-              </div>
+            <div v-for="(widget, idx) in message.widgets" :key="idx" class="widget-container">
+              <ApexChartsWidget v-if="widget.type === 'treemap'" :params="widget.params" :theme="theme" />
+              <TradingViewWidget v-if="widget.type === 'tradingview'" :ticker="widget.params.ticker" :theme="theme" />
             </div>
 
             <!-- User message -->
@@ -379,6 +375,31 @@ export default {
   },
 
   methods: {
+
+    renderedContent(message) {
+    if (!message.content || !message.widgets) return this.markdownify(message.content);
+
+    // Create an array of components (widgets) to be rendered
+    const widgets = message.widgets.map(widget => {
+      if (widget.type === 'treemap') {
+        return h(ApexChartsWidget, {
+          params: widget.params,
+          theme: this.theme,
+        });
+      } else if (widget.type === 'tradingview') {
+        return h(TradingViewWidget, {
+          ticker: widget.params.ticker,
+          theme: this.theme,
+        });
+      }
+      return null;
+    });
+
+    return [
+      this.markdownify(message.content), // Render the regular content
+      ...widgets, // Render the dynamic widgets
+    ];
+  },
 
     // SOCKET HANDLING
     initializeSocket() {
