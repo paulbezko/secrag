@@ -54,7 +54,6 @@ class SankeyChart(BaseModel):
 
 # Master model
 class PlotterOutputModel(BaseModel):
-    widget_id: str
     plot_type: Literal["time_series", "treemap", "stock_price", "None"]
     plot_data: Optional[Union[
         TimeSeriesPlotData,TreemapPlotData, StockPricePlotData, Literal["None"]
