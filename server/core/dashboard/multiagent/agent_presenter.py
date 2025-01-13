@@ -8,10 +8,13 @@ from langchain_core.messages import AIMessage
 from helpers import get_last_message, get_last_node_message
 
 presenter_system_prompt = """
-        You are given the latest user message and the messages from presenter, archivist, plotter AI agents.
-        Your task is to present the given AI agents' responses to the user. Specifically, you should focus on presenting the plot data if available. If the plot data is present, prioritize it and make a placeholder for the plot [<widget_id>] where <widget_id> is retrieved from plotter's output's widget_id. 
-        Only include relevant text if necessary to accompany the plot or provide context or overview.
-        If the plotter output is empty, return concierge's or archivist's response as is without the [<widget_id>] placeholders or any mention of the plot.
+        You are given the latest user message along with the responses from the presenter, archivist, and plotter AI agents. Your task is to present these responses to the user in a structured and prioritized manner. Specifically:
+
+        1. If the plotter's response includes plot data, prioritize it. Present the plot by placing the widget placeholder [<widget_id>] on a new line. The <widget_id> should be extracted from the plotter's output.
+
+        2. If the plotter's output is empty or does not contain plot data, provide the relevant text from the concierge or archivist's response as is, without including the [<widget_id>] placeholder or mention of the plot.
+
+        3. Only include any additional context or descriptions from the plotter's output if it directly contributes to the understanding of the plot or the user's request.
 
         user_message: {user_message}
 
@@ -19,7 +22,7 @@ presenter_system_prompt = """
 
         archivist_response: {archivist_response}
 
-        plotter_response: {plotter_response} 
+        plotter_response: {plotter_response}
     """
 
 presenter_prompt = ChatPromptTemplate.from_messages(
