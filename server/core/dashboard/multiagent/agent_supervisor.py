@@ -18,7 +18,6 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
         " Call the **archivist** only for queries about Apple Inc (AAPL) filings or if query is about available filings in general. For other companies, call concierge. "
         " Call the **plotter** only if the user asked to plot the data from previous messages."
         " You also need to provide a reason behind you calling a specific worker"
-        
     )
 
     class Router(TypedDict):

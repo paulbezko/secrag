@@ -11,7 +11,10 @@
   "dependencies": {
     "@stripe/stripe-js": "^3.4.0",
     "@supabase/supabase-js": "^2.43.5",
+    "apexsankey": "file:libraries/apexsankey-main",
     "axios": "^1.6.8",
+    "chart.js": "^4.4.7",
+    "chartjs-chart-sankey": "^0.14.0",
     "check-password-strength": "^2.0.10",
     "core-js": "^3.8.3",
     "katex": "^0.16.11",
@@ -24,10 +27,12 @@
     "sitemap": "^8.0.0",
     "socket.io-client": "^4.7.5",
     "stripe": "^15.6.0",
+    "turndown": "^7.2.0",
     "vue": "^3.2.13",
     "vue-router": "^4.3.2",
     "vue-trading-view": "^1.0.1",
     "vue-virtual-scroller": "^2.0.0-beta.8",
+    "vue3-apexcharts": "^1.8.0",
     "vue3-circle-progress": "^1.0.7",
     "vuex": "^4.1.0"
   },

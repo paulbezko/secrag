@@ -57,15 +57,15 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
 
     return graph
 
-async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id = "",debug = False) -> str:
-    with open("server/memory/trader_profiles.json", "r") as f:
-        profiles = json.load(f)
+async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_input, socket_id = "", debug = False) -> str:
+    # with open("server/memory/trader_profiles.json", "r") as f:
+    #     profiles = json.load(f)
+    #     # print(profiles.keys())
+    # if str(user_id) not in list(profiles.keys()):
+    #     profiles[str(user_id)] = json.loads(profile_template) 
 
-    if str(user_id) not in list(profiles.keys()):
-        profiles[str(user_id)] = json.loads(profile_template) 
-
-    user_profile = profiles[str(user_id)]
-    loaded_chat = get_chats_by_key(user_id)
+    # user_profile = profiles[str(user_id)]
+    # loaded_chat = get_chats_by_key(user_id)
    
     messages = add_message(user_id, {"role": "user", "content": user_input})
 
@@ -73,46 +73,45 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
 
     try:
         buffer = ""
+        profile = ""
         prompt_suggestions = []
 
         plotter_buffer = ""
 
         await socketio.emit('response_started', to=socket_id)
-
         async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
+            
             if debug:
                 print(f"-----------------\n[MSG] {type(msg)}: \n{msg}\n\n[METADATA]:\n{metadata}\n")
+
             if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "presenter": 
                 if stop_signals.get(socket_id): 
                     stop_signals.pop(socket_id, None)
                     break
                 await socketio.emit('response_token', {'word': msg.content}, to=socket_id)
-                
                 buffer += msg.content
 
+            elif msg.content and not isinstance(msg, HumanMessage) and (metadata["langgraph_node"] == "profiler"): 
+                profile += msg.content
+            
             elif  not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and not msg.response_metadata:
                 plotter_buffer += msg.additional_kwargs["tool_calls"][0]["function"]["arguments"]
 
             elif not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and msg.response_metadata:
+                
                 plotter_output_dict = json.loads(plotter_buffer)
                 widget_dict = {
                     "id": "widget_plot",
                     "type": plotter_output_dict["plot_type"],
                     "params": plotter_output_dict["plot_data"],
                 }
-                print("[PROCESSED PLOTTER OUTPUT]", widget_dict)
-                # await socketio.emit('widget', json.dumps(widget_dict), to=socket_id)
+                await socketio.emit('widget', {'metadata': widget_dict}, to=socket_id)
 
-            elif type(msg) == ToolMessage and 'widget' in msg.name:
-                print(msg.name, msg.content)
-                await socketio.emit('widget', {'params': msg.content}, to=socket_id)
+            elif type(msg) == ToolMessage and 'tool_' in msg.name:
+                await socketio.emit('tool', {'name': msg.name, 'flowstep': json.loads(msg.content)["message"]}, to=socket_id)
 
             elif type(msg) == ToolMessage:
                 await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
-
-        # if plotter_buffer:
-        #     await socketio.emit('response_token', {'word': plotter_buffer}, to=socket_id)
-        #     buffer += plotter_buffer
 
         add_message(user_id, {"role": "assistant", "content": buffer})
 
@@ -120,7 +119,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_input, socket_id
         await socketio.emit('suggestions', {'suggestions': prompt_suggestions}, to=socket_id)
         await socketio.emit('response_complete', to=socket_id)
 
-        return buffer, prompt_suggestions
+        return {"buffer": buffer, "prompt_suggestions": prompt_suggestions, "profile": profile}
 
     except Exception as e:
         print(f"An error occurred: \n{traceback.format_exc()}")
@@ -149,7 +148,7 @@ async def main():
             print("Exiting...")
             break
 
-        output, _ = await invoke_graph(agent, user_id, user_input, debug=False)
+        output, _ = await invoke_graph(agent, user_id, user_input, debug=True)
         print(f"Assistant: \n {output}")
 
 if __name__ == "__main__":

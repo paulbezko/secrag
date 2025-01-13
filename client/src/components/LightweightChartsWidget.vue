@@ -12,14 +12,10 @@ import { onMounted, ref, watch, } from 'vue';
 export default {
   name: 'TradingViewWidget',
   props: {
-    ticker: {
-      type: String,
-      required: true,
-    },
-    theme: {
-      type: String,
-      default: 'light',
-    },
+    params: {
+      type: Object,
+      required: true
+    }
   },
   setup(props) {
     const container = ref(null);
@@ -85,9 +81,8 @@ export default {
   },
 };
 </script>
-<style scoped>
-.widget-container-child {
-  position: relative;
-  margin: -1px;
-}
-</style>
+
+
+<!-- 
+{'multi_dimentional_treemap': {'series': [{'name': 'Q1 2024 Income Statement (in $ million)', 'data': [{'x': 'Net Sales - Products', 'y': 96458.0}, {'x': 'Net Sales - Services', 'y': 23117.0}, {'x': 'Total Net Sales', 'y': 119575.0}, {'x': 'Cost of Sales - Products', 'y': 58440.0}, {'x': 'Cost of Sales - Services', 'y': 6280.0}, {'x': 'Total Cost of Sales', 'y': 64720.0}, {'x': 'Gross Margin', 'y': 54855.0}, {'x': 'Operating Expenses - R&D', 'y': 7696.0}, {'x': 'Operating Expenses - SG&A', 'y': 6786.0}, {'x': 'Total Operating Expenses', 'y': 14482.0}, {'x': 'Operating Income', 'y': 40373.0}, {'x': 'Net Income', 'y': 33916.0}]}, {'name': 'Q2 2024 Income Statement (in $ million)', 'data': [{'x': 'Net Sales - Products', 'y': 66886.0}, {'x': 'Net Sales - Services', 'y': 23867.0}, {'x': 'Total Net Sales', 'y': 90753.0}, {'x': 'Cost of Sales - Products', 'y': 42424.0}, {'x': 'Cost of Sales - Services', 'y': 6058.0}, {'x': 'Total Cost of Sales', 'y': 48482.0}, {'x': 'Gross Margin', 'y': 42271.0}, {'x': 'Operating Expenses - R&D', 'y': 7903.0}, {'x': 'Operating Expenses - SG&A', 'y': 6468.0}, {'x': 'Total Operating Expenses', 'y': 14371.0}, {'x': 'Operating Income', 'y': 27900.0}, {'x': 'Net Income', 'y': 23636.0}]}]}}
+-->
