@@ -294,6 +294,9 @@ input:-webkit-autofill:active {
 }
 
 table {
+  width: 100%;
+  margin-block: 1rem;
+  line-height: 150%;
   border-top: 2px solid var(--black);
   border-bottom: 2px solid var(--black);
   border-collapse: collapse;

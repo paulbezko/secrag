@@ -27,6 +27,8 @@
               <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'">
                 <div v-for="(part, index) in processMessage(message)" :key="index">
                   <div v-if="part.type === 'text'" v-html="part.content"></div>
+
+                  <!-- Widget generation -->
                   <ApexChartsWidget v-else-if="part.type === 'treemap'" :theme="theme" :params="part.params"/>
                   <TradingViewWidget v-else-if="part.type === 'pricechart'" :theme="theme" :params="part.params"/>
                 </div>
@@ -504,22 +506,25 @@ export default {
     },
 
     processMessage(message) {
-        const content = message.content;
-        const widgets = message.widgets || [];
-        const parts = [];
-        let lastIndex = 0;
+      const content = message.content;
+      const widgets = message.widgets || [];
+      const parts = [];
+      let lastIndex = 0;
 
-        if (widgets.length > 0) {
-          widgets.forEach((widget) => {
-            const placeholder = `[${widget.id}]`;
-            const idx = content.indexOf(placeholder, lastIndex);
-            if (idx > lastIndex) {parts.push({ type: 'text', content: this.markdownify(content.substring(lastIndex, idx)) })}
+      if (widgets.length > 0) {
+        widgets.forEach((widget) => {
+          const placeholder = `[${widget.id}]`;
+          const idx = content.indexOf(placeholder, lastIndex);
+          if (idx > -1) {
+            if (idx > lastIndex) {parts.push({ type: 'text', content: this.markdownify(content.substring(lastIndex, idx)) });}
             parts.push({ type: widget.type, params: widget.params });
             lastIndex = idx + placeholder.length;
-        })}
+          }
+        });
+      }
 
-        if (widgets.length === 0 || lastIndex < content.length) {parts.push({ type: 'text', content: this.markdownify(content.substring(lastIndex)) })}
-        return parts;
+      if (lastIndex < content.length) {parts.push({ type: 'text', content: this.markdownify(content.substring(lastIndex)) });}
+      return parts;
     },
 
     chatScrollToBottom() {
@@ -600,8 +605,7 @@ export default {
       }
 
       else {
-        this.premadeSuggestions =  [
-        ];
+        this.premadeSuggestions =  [];
       }
     },
 
@@ -653,55 +657,11 @@ export default {
     },
 
     async processWidget(data) {
-      console.log(data)
-      this.chat[this.chat.length - 1].widgets = 
-        typeof data.metadata === 'string' 
-        ? JSON.parse(data.metadata)
-        : JSON.stringify(data.metadata);
-      console.log(this.chat)
+      const lastMessage = this.chat[this.chat.length - 1];
+      if (!Array.isArray(lastMessage.widgets)) {lastMessage.widgets = [];}
+      const widgetData = typeof data.metadata === "string" ? JSON.parse(data.metadata) : data.metadata;
+      lastMessage.widgets.push(widgetData);
     },
-
-      // let widgetMetadata = data.metadata;
-      // if (typeof data.metadata === 'string') {
-      //   widgetMetadata = JSON.parse(data.metadata);
-      // }
-
-      // const processAfterResponse = async () => {
-      //   this.chat.push({ role: 'widget', content: widgetMetadata });
-
-      //   this.$nextTick(() => {
-      //     setTimeout(() => {
-      //       this.chatScrollToBottom();
-      //     }, 100);
-      //   });
-
-        // if (this.responseIsSaved) {
-        //   try {
-        //     await axios.post(`${config.apiUrl}/api/new-message`, {
-        //       token: localStorage.getItem('_u'),
-        //       role: 'widget',
-        //       input: widgetMetadata,
-        //       socketId: this.socketId,
-        //     });
-        //   } catch (error) {
-        //     console.error("Error sending message:", error);
-        //   }
-        // }
-      // };
-
-      // if (this.responseIsProcessing) {
-      //   const checkResponseComplete = () => {
-      //     if (!this.responseIsProcessing) {
-      //       processAfterResponse();
-      //     } else {
-      //       setTimeout(checkResponseComplete, 50);
-      //     }
-      //   };
-      //   checkResponseComplete();
-      // } else {
-      //   processAfterResponse();
-      // }
-
 
     switchToDefaultInput() {
       this.inputMode = 'default';

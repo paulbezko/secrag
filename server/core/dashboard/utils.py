@@ -76,7 +76,6 @@ def mongo_log_response(response):
 def mongo_get_chat(collection, uuid):
     try:
         user_data = collection.find_one({"_id": uuid})
-        
         if user_data:
             return user_data.get("chats", {}).get("general", {})
         else:
