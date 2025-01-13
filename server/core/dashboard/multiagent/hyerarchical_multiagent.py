@@ -94,12 +94,11 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
             elif msg.content and not isinstance(msg, HumanMessage) and (metadata["langgraph_node"] == "profiler"): 
                 profile += msg.content
             
-            elif msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter":
-                plotter_buffer += msg.content
+            elif  not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and not msg.response_metadata:
+                plotter_buffer += msg.additional_kwargs["tool_calls"][0]["function"]["arguments"]
 
-            elif type(msg) == ToolMessage and '_plot' in msg.name:
-                print('\n\n\n', msg.content, '\n\n\n')
-                plotter_buffer += msg.content
+            elif not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and msg.response_metadata:
+                await socketio.emit('widget', {'metadata': plotter_buffer}, to=socket_id)
 
             elif type(msg) == ToolMessage and 'tool_' in msg.name:
                 await socketio.emit('tool', {'name': msg.name, 'flowstep': json.loads(msg.content)["message"]}, to=socket_id)
@@ -110,10 +109,11 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
             elif type(msg) == ToolMessage:
                 await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
 
-        add_message(user_id, {"role": "assistant", "content": buffer})
+        # if plotter_buffer:
+        #     await socketio.emit('response_token', {'word': plotter_buffer}, to=socket_id)
+        #     buffer += plotter_buffer
 
-        if plotter_buffer:
-            await socketio.emit('widget', {'metadata': plotter_buffer}, to=socket_id)
+        add_message(user_id, {"role": "assistant", "content": buffer})
 
         prompt_suggestions = await prompt_suggestions_tool(buffer)
         await socketio.emit('suggestions', {'suggestions': prompt_suggestions}, to=socket_id)

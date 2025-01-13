@@ -267,6 +267,7 @@ input:-webkit-autofill:active {
 .widget-container {
   width: 100%;
   border-radius: 1rem;
+  margin-block: 1rem;
   overflow: hidden;
 }
 

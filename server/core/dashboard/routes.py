@@ -66,12 +66,13 @@ async def new_message_post(request: Request):
     token = data.get("token")
     role = data.get("role")
     input = data.get("input")
+    widgets = data.get("widgets")
     socket_id = data.get("socketId")
 
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    mongo_insert_message(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'], 'general', role, input)
+    mongo_insert_message(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'], 'general', role, input, widgets)
     if role == 'user': await get_assistant_response(socket_id, user_info['uuid'], input)
     
     return 200
