@@ -106,11 +106,11 @@ def mongo_insert_chat(collection, uuid, chat_id):
         return {"error": f"Error creating chat for '{uuid}' and chat '{chat_id}': {str(e)}"}
 
 
-def mongo_insert_message(collection, uuid, chat_id, role, content):
+def mongo_insert_message(collection, uuid, chat_id, role, content, widgets):
     try:
         result = collection.update_one(
             {"_id": uuid},
-            {"$push": {f"chats.{chat_id}.messages": {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "role": role, "content": content}}}
+            {"$push": {f"chats.{chat_id}.messages": {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "role": role, "content": content, "widgets": widgets}}}
         )
         if result.modified_count > 0: 
             return {"message": f"Message added to chat '{chat_id}' for user '{uuid}'."}

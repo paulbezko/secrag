@@ -24,12 +24,13 @@
               >
               <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past">
               <div v-if="isLatestAssistantMessage(message) && responseFlowstep !== ''" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div>
-              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'" v-html="renderedContent(message)"></div>
-            </div>
-
-            <div v-for="(widget, idx) in message.widgets" :key="idx" class="widget-container">
-              <ApexChartsWidget v-if="widget.type === 'treemap'" :params="widget.params" :theme="theme" />
-              <TradingViewWidget v-if="widget.type === 'tradingview'" :ticker="widget.params.ticker" :theme="theme" />
+              <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'">
+                <div v-for="(part, index) in processMessage(message)" :key="index">
+                  <div v-if="part.type === 'text'" v-html="part.content"></div>
+                  <ApexChartsWidget v-else-if="part.type === 'treemap'" :theme="theme" :params="part.params"/>
+                  <TradingViewWidget v-else-if="part.type === 'pricechart'" :theme="theme" :params="part.params"/>
+                </div>
+              </div>
             </div>
 
             <!-- User message -->
@@ -306,7 +307,7 @@ export default {
       premadeSuggestionsShown: false,
       premadeSuggsetionsTopic: '',
       responseIsProcessing: false,
-      responseIsSaved: true,
+      // responseIsSaved: true,
       responseFlowstep: '',
       currentAssistantMessage: '',
     };
@@ -376,31 +377,6 @@ export default {
 
   methods: {
 
-    renderedContent(message) {
-    if (!message.content || !message.widgets) return this.markdownify(message.content);
-
-    // Create an array of components (widgets) to be rendered
-    const widgets = message.widgets.map(widget => {
-      if (widget.type === 'treemap') {
-        return h(ApexChartsWidget, {
-          params: widget.params,
-          theme: this.theme,
-        });
-      } else if (widget.type === 'tradingview') {
-        return h(TradingViewWidget, {
-          ticker: widget.params.ticker,
-          theme: this.theme,
-        });
-      }
-      return null;
-    });
-
-    return [
-      this.markdownify(message.content), // Render the regular content
-      ...widgets, // Render the dynamic widgets
-    ];
-  },
-
     // SOCKET HANDLING
     initializeSocket() {
       socket.connect();
@@ -409,7 +385,7 @@ export default {
       });
       socket.on("response_started", () => {
         this.responseIsProcessing = true; 
-        this.responseIsSaved = false; 
+        // this.responseIsSaved = false; 
         this.responseFlowstep = 'Thinking...'; 
         this.chat.push({ role: "assistant", content: "" })
       });
@@ -507,11 +483,6 @@ export default {
       this.resizeObserver.observe(dashboard);
     },
 
-    markdownify(text) {
-      if (typeof text !== 'string') {return '';}
-      return marked(text, { breaks: false });
-    },
-
     togglePremadeSuggestionsVisibility() {
       this.premadeSuggestionsShown = !this.premadeSuggestionsShown;
     },
@@ -525,6 +496,30 @@ export default {
     checkScreenWidth() {
       if (window.innerWidth <= 796) {this.isMobile = true; this.premadeSuggestionsShown = false} 
       else {this.isMobile = false; this.premadeSuggestionsShown = true}
+    },
+
+    markdownify(text) {
+      if (typeof text !== 'string') {return '';}
+      return marked(text, { breaks: false });
+    },
+
+    processMessage(message) {
+        const content = message.content;
+        const widgets = message.widgets || [];
+        const parts = [];
+        let lastIndex = 0;
+
+        if (widgets.length > 0) {
+          widgets.forEach((widget) => {
+            const placeholder = `[${widget.id}]`;
+            const idx = content.indexOf(placeholder, lastIndex);
+            if (idx > lastIndex) {parts.push({ type: 'text', content: this.markdownify(content.substring(lastIndex, idx)) })}
+            parts.push({ type: widget.type, params: widget.params });
+            lastIndex = idx + placeholder.length;
+        })}
+
+        if (widgets.length === 0 || lastIndex < content.length) {parts.push({ type: 'text', content: this.markdownify(content.substring(lastIndex)) })}
+        return parts;
     },
 
     chatScrollToBottom() {
@@ -625,7 +620,13 @@ export default {
       this.$nextTick(() => {this.chatScrollToBottom(); this.updateTextareaHeight()});
       this.input = '';
 
-      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'user', input: input, socketId: this.socketId});
+      await axios.post(`${config.apiUrl}/api/new-message`, {
+        token: localStorage.getItem('_u'), 
+        role: 'user', 
+        input: input, 
+        widgets: null,
+        socketId: this.socketId
+      });
     },
 
     processTool(data) {
@@ -652,48 +653,54 @@ export default {
     },
 
     async processWidget(data) {
-      console.log(data);
-      let widgetMetadata = data.metadata;
-      if (typeof data.metadata === 'string') {
-        widgetMetadata = JSON.parse(data.metadata);
-      }
-
-      const processAfterResponse = async () => {
-        this.chat.push({ role: 'widget', content: widgetMetadata });
-
-        this.$nextTick(() => {
-          setTimeout(() => {
-            this.chatScrollToBottom();
-          }, 100);
-        });
-
-        if (this.responseIsSaved) {
-          try {
-            await axios.post(`${config.apiUrl}/api/new-message`, {
-              token: localStorage.getItem('_u'),
-              role: 'widget',
-              input: widgetMetadata,
-              socketId: this.socketId,
-            });
-          } catch (error) {
-            console.error("Error sending message:", error);
-          }
-        }
-      };
-
-      if (this.responseIsProcessing) {
-        const checkResponseComplete = () => {
-          if (!this.responseIsProcessing) {
-            processAfterResponse();
-          } else {
-            setTimeout(checkResponseComplete, 50);
-          }
-        };
-        checkResponseComplete();
-      } else {
-        processAfterResponse();
-      }
+      console.log(data)
+      this.chat[this.chat.length - 1].widgets = 
+        typeof data.metadata === 'string' 
+        ? JSON.parse(data.metadata)
+        : JSON.stringify(data.metadata);
+      console.log(this.chat)
     },
+
+      // let widgetMetadata = data.metadata;
+      // if (typeof data.metadata === 'string') {
+      //   widgetMetadata = JSON.parse(data.metadata);
+      // }
+
+      // const processAfterResponse = async () => {
+      //   this.chat.push({ role: 'widget', content: widgetMetadata });
+
+      //   this.$nextTick(() => {
+      //     setTimeout(() => {
+      //       this.chatScrollToBottom();
+      //     }, 100);
+      //   });
+
+        // if (this.responseIsSaved) {
+        //   try {
+        //     await axios.post(`${config.apiUrl}/api/new-message`, {
+        //       token: localStorage.getItem('_u'),
+        //       role: 'widget',
+        //       input: widgetMetadata,
+        //       socketId: this.socketId,
+        //     });
+        //   } catch (error) {
+        //     console.error("Error sending message:", error);
+        //   }
+        // }
+      // };
+
+      // if (this.responseIsProcessing) {
+      //   const checkResponseComplete = () => {
+      //     if (!this.responseIsProcessing) {
+      //       processAfterResponse();
+      //     } else {
+      //       setTimeout(checkResponseComplete, 50);
+      //     }
+      //   };
+      //   checkResponseComplete();
+      // } else {
+      //   processAfterResponse();
+      // }
 
 
     switchToDefaultInput() {
@@ -734,7 +741,15 @@ export default {
     },
 
     async saveAssitantResponse() {
-      await axios.post(`${config.apiUrl}/api/new-message`, {token: localStorage.getItem('_u'), role: 'assistant', input: this.chat[this.chat.length - 1].content, socketId: this.socketId});
+      const lastMessage = this.chat[this.chat.length - 1];
+
+      await axios.post(`${config.apiUrl}/api/new-message`, {
+        token: localStorage.getItem('_u'), 
+        role: 'assistant', 
+        input: lastMessage.content, 
+        widgets: lastMessage.widgets || null,
+        socketId: this.socketId
+      });
     },
 
     // AUTHENTICATION
