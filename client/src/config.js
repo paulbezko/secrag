@@ -12,9 +12,9 @@ const dev = {
 // };
 
 const prod = {
-  apiUrl: "https://secrag.com",
-  webUrl: "https://secrag.com",
-  socketUrl: "https://secrag.com",
+  apiUrl: "https://alpha.secrag.com",
+  webUrl: "https://alpha.secrag.com",
+  socketUrl: "https://alpha.secrag.com",
 };
 
 export const config = process.env.NODE_ENV === "production" ? prod : dev;

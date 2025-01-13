@@ -105,6 +105,39 @@ input:-webkit-autofill:active {
   color: var(--yellow-dark);
 }
 
+.input-profile {
+  width: 100%;
+  height: 70dvh;
+  padding: 1rem;
+  border: 1px solid var(--grey-semilight);
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-family: 'Inter', sans-serif;
+  line-height: 150%;
+  color: var(--black);
+  background-color: var(--white);
+  transition: all 0.2s ease;
+  overflow-y: scroll;
+}
+
+.input-profile * {
+  margin: 0;
+}
+
+.input-profile::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.input-profile::-webkit-scrollbar-thumb {
+  background: var(--grey-semilight);
+  border-radius: 4px;
+}
+
+.input-profile::-webkit-scrollbar-thumb:hover {
+  background: var(--grey-semilight);
+}
+
 .button-send {
   display: flex;
   align-items: center;
@@ -132,6 +165,11 @@ input:-webkit-autofill:active {
   border: 1px solid var(--yellow-dark);
   color: var(--yellow-dark);
   background-color: var(--yellow-highlight)
+}
+
+.button-send-disabled {
+  pointer-events:none;
+  opacity: 0.5;
 }
 
 .input-suggestion {
@@ -217,15 +255,20 @@ input:-webkit-autofill:active {
   width: 100%;
 }
 
+.assistant-text-flowstep {
+  animation: flash .6s infinite alternate;
+}
+
+@keyframes flash {
+  from {color: var(--black); opacity: 0.5;}
+  to {color: var(--black); opacity: 0.25;}
+}
+
 .widget-container {
   width: 100%;
   border-radius: 1rem;
+  margin-block: 1rem;
   overflow: hidden;
-}
-
-.widget-container-child {
-  position: relative;
-  margin: -1px;
 }
 
 .user-message {
@@ -247,13 +290,28 @@ input:-webkit-autofill:active {
   line-height: 150%;
   color: var(--black);
   font-size: 1.4rem;
-  height: 100%;
   font-family: 'Inter', sans-serif;
+}
+
+table {
+  width: 100%;
+  margin-block: 1rem;
+  line-height: 150%;
+  border-top: 2px solid var(--black);
+  border-bottom: 2px solid var(--black);
+  border-collapse: collapse;
+}
+
+thead {
+  border-bottom: 1px dotted var(--black);
 }
 
 @media (max-width: 796px) {
   .row-to-column {
     flex-direction: column;
+  }
+  .assistant-text {
+    width: 100%;
   }
 }
 
@@ -269,6 +327,7 @@ input:-webkit-autofill:active {
     
     --blue-highlight: #e5eef7;
     --blue-dark: #1f4a75;
+    --test: #2f4d6b;
   }
 }
 
@@ -284,5 +343,6 @@ input:-webkit-autofill:active {
 
     --blue-highlight: #1b1c22;
     --blue-dark: #2a3b54;
+    --test: #685000;
   }
 }

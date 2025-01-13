@@ -1,5 +1,6 @@
-from ...globals import stop_signals
+from ...globals import stop_signals, mongo, config
 
+from datetime import datetime
 import time
 
 async def get_assistant_response_old(socket_id, input):
@@ -57,10 +58,13 @@ async def send_assistant_response(socket_id, response: str, signal_payload: dict
 from .multiagent.hyerarchical_multiagent import create_graph, invoke_graph
 graph = create_graph()
 
+
 async def get_assistant_response(socket_id, uuid, input):
-    
-    response = await invoke_graph(graph, uuid, input, socket_id, debug=False)
-    print(response)
+    profile = mongo_get_user_profile(mongo.db[f"chats_{config.get('MODE')}"], uuid)
+    llm_response = await invoke_graph(graph, uuid, profile, input, socket_id)
+    response = mongo_update_user_profile(mongo.db[f"chats_{config.get('MODE')}"], uuid, llm_response['profile'])
+    mongo_log_response(response)
+
 
 def mongo_log_response(response):
     if 'error' in response:
@@ -69,12 +73,25 @@ def mongo_log_response(response):
         print(response['message'])
 
 
+def mongo_get_chat(collection, uuid):
+    try:
+        user_data = collection.find_one({"_id": uuid})
+        if user_data:
+            return user_data.get("chats", {}).get("general", {})
+        else:
+            return {"error": f"User with UUID '{uuid}' not found."}
+    except Exception as e:
+        return {"error": f"Error retrieving chat for '{uuid}': {str(e)}"}
+    
+
 def mongo_insert_chat(collection, uuid, chat_id):
     try:
         result = collection.update_one(
             {"_id": uuid},
-            {"$set": {f"chats.{chat_id}": {
-                "messages": []
+            {"$set": {
+                "profile": "",
+                f"chats.{chat_id}": {
+                    "messages": [{'role': 'assistant', 'content': 'Welcome to **SECRAG**.<br>We make security analysis easier.'}],
             }}},
             upsert=True
         )
@@ -88,11 +105,11 @@ def mongo_insert_chat(collection, uuid, chat_id):
         return {"error": f"Error creating chat for '{uuid}' and chat '{chat_id}': {str(e)}"}
 
 
-def mongo_insert_message(collection, uuid, chat_id, role, content):
+def mongo_insert_message(collection, uuid, chat_id, role, content, widgets):
     try:
         result = collection.update_one(
             {"_id": uuid},
-            {"$push": {f"chats.{chat_id}.messages": {"role": role, "content": content}}}
+            {"$push": {f"chats.{chat_id}.messages": {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "role": role, "content": content, "widgets": widgets}}}
         )
         if result.modified_count > 0: 
             return {"message": f"Message added to chat '{chat_id}' for user '{uuid}'."}
@@ -100,3 +117,29 @@ def mongo_insert_message(collection, uuid, chat_id, role, content):
             return {"error": f"Chat '{chat_id}' not found for user '{uuid}'."}
     except Exception as e:
         return {"error": f"Error inserting message for '{uuid}' and chat '{chat_id}' and message '{content}': {str(e)}"}
+
+
+def mongo_get_user_profile(collection, uuid):
+    try:
+        user_data = collection.find_one({"_id": uuid})
+        
+        if user_data:
+            return user_data.get("profile", "")
+        else:
+            return {"error": f"User with UUID '{uuid}' not found."}
+    except Exception as e:
+        return {"error": f"Error retrieving profile for '{uuid}': {str(e)}"}
+
+
+def mongo_update_user_profile(collection, uuid, profile):
+    try:
+        result = collection.update_one(
+            {"_id": uuid},
+            {"$set": {"profile": profile}}
+        )
+        if result.modified_count > 0: 
+            return {"message": f"Profile updated for user '{uuid}'."}
+        else: 
+            return {"error": f"User '{uuid}' not found."}
+    except Exception as e:
+        return {"error": f"Error updating profile for '{uuid}': {str(e)}"}
