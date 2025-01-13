@@ -13,7 +13,7 @@ sys.path.append("")
 from PIL import Image
 
 # Various project-related imports
-from globals import State
+from globals import State, tool_call_strings
 from helpers import add_message, get_chats_by_key, create_file_if_not_exists
 from user_profile_model import profile_template
 
@@ -106,12 +106,15 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
                     "params": plotter_output_dict["plot_data"],
                 }
                 await socketio.emit('widget', {'metadata': widget_dict}, to=socket_id)
+                await socketio.emit('tool', {'name': msg.name, 'flowstep': "Finalizing..."}, to=socket_id)
 
             elif type(msg) == ToolMessage and 'tool_' in msg.name:
                 await socketio.emit('tool', {'name': msg.name, 'flowstep': json.loads(msg.content)["message"]}, to=socket_id)
 
             elif type(msg) == ToolMessage:
                 await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
+                await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[msg.name]}, to=socket_id)
+
 
         add_message(user_id, {"role": "assistant", "content": buffer})
 

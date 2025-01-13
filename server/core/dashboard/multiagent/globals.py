@@ -36,7 +36,6 @@ toolset = [
     'get_current_time', 
     'stock_price_plotter', 
     'get_current_time', 
-    'basic_treemap_plotter'
 ]
 
 tools_triggering_plotter = [
@@ -47,3 +46,24 @@ tools_triggering_plotter = [
     # Archivist tools
     'retrieve_data_from_filing', 
 ]
+
+
+tool_call_strings = {
+    # Concierge tools
+    'ticker_news' : "Searching for news...", 
+    'ticker_balance_sheet': "Searching for balance sheet...", 
+    'ticker_income_statement': "Searching for income statement...", 
+    'ticker_cash_flow_statement': "Searching for cash flow statement...", 
+    'ticker_analyst_price_targets': "Retrieving analyst price targets...", 
+    'login': "Initiating login...", 
+    'signup_email': "Initiating sign up...", 
+    'forgot_password': "Initiating password reset...", 
+    'widget_tradingview': "Plotting stock price...",
+    # Archivist tools
+    'retrieve_data_from_filing': "Reading the filing...", 
+    'get_available_filings': "Searching for filings...", 
+    'get_all_available_filings_tickers_and_years': "Searching for filings...", 
+    'search_tickers': "Retrieving the ticker...", 
+    'get_current_time': "Thinking...", 
+    'stock_price_plotter': "Plotting stock price...",  
+} 
