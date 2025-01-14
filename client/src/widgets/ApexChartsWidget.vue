@@ -112,7 +112,6 @@ export default {
   computed: {
     chartSeries() {
       const parsedParams = typeof this.params === "string" ? JSON.parse(this.params) : this.params;
-      console.log(parsedParams.series)
       return parsedParams.series;
     },
   },
