@@ -9,6 +9,10 @@ const routes = [
     path: "/test",
     component: () => import("../views/TestView.vue"),
   },
+  // {
+  //   path: "/dashboard",
+  //   component: () => import("../views/Dashboard/DashboardView.vue"),
+  // },
   {
     path: "/terms-and-conditions",
     component: () => import("../views/TermsAndConditionsView.vue"),

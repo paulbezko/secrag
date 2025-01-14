@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import ApexChartsWidget from "@/components/ApexChartsWidget.vue";
-import TradingViewWidget from "@/components/TradingViewWidget.vue"; // Assume this exists for 'pricechart'
+import ApexChartsWidget from "@/widgets/ApexChartsWidget.vue";
+import TradingViewWidget from "@/widgets/TradingViewWidget.vue"; // Assume this exists for 'pricechart'
 
 export default {
   name: "TestView",
