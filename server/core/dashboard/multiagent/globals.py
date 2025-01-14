@@ -38,6 +38,12 @@ toolset = [
     'get_current_time', 
 ]
 
+layout_changing_tools = [
+    'login', 
+    'signup_email', 
+    'forgot_password'
+]
+
 tools_triggering_plotter = [
     # Concierge tools
     'ticker_balance_sheet', 
@@ -50,20 +56,20 @@ tools_triggering_plotter = [
 
 tool_call_strings = {
     # Concierge tools
-    'ticker_news' : "Searching for news...", 
-    'ticker_balance_sheet': "Searching for balance sheet...", 
-    'ticker_income_statement': "Searching for income statement...", 
-    'ticker_cash_flow_statement': "Searching for cash flow statement...", 
-    'ticker_analyst_price_targets': "Retrieving analyst price targets...", 
-    'login': "Initiating login...", 
-    'signup_email': "Initiating sign up...", 
-    'forgot_password': "Initiating password reset...", 
-    'widget_tradingview': "Plotting stock price...",
+    'ticker_news' : "Searching for news", 
+    'ticker_balance_sheet': "Searching for balance sheet", 
+    'ticker_income_statement': "Searching for income statement", 
+    'ticker_cash_flow_statement': "Searching for cash flow statement", 
+    'ticker_analyst_price_targets': "Retrieving analyst price targets", 
+    'login': "Initiating login", 
+    'signup_email': "Initiating sign up", 
+    'forgot_password': "Initiating password reset", 
+    'widget_tradingview': "Plotting stock price",
     # Archivist tools
-    'retrieve_data_from_filing': "Reading the filing...", 
-    'get_available_filings': "Searching for filings...", 
-    'get_all_available_filings_tickers_and_years': "Searching for filings...", 
-    'search_tickers': "Retrieving the ticker...", 
-    'get_current_time': "Thinking...", 
-    'stock_price_plotter': "Plotting stock price...",  
+    'retrieve_data_from_filing': "Reading the filing", 
+    'get_available_filings': "Searching for filings", 
+    'get_all_available_filings_tickers_and_years': "Searching for filings", 
+    'search_tickers': "Retrieving the ticker", 
+    'get_current_time': "Thinking", 
+    'stock_price_plotter': "Plotting stock price",  
 } 
