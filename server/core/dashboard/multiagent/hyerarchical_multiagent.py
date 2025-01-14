@@ -13,8 +13,8 @@ sys.path.append("")
 from PIL import Image
 
 # Various project-related imports
-from globals import State, tool_call_strings
-from helpers import add_message, get_chats_by_key, create_file_if_not_exists
+from globals import State, tool_call_strings, layout_changing_tools
+from helpers import add_message, get_chats_by_key, create_file_if_not_exists, flowstep_string_state_machine
 from user_profile_model import profile_template
 
 # LangGraph
@@ -22,7 +22,7 @@ from langgraph.graph import StateGraph, START
 from langgraph.graph.state import CompiledStateGraph
 
 # LangChain
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, ToolMessage, AIMessageChunk
 
 # Agents
 from agent_supervisor import supervisor_node
@@ -77,6 +77,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
         prompt_suggestions = []
 
         plotter_buffer = ""
+        tool_call_buffer = {}
 
         await socketio.emit('response_started', to=socket_id)
         async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
@@ -84,17 +85,34 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
             if debug:
                 print(f"-----------------\n[MSG] {type(msg)}: \n{msg}\n\n[METADATA]:\n{metadata}\n")
 
+            if not msg.content and isinstance(msg, AIMessageChunk) and 'tool_calls' in msg.additional_kwargs:
+                if msg.id not in tool_call_buffer:
+                    tool_call_buffer[msg.id] = {"name": "", "buffer": ""}
+                for tool_call_chunk in msg.tool_call_chunks:
+                    if tool_call_chunk["name"]:
+                        tool_call_buffer[msg.id]["name"] = tool_call_chunk["name"]
+                    tool_call_buffer[msg.id]["buffer"] += tool_call_chunk["args"]
+
+            elif not msg.content and isinstance(msg, AIMessageChunk) and msg.response_metadata and msg.response_metadata["finish_reason"] == "tool_calls":
+                
+                flowstep_string = flowstep_string_state_machine(tool_call_buffer[msg.id])
+                print("[TOOL CALL DATA]:", tool_call_buffer[msg.id])
+                print("[FLOWSTEP]:", flowstep_string) 
+                await socketio.emit('tool', {'name': msg.name, 'flowstep': flowstep_string}, to=socket_id)
+
             if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "presenter": 
                 if stop_signals.get(socket_id): 
                     stop_signals.pop(socket_id, None)
                     break
                 await socketio.emit('response_token', {'word': msg.content}, to=socket_id)
                 buffer += msg.content
+            
+            
 
             elif msg.content and not isinstance(msg, HumanMessage) and (metadata["langgraph_node"] == "profiler"): 
                 profile += msg.content
-            
-            elif  not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and not msg.response_metadata:
+
+            elif not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and not msg.response_metadata:
                 plotter_buffer += msg.additional_kwargs["tool_calls"][0]["function"]["arguments"]
 
             elif not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "plotter" and msg.response_metadata:
@@ -108,13 +126,15 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
                 await socketio.emit('widget', {'metadata': widget_dict}, to=socket_id)
                 await socketio.emit('tool', {'name': msg.name, 'flowstep': "Finalizing..."}, to=socket_id)
 
-            elif type(msg) == ToolMessage and 'tool_' in msg.name:
-                await socketio.emit('tool', {'name': msg.name, 'flowstep': json.loads(msg.content)["message"]}, to=socket_id)
+            # elif type(msg) == ToolMessage and 'tool_' in msg.name:
+            #     await socketio.emit('tool', {'name': msg.name, 'flowstep': json.loads(msg.content)["message"]}, to=socket_id)
 
             elif type(msg) == ToolMessage:
-                await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
-                await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[msg.name]}, to=socket_id)
+                if msg.name in layout_changing_tools:
+                    await socketio.emit('tool', {'name': "layout_"+msg.name}, to=socket_id)
+                # await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[msg.name]}, to=socket_id)
 
+        # print("[TOOL_CALL_BUFFER]\n",tool_call_buffer)
 
         add_message(user_id, {"role": "assistant", "content": buffer})
 
@@ -127,14 +147,20 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
     except Exception as e:
         print(f"An error occurred: \n{traceback.format_exc()}")
         raise e
-    
+
+
+def layout_changing_tool_signal_statemachine(tool_name):
+    if tool_name in layout_changing_tools:
+        return "tool_"+tool_name
+
+
 # Main asynchronous loop
 async def main():
     load_dotenv(".env")
     """
     Main loop to interact with the LangGraph agent.
     """
-
+    create_file_if_not_exists("server/memory/anonymous_chats_db.json")
     create_file_if_not_exists("server/memory/trader_profiles.json")
     agent = create_graph(display_graph=DISPLAY_GRAPH)
 
@@ -151,8 +177,9 @@ async def main():
             print("Exiting...")
             break
 
-        output, _ = await invoke_graph(agent, user_id, user_input, debug=True)
-        print(f"Assistant: \n {output}")
+        output = await invoke_graph(agent, user_id, {}, user_input, debug=False)
+        print(f"Assistant: \n {output["buffer"]}")
 
 if __name__ == "__main__":
     asyncio.run(main())
+
