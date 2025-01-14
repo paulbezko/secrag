@@ -113,7 +113,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
 
             elif type(msg) == ToolMessage:
                 await socketio.emit('signal', {'signal_type': msg.name}, to=socket_id)
-                await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[msg.name]}, to=socket_id)
+                # await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[msg.name]}, to=socket_id)
 
 
         add_message(user_id, {"role": "assistant", "content": buffer})
