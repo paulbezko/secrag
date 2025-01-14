@@ -5,7 +5,7 @@
     <div v-if="premadeSuggestionsShown && isMobile"></div>
     <div class="flex-row center" v-if="!premadeSuggestionsShown && isMobile || !isMobile" :class="isMobile ? 'gap-1' : 'gap-15'">
       <div v-for="(prompt, index) in organicSuggestions" :key="index" class="input-suggestion" @click="this.$emit('send-message', prompt)">{{ prompt }}</div>
-      <div class="input-suggestion" v-if="inputMode === 'login' || inputMode === 'signup_email'" @click="switchToDefaultInput()">Go back</div>
+      <div class="input-suggestion" v-if="inputMode === 'login' || inputMode === 'signup_email'" @click="$emit('switch-to-default-input')">Go back</div>
     </div>
 
     <!-- Premade suggestions -->
