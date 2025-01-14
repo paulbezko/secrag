@@ -53,26 +53,27 @@ export const messaging = {
   },
 
   processTool(ctx, data) {
-    console.log(data.name)
     ctx.responseFlowstep = data.flowstep;
-    if (data.name === "tool_signup_email") {ctx.inputMode = 'signup_email'} 
-    else if (data.name === "tool_login") {ctx.inputMode = 'login'} 
-    else if (data.name === "tool_forgot_password") {ctx.inputMode = 'forgot_password'}
-    else if (data.name === "tool_reset_password") {ctx.inputMode = 'reset_password'}
+    if (data.name && data.name.startsWith('layout_')) {
+      if (data.name === "layout_signup_email") {ctx.inputMode = 'signup_email'} 
+      else if (data.name === "layout_login") {ctx.inputMode = 'login'} 
+      else if (data.name === "layout_forgot_password") {ctx.inputMode = 'forgot_password'}
+      else if (data.name === "layout_reset_password") {ctx.inputMode = 'reset_password'}
+  
+      else if (data.name === "layout_signed_in") {
+        localStorage.setItem('_u', data.token)
+        ctx.userIsAuthenticated = true
+        if (data.subscription !== 'none') {ctx.userIsSubscribed = true}
+        ctx.inputMode = 'default'
+        const lastAssistantMessage = ctx.chat.slice().reverse().find((message) => message.role === 'assistant');
+        ctx.chat = lastAssistantMessage ? [lastAssistantMessage] : [];
+        ctx.getPremadeSuggestions();
+      }
 
-    else if (data.name === "tool_signed_in") {
-      localStorage.setItem('_u', data.token)
-      ctx.userIsAuthenticated = true
-      if (data.subscription !== 'none') {ctx.userIsSubscribed = true}
-      ctx.inputMode = 'default'
-      const lastAssistantMessage = ctx.chat.slice().reverse().find((message) => message.role === 'assistant');
-      ctx.chat = lastAssistantMessage ? [lastAssistantMessage] : [];
-      ctx.getPremadeSuggestions();
+      if ((data.name === "tool_login" || data.name === "tool_signup_email") && ctx.isMobile === true) {ctx.premadeSuggestionsShown = false}
     }
 
     else {ctx.inputMode = 'default'}
-
-    if ((data.name === "tool_login" || data.name === "tool_signup_email") && ctx.isMobile === true) {ctx.premadeSuggestionsShown = false}
     ctx.$nextTick(() => {interfacing.updateChatHeight(ctx)});
   },
 

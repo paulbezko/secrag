@@ -51,6 +51,7 @@
             :responseIsProcessing="responseIsProcessing"
 
             @send-message="sendMessage"
+            @switch-to-default-input="switchToDefaultInput"
             @toggle-premade-suggestions-visibility="togglePremadeSuggestionsVisibility"
           />
 
@@ -282,6 +283,7 @@ export default {
     updateTextareaHeight() {interfacing.updateTextareaHeight(this);},
 
     // SUGGESTING
+    switchToDefaultInput() {this.inputMode = 'default';},
     togglePremadeSuggestionsVisibility() {this.premadeSuggestionsShown = !this.premadeSuggestionsShown},
 
     // MESSAGING
