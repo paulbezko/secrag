@@ -21,11 +21,10 @@ export default {
   },
   data() {
     return {
-      container: null,  // Ref for container
+      container: null,
     };
   },
   methods: {
-    // Function to update the widget based on the ticker symbol
     loadWidget() {
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
@@ -65,7 +64,6 @@ export default {
         "dateRanges": ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
       }`;
 
-      // Clear any existing widget before appending a new one
       if (this.container) {
         this.container.innerHTML = '';
         this.container.appendChild(script);

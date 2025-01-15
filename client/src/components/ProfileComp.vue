@@ -1,6 +1,6 @@
 <template>
   <div v-if="view === 'profile'" class="flex-column width-100 gap-1 center" style="padding-inline: 1rem">
-    <div class="flex-row center gap-1 assistant-message single" style="height: 4rem; text-align: left;">
+    <div class="flex-row center gap-1 assistant-message single" style="height: 4rem;">
       <img
         :src="input !== '' 
           ? require('@/assets/dashboard/face_with_monocle_3d.png')

@@ -20,7 +20,6 @@ export default {
   setup(props) {
     const container = ref(null);
 
-    // Function to update the widget based on the ticker symbol
     const loadWidget = () => {
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
@@ -60,19 +59,16 @@ export default {
         "dateRanges": ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
       }`;
 
-      // Clear any existing widget before appending a new one
       if (container.value) {
         container.value.innerHTML = '';
         container.value.appendChild(script);
       }
     };
 
-    // Load widget when the component is mounted
     onMounted(() => {
       loadWidget();
     });
 
-    // Watch for changes in the ticker prop and reload the widget
     watch([() => props.ticker, () => props.theme], loadWidget);
 
     return {
