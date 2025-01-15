@@ -4,6 +4,7 @@ import json
 import asyncio
 import traceback
 
+
 from dotenv import load_dotenv
 
 # Adds directories to PATH to avoid relative imports
@@ -13,9 +14,8 @@ sys.path.append("")
 from PIL import Image
 
 # Various project-related imports
-from globals import State, tool_call_strings, layout_changing_tools
-from helpers import add_message, get_chats_by_key, create_file_if_not_exists, flowstep_string_state_machine
-from user_profile_model import profile_template
+from globals import State, layout_changing_tools, common_retry_policy
+from helpers import add_message, create_file_if_not_exists, flowstep_string_state_machine
 
 # LangGraph
 from langgraph.graph import StateGraph, START
@@ -40,12 +40,12 @@ DISPLAY_GRAPH = False
 
 def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder = StateGraph(State)
-    builder.add_node("supervisor", supervisor_node)
-    builder.add_node("profiler", profiler_node)
-    builder.add_node("concierge", concierge_node)
-    builder.add_node("archivist", archivist_node)
-    builder.add_node("plotter", plotter_node)
-    builder.add_node("presenter", presenter_node)
+    builder.add_node("supervisor", supervisor_node, retry=common_retry_policy)
+    builder.add_node("profiler", profiler_node, retry=common_retry_policy)
+    builder.add_node("concierge", concierge_node, retry=common_retry_policy)
+    builder.add_node("archivist", archivist_node, retry=common_retry_policy)
+    builder.add_node("plotter", plotter_node, retry=common_retry_policy)
+    builder.add_node("presenter", presenter_node, retry=common_retry_policy)
 
     builder.add_edge(START, "supervisor")
     builder.add_edge(START, "profiler")
