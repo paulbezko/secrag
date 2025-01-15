@@ -97,7 +97,6 @@ export default {
 
     handleScroll() {
       const chatContainer = document.getElementById('chatContainer');
-      // console.log(chatContainer.scrollHeight, chatContainer.scrollTop);
       if (chatContainer.scrollTop === 0 && this.chatFullyLoaded === false) {this.$emit('get-x-more-messages')}
     },
 

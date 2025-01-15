@@ -251,7 +251,6 @@ input:-webkit-autofill:active {
 }
 
 .assistant-message.single {
-  /* text-align: center; */
   max-width: 80rem;
   min-height: fit-content;
   height: 100%;
