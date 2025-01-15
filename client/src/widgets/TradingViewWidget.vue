@@ -7,13 +7,11 @@
 </template>
 
 <script>
-import { onMounted, ref, watch, } from 'vue';
-
 export default {
   name: 'TradingViewWidget',
   props: {
-    ticker: {
-      type: String,
+    params: {
+      type: Object,
       required: true,
     },
     theme: {
@@ -21,26 +19,29 @@ export default {
       default: 'light',
     },
   },
-  setup(props) {
-    const container = ref(null);
-
+  data() {
+    return {
+      container: null,  // Ref for container
+    };
+  },
+  methods: {
     // Function to update the widget based on the ticker symbol
-    const loadWidget = () => {
+    loadWidget() {
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
       script.type = 'text/javascript';
       script.async = true;
       script.innerHTML = `{
         "symbols": [
-          ["${props.ticker}|1M"]
+          ["${this.params.ticker}|1M"]
         ],
         "chartOnly": false,
         "width": "100%",
         "height": "400",
         "locale": "en",
-        "backgroundColor": ${props.theme === 'dark' ? '"#1a1a1b"' : '"#F4F6F9"'},
-        "gridColor": ${props.theme === 'dark' ? '"#2d2d30"' : '"#D1D5DB"'},
-        "colorTheme": ${props.theme === 'dark' ? '"dark"' : '"light"'},
+        "backgroundColor": ${this.theme === 'dark' ? '"#1a1a1b"' : '"#F4F6F9"'},
+        "gridColor": ${this.theme === 'dark' ? '"#2d2d30"' : '"#D1D5DB"'},
+        "colorTheme": ${this.theme === 'dark' ? '"dark"' : '"light"'},
         "autosize": true,
         "showVolume": true,
         "showMA": false,
@@ -65,28 +66,22 @@ export default {
       }`;
 
       // Clear any existing widget before appending a new one
-      if (container.value) {
-        container.value.innerHTML = '';
-        container.value.appendChild(script);
+      if (this.container) {
+        this.container.innerHTML = '';
+        this.container.appendChild(script);
       }
-    };
-
-    // Load widget when the component is mounted
-    onMounted(() => {
-      loadWidget();
-    });
-
-    // Watch for changes in the ticker prop and reload the widget
-    watch([() => props.ticker, () => props.theme], loadWidget);
-
-    return {
-      container,
-    };
+    },
+  },
+  mounted() {
+    this.container = this.$refs.container;
+    this.loadWidget();
   },
 };
 </script>
+
 <style scoped>
 .widget-container-child {
+  height: 400px;
   position: relative;
   margin: -1px;
 }

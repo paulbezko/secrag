@@ -1,20 +1,28 @@
 from fastapi.responses import JSONResponse
-from .utils import get_assistant_response, mongo_get_chat,mongo_insert_chat, mongo_log_response, mongo_insert_message, mongo_get_user_profile, mongo_update_user_profile
+from .utils import (
+    get_assistant_response, 
+    mongo_get_x_more_messages,
+    mongo_insert_chat, 
+    mongo_log_response, 
+    mongo_insert_message, 
+    mongo_get_user_profile, 
+    mongo_update_user_profile)
 from ..general.utils import log, decode_token
 from ...globals import config, mongo
 from fastapi import APIRouter, Request
 
 routes = APIRouter()
 
-@routes.get('/get-chat-history')
-async def get_chat_history_get(token: str):
+
+@routes.get('/get-x-more-messages')
+async def get_x_more_messages_get(token: str, count: int, skip: int):
 
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    chat = mongo_get_chat(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'])
+    x_more_messages = mongo_get_x_more_messages(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'], count, skip)
 
-    return JSONResponse(content={'chat': chat})
+    return JSONResponse(content={'x_more_messages': x_more_messages})
 
 
 @routes.get('/get-user-profile')

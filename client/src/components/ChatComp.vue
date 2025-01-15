@@ -1,9 +1,18 @@
 <template>
-  <div v-if="view === 'chat'" class="flex-column width-100 gap-2 no-scrollbar chat-container" id="chatContainer" style="overflow-y: auto;" :style="{ 'max-height': `${chatContainerHeight}px` }">
+
+  <div 
+    v-if="view === 'chat'" 
+    class="flex-column width-100 gap-2 no-scrollbar chat-container" 
+    id="chatContainer" 
+    style="overflow-y: auto;" 
+    :style="{ 'max-height': `${chatContainerHeight}px` }"
+    @scroll="handleScroll()"
+  >
+
     <div v-for="(message, index) in chat" :key="index" class="flex-row center gap-1 width-100 chat-message">
       
       <!-- Assistant Message -->
-      <div v-if="message.role === 'assistant'" :class="['flex-row', 'center', 'gap-1', 'row-to-column', chat.length === 1 ? 'assistant-message single' : 'assistant-message']">
+      <div v-if="message.role === 'assistant'" :class="['flex-row', 'center', 'gap-1', chat.length === 1 ? 'assistant-message single' : 'assistant-message']">
         <img
           v-if="isLatestAssistantMessage(message)" 
           :src="input !== '' 
@@ -12,7 +21,7 @@
               : require('@/assets/dashboard/slightly_smiling_face_3d.png'))"
           class="assistant-image"
         />
-        <img  v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')"  class="assistant-image assistant-image-past"/>
+        <img v-if="!isLatestAssistantMessage(message)" :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image assistant-image-past"/>
         <div v-if="isLatestAssistantMessage(message) && responseFlowstep !== ''" class="chat-text assistant-text assistant-text-flowstep">{{ responseFlowstep }}</div>
         <div class="chat-text" :class="chat.length === 1 ? 'assistant-text single' : 'assistant-text'">
           <div v-for="(part, index) in processMessage(message)" :key="index">
@@ -20,7 +29,7 @@
 
             <!-- Widget generation -->
             <ApexChartsWidget v-else-if="part.type === 'treemap'" :theme="theme" :params="part.params" />
-            <TradingViewWidget v-else-if="part.type === 'pricechart'" :theme="theme" :params="part.params" />
+            <TradingViewWidget v-else-if="part.type === 'stock_price'" :theme="theme" :params="part.params" />
           </div>
         </div>
       </div>
@@ -41,6 +50,7 @@ import TradingViewWidget from '@/widgets/TradingViewWidget.vue';
 export default {
   props: {
     chat: Array,
+    chatFullyLoaded: Boolean,
     view: String,
     input: String,
     responseIsProcessing: Boolean,
@@ -81,10 +91,14 @@ export default {
       return parts;
     },
 
-
-
     markdownify(text) {
       return messaging.markdownify(text);
+    },
+
+    handleScroll() {
+      const chatContainer = document.getElementById('chatContainer');
+      // console.log(chatContainer.scrollHeight, chatContainer.scrollTop);
+      if (chatContainer.scrollTop === 0 && this.chatFullyLoaded === false) {this.$emit('get-x-more-messages')}
     },
 
     chatScrollToBottom() {

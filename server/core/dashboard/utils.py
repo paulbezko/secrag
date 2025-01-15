@@ -73,15 +73,32 @@ def mongo_log_response(response):
         print(response['message'])
 
 
-def mongo_get_chat(collection, uuid):
-    try:
-        user_data = collection.find_one({"_id": uuid})
-        if user_data:
-            return user_data.get("chats", {}).get("general", {})
-        else:
-            return {"error": f"User with UUID '{uuid}' not found."}
-    except Exception as e:
-        return {"error": f"Error retrieving chat for '{uuid}': {str(e)}"}
+def mongo_get_x_more_messages(collection, uuid, count, skip):
+    skip *= count
+    pipeline = [
+        {"$match": {"_id": uuid}},
+        {"$project": {
+            "messages_count": {"$size": "$chats.general.messages"},
+            "more_messages": {
+                "$cond": [
+                    {"$gt": [{"$subtract": [{"$size": "$chats.general.messages"}, skip]}, 0]},
+                    {"$slice": [
+                        "$chats.general.messages",
+                        {"$max": [0, {"$subtract": [{"$size": "$chats.general.messages"}, skip + count]}]},
+                        {"$min": [count, {"$subtract": [{"$size": "$chats.general.messages"}, skip]}]}
+                    ]},
+                    []
+                ]
+            }
+        }}
+    ]
+    
+    result = list(collection.aggregate(pipeline))
+
+    if result:
+        return result[0].get("more_messages", [])
+    else:
+        return []
     
 
 def mongo_insert_chat(collection, uuid, chat_id):
