@@ -1,4 +1,6 @@
 from typing import Annotated, TypedDict
+from openai import APIError
+from langgraph.pregel import RetryPolicy
 from langchain_openai import ChatOpenAI
 from langgraph.graph.message import add_messages
 
@@ -73,3 +75,5 @@ tool_call_strings = {
     'get_current_time': "Thinking", 
     'stock_price_plotter': "Plotting stock price",  
 } 
+
+common_retry_policy = RetryPolicy(retry_on=(APIError,))
