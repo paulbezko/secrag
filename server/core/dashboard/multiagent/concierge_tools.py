@@ -15,17 +15,17 @@ from yfinance import Ticker
 
 @tool
 async def login(*args) -> str:
-    """"Login tool. This tool adjusts the frontend so that the user could input his email and password."""
+    """"Use this when user wants to login. This tool adjusts the frontend so that the user could input his email and password."""
     return "Login tool executed."
 
 @tool
 async def signup_email(*args) -> str:
-    """"Signup tool. This tool adjusts the frontend so that the user could input his email, after which a confirmation email will be sent."""
+    """"Use this when user wants to sign up. This tool adjusts the frontend so that the user could input his email, after which a confirmation email will be sent."""
     return "Signup tool executed."
 
 @tool
 async def forgot_password(*args) -> str:
-    """"Forgot Password tool. This tool adjusts the frontend so that the user could input his email, after which a confirmation email with password reset link will be sent."""
+    """"Use this when user forgot password or wants to reset password. This tool adjusts the frontend so that the user could input his email, after which a confirmation email with password reset link will be sent."""
     return "Forgot Password tool executed."
 
 @tool
