@@ -5,6 +5,7 @@ import axios from 'axios';
 import { interfacing } from './interfacing.js';
 
 export const messaging = {
+
   markdownify(text) {
     if (typeof text !== 'string') {return '';}
     return marked(text, { breaks: false });
@@ -55,6 +56,7 @@ export const messaging = {
   processTool(ctx, data) {
     ctx.responseFlowstep = data.flowstep;
     if (data.name && data.name.startsWith('layout_')) {
+      if (ctx.isMobile === true) {ctx.premadeSuggestionsShown = false}
       if (data.name === "layout_signup_email") {ctx.inputMode = 'signup_email'} 
       else if (data.name === "layout_login") {ctx.inputMode = 'login'} 
       else if (data.name === "layout_forgot_password") {ctx.inputMode = 'forgot_password'}
