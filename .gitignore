@@ -53,3 +53,4 @@ database/logs/*
 autoupdate.log
 .github
 server/memory/*
+server/tests/*

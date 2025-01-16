@@ -104,8 +104,8 @@ export default {
           width: 5,
         },
         colors: this.theme === "dark" 
-          ? ["#2a3b54", "#404045", "#8a7300"] 
-          : ["#4a90e2", "#D1D5DB", "#ffd54f"],
+          ? ["#404045", "#2a3b54", "#8a7300"] 
+          : ["#D1D5DB", "#89b4e6", "#ffd54f"],
       },
     };
   },
