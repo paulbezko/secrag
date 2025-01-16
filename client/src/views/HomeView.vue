@@ -1,10 +1,15 @@
 <template>
   <div class="flex-column center width-100 height-100svh" id="dashboard">
-    <div class="flex-column center space-between width-100 height-100svh" style="max-width: 80rem; ">
+    
+    <div v-if="!pageLoaded" class="page-loading-message flex-row center width-100 gap-1">
+      <img :src="require('@/assets/dashboard/relieved_face_3d.png')" class="assistant-image"/>
+      <div class="assistant-text-flowstep">Loading...</div>
+    </div>
 
+    <div :class="{ 'hidden': !pageLoaded }" class="flex-column center space-between width-100 height-100svh" style="max-width: 80rem; ">
+      
       <!-- Header -->
       <div style="min-height: 1rem;" class="width-100 header" id="header"></div>
-
       <div class="flex-column width-100 height-100 center">
 
         <!-- Chat container section -->
@@ -13,11 +18,14 @@
 
           :input="input"
           :chat="chat"
+          :chatFullyLoaded="chatFullyLoaded"
           :view="view"
           :responseIsProcessing="responseIsProcessing"
           :responseFlowstep="responseFlowstep"
           :theme="theme"
           :chatContainerHeight="chatContainerHeight"
+
+          @get-x-more-messages="getXMoreMessages"
         />
 
         <!-- Profile container section -->
@@ -109,6 +117,7 @@ export default {
 
   data() {
     return {
+      pageLoaded: false,
       isMobile: window.innerWidth <= 796,
       theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       view: 'chat',
@@ -120,6 +129,8 @@ export default {
       
       chatContainerHeight: null,
       chat: [],
+      chatChunksLoaded: 0,
+      chatFullyLoaded: false,
 
       organicSuggestions: [],
       premadeSuggestions: [],
@@ -155,7 +166,7 @@ export default {
     else if (localStorage.getItem('_u')) {
       const token = localStorage.getItem('_u');
       promises.push(
-        this.getChatHistory(token),
+        this.getXMoreMessages(),
         this.getUserData(token).then(() => {
           if (this.userStatus === 'anonymous') {
             // messaging.sendManualAssistantMessage(this, "Welcome back!");
@@ -222,7 +233,7 @@ export default {
 
       socket.on("suggestions", (data) => {this.organicSuggestions = data.suggestions;});
       socket.on("flowstep", (data) => {this.responseFlowstep = data.flowstep});
-      socket.on("widget", (data) => {messaging.processWidget(this, data)});
+      socket.on("widget", (data) => {console.log(data), messaging.processWidget(this, data)});
       socket.on("tool", (data) => {messaging.processTool(this, data)});
     },
 
@@ -262,6 +273,33 @@ export default {
     async getChatHistory(token) {
       const result = await axios.get(`${config.apiUrl}/api/get-chat-history?token=` + token);
       this.chat = result.data.chat.messages;
+      this.chatChunksLoaded += 1
+    },
+
+    async getXMoreMessages() {
+      const messageCount = 20;
+
+      const chatContainer = document.getElementById("chatContainer");
+      const scrollHeightBefore = chatContainer.scrollHeight;
+      const scrollTopBefore = chatContainer.scrollTop;
+
+      const result = await axios.get(
+        `${config.apiUrl}/api/get-x-more-messages?token=` +
+          localStorage.getItem('_u') +
+          `&count=` + messageCount +
+          `&skip=` + this.chatChunksLoaded
+      );
+
+      if (result.data.x_more_messages.length < messageCount) {this.chatFullyLoaded = true;}
+
+      this.chat = [...result.data.x_more_messages, ...this.chat];
+      this.chatChunksLoaded += 1;
+
+      requestAnimationFrame(() => {
+        const scrollHeightAfter = chatContainer.scrollHeight;
+        const heightDifference = scrollHeightAfter - scrollHeightBefore;
+        chatContainer.scrollTop = scrollTopBefore + heightDifference;
+      });
     },
 
     async getUserProfile(token) {
@@ -289,6 +327,7 @@ export default {
     // MESSAGING
     async sendMessage(input) {await messaging.sendMessage(this, input)},
     async stopResponse() {messaging.stopResponse(this, socket)},
+    sendManualAssistantMessage(ctx, message) {messaging.sendManualAssistantMessage(ctx, message)},
 
     // AUTHENTICATING
     async signupEmail(email) {await authenticating.signupEmail(this, email);},

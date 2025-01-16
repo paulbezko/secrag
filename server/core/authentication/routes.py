@@ -24,6 +24,7 @@ async def initi_anon_user_get():
     token = encode_token({'uuid': uuid, 'user_status': 'anonymous'})
     return JSONResponse(content={'token': token})
 
+
 # This route is used for email signup confirmation and password reset links
 @routes.get('/process-url-token')
 async def decode_url_token_get(token: str):
@@ -52,6 +53,7 @@ async def decode_url_token_get(token: str):
         return JSONResponse(content={'action': 'reset_password', 'input_mode': 'reset_password'})
     
     else: return JSONResponse(content={'error': 'Invalid token.'})
+
 
 @routes.post('/signup-email')
 async def signup_email_post(request: Request):

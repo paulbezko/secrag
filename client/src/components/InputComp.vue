@@ -32,13 +32,13 @@
         type="email" 
         placeholder="Email"
         @keydown.enter.exact.prevent 
-        @keyup.enter.exact="$emit('signup-email',inputEmail)"
+        @keyup.enter.exact="$emit('signup-email', inputEmail)"
       >
       <div class="flex-row center gap-1">
         <div class="button-send" :class="{ 'input-chat-disabled': responseIsProcessing }" @click="$emit('authenticate-with-google')">
           <div class="icon fa-brands fa-google"></div>
         </div>
-        <div class="button-send" @click="$emit('signup-email',inputEmail)">
+        <div class="button-send" @click="$emit('signup-email', inputEmail)">
           <div class="icon fa-solid fa-arrow-up"></div>
         </div>
       </div>

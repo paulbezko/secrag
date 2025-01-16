@@ -128,6 +128,8 @@ def execute_query(query, params, retries=3):
 
 def send_email_from_template(email, template, payload):
 
+    print(email, template, payload)
+
     head = f"""
         <head>
             <style>
