@@ -77,7 +77,11 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
         prompt_suggestions = []
 
         plotter_buffer = ""
+
         tool_call_buffer = {}
+        tool_call_index = 0
+        tool_call_entry_buffer = ""
+
 
         await socketio.emit('response_started', to=socket_id)
         async for msg, metadata in graph.astream({"messages": messages[-10:], "user_profile": user_profile, "user_id": user_id, "latest_user_message": user_input}, {"recursion_limit":100}, stream_mode="messages"):
@@ -86,19 +90,43 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
                 print(f"-----------------\n[MSG] {type(msg)}: \n{msg}\n\n[METADATA]:\n{metadata}\n")
 
             if not msg.content and isinstance(msg, AIMessageChunk) and 'tool_calls' in msg.additional_kwargs:
+                # New message ID indicates that a different tool is being used
                 if msg.id not in tool_call_buffer:
-                    tool_call_buffer[msg.id] = {"name": "", "buffer": ""}
+                    # Initialize tool call record
+                    tool_call_buffer[msg.id] = {"name": "", "buffer": []}
+                    # Record tool call index
+                    tool_call_index = msg.additional_kwargs["tool_calls"][0]["index"]
+
+                # The same tool is used, but the index has changed. This indicates that the same tool is being used again with a different input
+                if msg.additional_kwargs["tool_calls"][0]["index"] != tool_call_index:
+                    # Record tool call index
+                    tool_call_index = msg.additional_kwargs["tool_calls"][0]["index"]
+                    # Add previous tool call entry buffer of the to tool call buffer
+                    tool_call_buffer[msg.id]["buffer"].append(tool_call_entry_buffer)
+                    # Reset tool call entry buffer
+                    tool_call_entry_buffer = ""
+
                 for tool_call_chunk in msg.tool_call_chunks:
-                    if tool_call_chunk["name"]:
+                    # Record a tool name if it is not already recorded
+                    if tool_call_chunk["name"] and not tool_call_buffer[msg.id]["name"]:
                         tool_call_buffer[msg.id]["name"] = tool_call_chunk["name"]
-                    tool_call_buffer[msg.id]["buffer"] += tool_call_chunk["args"]
+                    
+                    # Sometimes LLMs stream an empty dictionary. We do not want that.
+                    if tool_call_chunk["args"] != "{}":
+                        # Add tool call arguments to the tool call entry buffer
+                        tool_call_entry_buffer += tool_call_chunk["args"]
 
             elif not msg.content and isinstance(msg, AIMessageChunk) and msg.response_metadata and msg.response_metadata["finish_reason"] == "tool_calls":
+                # Tool call entry buffer is complete. Add it to the tool call buffer
+                tool_call_buffer[msg.id]["buffer"].append(tool_call_entry_buffer)
+                tool_call_entry_buffer = ""
                 
-                flowstep_string = flowstep_string_state_machine(tool_call_buffer[msg.id])
+                flowstep_strings = flowstep_string_state_machine(tool_call_buffer[msg.id])
                 print("[TOOL CALL DATA]:", tool_call_buffer[msg.id])
-                print("[FLOWSTEP]:", flowstep_string) 
-                await socketio.emit('tool', {'name': msg.name, 'flowstep': flowstep_string}, to=socket_id)
+
+                for flowstep_string in flowstep_strings: 
+                    print("[FLOWSTEP]:", flowstep_string) 
+                    await socketio.emit('tool', {'name': msg.name, 'flowstep': flowstep_string}, to=socket_id)
 
             if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "presenter": 
                 if stop_signals.get(socket_id): 
