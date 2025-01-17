@@ -61,22 +61,24 @@ def get_last_node_message(messages: list, node_name: Literal["concierge", "archi
     return last_message
 
 def flowstep_string_state_machine(tool_call_data: dict):
-        tool_call_buffer_data = json.loads(tool_call_data["buffer"])
+        flowstep_strings = []
 
-        if tool_call_data["name"] == "retrieve_data_from_filing":           
-            flowstep_string = f"Reading {tool_call_buffer_data['tool_input']['filing_type']} filing from {tool_call_buffer_data['tool_input']['filing_date']}... "
+        for i in tool_call_data["buffer"]:
+            tool_call_buffer_data = json.loads(i)       
+            if tool_call_data["name"] == "retrieve_data_from_filing":           
+                flowstep_string = f"Reading {tool_call_buffer_data['tool_input']['filing_type']} filing from {tool_call_buffer_data['tool_input']['filing_date']}... "
 
-        elif tool_call_data["name"] == "search_tickers":
-            flowstep_string = f"Retrieving ticker for {tool_call_buffer_data['query']}... "
+            elif tool_call_data["name"] == "search_tickers":
+                flowstep_string = f"Retrieving ticker for {tool_call_buffer_data['query']}... "
 
-        elif tool_call_data["name"] == "get_available_filings":
-            flowstep_string = f"Retrieving available {tool_call_buffer_data['year']} filings for {tool_call_buffer_data['ticker']}... "
+            elif tool_call_data["name"] == "get_available_filings":
+                flowstep_string = f"Retrieving available {tool_call_buffer_data['year']} filings for {tool_call_buffer_data['ticker']}... "
 
-        elif tool_call_data["name"] == "ticker_news":
-            flowstep_string = f"Searching news for {tool_call_buffer_data['query']}... "
+            elif tool_call_data["name"] == "ticker_news":
+                flowstep_string = f"Searching news for {tool_call_buffer_data['query']}... "
 
-        else:
-            flowstep_string = tool_call_strings[tool_call_data["name"]]+"... "
-
-        return flowstep_string
+            else:
+                flowstep_string = tool_call_strings[tool_call_data["name"]]+"... "
+            flowstep_strings.append(flowstep_string)
+        return flowstep_strings
 
