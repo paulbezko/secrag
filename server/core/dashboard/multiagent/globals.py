@@ -1,8 +1,10 @@
-from typing import Annotated, TypedDict
+from typing import Annotated, Any, TypedDict
 from openai import APIError
 from langgraph.pregel import RetryPolicy
 from langchain_openai import ChatOpenAI
 from langgraph.graph.message import add_messages
+from langchain_core.messages import BaseMessage
+from langgraph.managed import IsLastStep, RemainingSteps
 
 from dotenv import load_dotenv
 
@@ -16,6 +18,13 @@ class State(TypedDict):
     user_profile: str
     user_id: str
     
+# Used to pass additional context like current date to the system prompts of Concierge and Archivist
+class CustomConciergeArchivistState(TypedDict):
+    current_date: str
+    messages: Annotated[list[BaseMessage], add_messages]
+    user_profile: Any
+    is_last_step: IsLastStep
+    remaining_steps: RemainingSteps
 
 supported_form_types = ["10-Q", "10-K", "8-K", "4", "3", "144", "SC 13", "DEF 14"]
 
