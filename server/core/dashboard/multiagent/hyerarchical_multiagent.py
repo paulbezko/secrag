@@ -15,7 +15,7 @@ from PIL import Image
 
 # Various project-related imports
 from globals import State, layout_changing_tools, common_retry_policy
-from helpers import add_message, create_file_if_not_exists, flowstep_string_state_machine
+from helpers import add_message, create_file_if_not_exists, flowstep_string_state_machine, tool_call_strings
 
 # LangGraph
 from langgraph.graph import StateGraph, START
@@ -96,6 +96,8 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
                     tool_call_buffer[msg.id] = {"name": "", "buffer": []}
                     # Record tool call index
                     tool_call_index = msg.additional_kwargs["tool_calls"][0]["index"]
+                    # Make sure the buffer is empty when a new message id is detected
+                    tool_call_entry_buffer = ""
 
                 # The same tool is used, but the index has changed. This indicates that the same tool is being used again with a different input
                 if msg.additional_kwargs["tool_calls"][0]["index"] != tool_call_index:
@@ -120,14 +122,21 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
                 # Tool call entry buffer is complete. Add it to the tool call buffer
                 tool_call_buffer[msg.id]["buffer"].append(tool_call_entry_buffer)
                 tool_call_entry_buffer = ""
+
+                # Finally some error handling
+                try:
+                    flowstep_strings = flowstep_string_state_machine(tool_call_buffer[msg.id])
+                    print("[TOOL CALL DATA]:", msg.name, tool_call_buffer[msg.id])
+
+                    for flowstep_string in flowstep_strings: 
+                        print("[FLOWSTEP]:", flowstep_string) 
+                        await socketio.emit('tool', {'name': msg.name, 'flowstep': flowstep_string}, to=socket_id)
                 
-                flowstep_strings = flowstep_string_state_machine(tool_call_buffer[msg.id])
-                print("[TOOL CALL DATA]:", tool_call_buffer[msg.id])
-
-                for flowstep_string in flowstep_strings: 
-                    print("[FLOWSTEP]:", flowstep_string) 
-                    await socketio.emit('tool', {'name': msg.name, 'flowstep': flowstep_string}, to=socket_id)
-
+                except Exception as e:
+                    print("[FLOWSTEP_ERROR]:", tool_call_buffer[msg.id], "\n", str(e))
+                    if msg.name in tool_call_strings:
+                        await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[tool_call_buffer[msg.id]["name"]]}, to=socket_id)
+            
             if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "presenter": 
                 if stop_signals.get(socket_id): 
                     stop_signals.pop(socket_id, None)
