@@ -73,13 +73,6 @@ async def get_available_filings(
         raise e
 
 @tool
-async def get_current_time(*args) -> str:
-    """Returns the current time in YYYY-MM-DD format."""
-    current_time = datetime.now().strftime("%Y-%m-%d")
-    debug_print("[get_current_time]",current_time)
-    return current_time
-
-@tool
 async def get_all_available_filings_tickers_and_years(
 *args
 ) -> List[List[str]]:
@@ -143,9 +136,7 @@ archivist_tools = [
     get_available_filings,
     get_all_available_filings_tickers_and_years,
     search_tickers,
-    get_current_time,
-    stock_price_plotter,
-    get_current_time
+    stock_price_plotter
 ]
 
 archivist_toolnames = [tool.name for tool in archivist_tools]
