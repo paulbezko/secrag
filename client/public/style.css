@@ -219,8 +219,8 @@ input:-webkit-autofill:active {
   pointer-events: none;
 }
 
-.chat-container > :first-child {margin-top: 20svh;}
-.chat-container > :last-child {margin-bottom: 20svh;}
+.chat-container > :first-child {margin-top: 30svh;}
+.chat-container > :last-child {margin-bottom: 30svh;}
 
 .chat-message {
   font-size: 1.4rem;
@@ -270,6 +270,7 @@ input:-webkit-autofill:active {
 
 .assistant-text.single {
   width: 100%;
+  margin-right: 0;
 }
 
 .assistant-text-flowstep {

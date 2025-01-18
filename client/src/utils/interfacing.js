@@ -10,6 +10,7 @@ export const interfacing = {
           requestAnimationFrame(() => {
             interfacing.updateChatHeight(ctx);
             interfacing.checkScreenWidth(ctx);
+            console.log('page loaded');
             ctx.pageLoaded = true;
           });
         }

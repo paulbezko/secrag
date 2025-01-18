@@ -64,6 +64,7 @@ def flowstep_string_state_machine(tool_call_data: dict):
         flowstep_strings = []
 
         for i in tool_call_data["buffer"]:
+            print(i)
             tool_call_buffer_data = json.loads(i)       
             if tool_call_data["name"] == "retrieve_data_from_filing":           
                 flowstep_string = f"Reading {tool_call_buffer_data['tool_input']['filing_type']} filing from {tool_call_buffer_data['tool_input']['filing_date']}... "
