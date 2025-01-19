@@ -31,6 +31,7 @@ from agent_concierge import concierge_node
 from agent_archivist import archivist_node
 from agent_plotter import plotter_node
 from agent_presenter import presenter_node
+from agent_layout_changer import layout_changer_node
 from agent_prompt_suggestions import prompt_suggestions_tool
 
 # Global Stop Signals
@@ -45,6 +46,7 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder.add_node("concierge", concierge_node, retry=common_retry_policy)
     builder.add_node("archivist", archivist_node, retry=common_retry_policy)
     builder.add_node("plotter", plotter_node, retry=common_retry_policy)
+    builder.add_node("layout_changer", layout_changer_node, retry=common_retry_policy)
     builder.add_node("presenter", presenter_node, retry=common_retry_policy)
 
     builder.add_edge(START, "supervisor")
