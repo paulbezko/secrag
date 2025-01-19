@@ -19,7 +19,7 @@ class State(TypedDict):
     user_id: str
     
 # Used to pass additional context like current date to the system prompts of Concierge and Archivist
-class CustomConciergeArchivistState(TypedDict):
+class CustomSECRAGAgentState(TypedDict):
     current_date: str
     messages: Annotated[list[BaseMessage], add_messages]
     user_profile: Any
