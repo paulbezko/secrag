@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 from custom_langgraph_methods import create_react_agent_with_node_name
-from globals import State, llm, CustomConciergeArchivistState
+from globals import State, llm, CustomSECRAGAgentState
 from langgraph.types import Command
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -50,8 +50,7 @@ concierge_system_prompt = """\
         
         When interacting with a user for the first time (message history is empty), don't forget to introduce yourself in a friendly, concise way.
         
-        You have a tool that helps you to find a company's ticker based on keywords.
-        You are also given some tools to retrieve news and financials based on company's ticker.
+        You are given some tools to retrieve news, analyst price targets, and financials based on company's ticker.
         
         If query is about companies other than Apple (ticker: AAPL), reply that this information is only available to Subscribers.
 
@@ -71,7 +70,7 @@ concierge_agent = create_react_agent_with_node_name(
     node_name="concierge", 
     tools=concierge_tools, 
     state_modifier=concierge_prompt_template,
-    state_schema=CustomConciergeArchivistState
+    state_schema=CustomSECRAGAgentState
 )
 
 async def concierge_node(state: State) -> Command[Literal["presenter", "plotter"]]:

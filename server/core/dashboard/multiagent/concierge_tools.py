@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("")
 
-from server.core.dashboard.multiagent.archivist_tools import ticker_vectorstore
+from archivist_tools import ticker_vectorstore
 
 import json
 
