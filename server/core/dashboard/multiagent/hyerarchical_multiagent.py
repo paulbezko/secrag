@@ -31,13 +31,14 @@ from agent_concierge import concierge_node
 from agent_archivist import archivist_node
 from agent_plotter import plotter_node
 from agent_presenter import presenter_node
+from agent_tailor import tailor_node
 from agent_layout_changer import layout_changer_node
 from agent_prompt_suggestions import prompt_suggestions_tool
 
 # Global Stop Signals
 from server.globals import stop_signals
 
-DISPLAY_GRAPH = False
+DISPLAY_GRAPH = True
 
 def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder = StateGraph(State)
@@ -48,6 +49,7 @@ def create_graph(display_graph: bool = False) -> CompiledStateGraph:
     builder.add_node("plotter", plotter_node, retry=common_retry_policy)
     builder.add_node("layout_changer", layout_changer_node, retry=common_retry_policy)
     builder.add_node("presenter", presenter_node, retry=common_retry_policy)
+    builder.add_node("tailor", tailor_node, retry=common_retry_policy)
 
     builder.add_edge(START, "supervisor")
     builder.add_edge(START, "profiler")
@@ -139,7 +141,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
                     if msg.name in tool_call_strings:
                         await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[tool_call_buffer[msg.id]["name"]]}, to=socket_id)
             
-            if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "presenter": 
+            if msg.content and not isinstance(msg, HumanMessage) and metadata["langgraph_node"] == "tailor": 
                 if stop_signals.get(socket_id): 
                     stop_signals.pop(socket_id, None)
                     break
@@ -215,8 +217,8 @@ async def main():
         if user_input.lower() == "exit":
             print("Exiting...")
             break
-
-        output = await invoke_graph(agent, user_id, {}, user_input, debug=False)
+        example_profile = "A beginner trader who has little experience in trading. A big Apple fan that is curious about how the company works on a day-to-day basis"
+        output = await invoke_graph(agent, user_id, example_profile, user_input, debug=False)
         print(f"Assistant: \n {output["buffer"]}")
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ presenter_prompt = ChatPromptTemplate.from_messages(
 
 presenter_chain = presenter_prompt | llm
 
-async def presenter_node(state: State) -> Command[Literal["__end__"]]:
+async def presenter_node(state: State) -> Command[Literal["tailor"]]:
 
     last_user_message = get_last_message(state["messages"], "user")
     last_concierge_message = get_last_node_message(state["messages"], "concierge")
@@ -60,5 +60,5 @@ async def presenter_node(state: State) -> Command[Literal["__end__"]]:
                 )
             ]
         },
-        goto="__end__"
+        goto="tailor"
     )

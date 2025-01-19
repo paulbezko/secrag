@@ -39,7 +39,7 @@ layout_changer_agent = create_react_agent_with_node_name(
     state_schema=CustomSECRAGAgentState
 )
 
-async def layout_changer_node(state: State) -> Command[Literal["presenter", "plotter"]]:
+async def layout_changer_node(state: State) -> Command[Literal["presenter"]]:
     result = await layout_changer_agent.ainvoke({"messages": state["messages"], "user_profile": state["user_profile"], "user_message": state["latest_user_message"], "current_date": datetime.now().strftime("%Y-%m-%d")})
     
     goto = "presenter"

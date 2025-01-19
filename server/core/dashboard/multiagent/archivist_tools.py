@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 
 from vectorstore import vectorstore_manager 
@@ -71,6 +72,34 @@ async def get_available_filings(
     except Exception as e:
         print(traceback.format_exc())
         raise e
+    
+@tool
+async def get_latest_filings(
+    ticker: str | None = Field("Company ticker")
+) -> List[List[str]]:
+    """Use ticker that you found using search_tickers or from the message history to search for metadata on ten latest filings that are available in the database for the input ticker."""
+    try:
+        metadata = {"ticker": ticker.lower(), "year":[str(int(datetime.now().year)-1), str(datetime.now().year)]}
+        debug_print("[get_latest_filings] Metadata:", metadata)
+        chunks = await vectorstore_manager.vectorstore.asimilarity_search("", k=1000, fetch_k=1000, filter=metadata) 
+        if len(chunks) == 0:
+            debug_print("[get_latest_filings]","No filings available for this ticker")
+            return "No filings available for this ticker"
+        else:
+            debug_print("[get_latest_filings] chunks:",len(chunks))
+        available_filings = []
+        header = ["ticker", "filing_date", "filing_type"]
+        
+        for chunk in chunks:
+            data = [chunk.metadata["ticker"], chunk.metadata["date"], chunk.metadata["form"]]
+            if data not in available_filings:
+                available_filings.append(data)
+                
+        sorted_filings = sorted(available_filings, key=lambda x: x[1], reverse=True)
+        return header + sorted_filings[:10]
+    except Exception as e:
+        print(traceback.format_exc())
+        raise e
 
 @tool
 async def get_all_available_filings_tickers_and_years(
@@ -134,6 +163,7 @@ async def retrieve_data_from_filing(
 archivist_tools = [
     retrieve_data_from_filing,
     get_available_filings,
+    get_latest_filings,
     get_all_available_filings_tickers_and_years,
     search_tickers,
     stock_price_plotter
@@ -141,5 +171,10 @@ archivist_tools = [
 
 archivist_toolnames = [tool.name for tool in archivist_tools]
 
+async def main():
+    output = await get_latest_filings.ainvoke("aapl")
+    print(output)
+
 if __name__ == "__main__":
     print(archivist_toolnames)
+    asyncio.run(main()) 
