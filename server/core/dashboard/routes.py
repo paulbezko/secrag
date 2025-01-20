@@ -20,7 +20,6 @@ async def get_x_more_messages_get(token: str, count: int, skip: int):
     try: user_info = decode_token(token)
     except: return JSONResponse(content={'error': 'Error decoding token'})
 
-    print(count, skip)
     x_more_messages = mongo_get_x_more_messages(mongo.db[f"chats_{config.get('MODE')}"], user_info['uuid'], count, skip)
 
     return JSONResponse(content={'x_more_messages': x_more_messages})

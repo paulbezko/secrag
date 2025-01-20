@@ -228,7 +228,7 @@ export default {
       socket.on("suggestions", (data) => {this.organicSuggestions = data.suggestions;});
       socket.on("flowstep", (data) => {console.log('flowstep received', data.flowstep), this.responseFlowstep = data.flowstep});
       socket.on("widget", (data) => {console.log(data), messaging.processWidget(this, data)});
-      socket.on("tool", (data) => {messaging.processTool(this, data)});
+      socket.on("tool", (data) => {console.log(data), messaging.processTool(this, data)});
     },
 
     // SESSION HANDLING
