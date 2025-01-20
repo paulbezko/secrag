@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal
 
 from custom_langgraph_methods import create_react_agent_with_node_name
-from globals import State, llm, CustomConciergeArchivistState
+from globals import State, llm, CustomSECRAGAgentState
 from helpers import should_call_plotter
 from archivist_tools import archivist_tools
 
@@ -45,7 +45,7 @@ archivist_agent = create_react_agent_with_node_name(
     node_name="archivist", 
     tools=archivist_tools, 
     state_modifier=archivist_prompt_template,
-    state_schema=CustomConciergeArchivistState    
+    state_schema=CustomSECRAGAgentState    
 )
 
 async def archivist_node(state: State) -> Command[Literal["presenter", "plotter"]]:
