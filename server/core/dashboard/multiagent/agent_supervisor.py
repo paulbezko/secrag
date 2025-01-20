@@ -14,6 +14,8 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
         " task and respond with their results and status."
         " **concierge** is meant for conversational interactions. It has access to news data."
         " **archivist** knows about the company filings and is meant for navigating through SECRAG company filing database."
+        " **plotter** is meant for plotting data from previous messages."
+        " **layout_changer** is meant for changing the layout for the user so that the user can login, signup, or reset his password."
         " Call the **archivist** only if you need to search for available company filings or retrieve data from available filings."
         " Call the **archivist** only for queries about Apple Inc (AAPL) filings or if query is about available filings in general. For other companies, call concierge. "
         " Call the **plotter** only if the user asked to plot the data from previous messages."
@@ -56,4 +58,4 @@ def make_supervisor_node(llm: BaseChatModel, members: list[str]) -> str:
 
     return supervisor_node
 
-supervisor_node = make_supervisor_node(llm, ["concierge", "archivist", "plotter"])
+supervisor_node = make_supervisor_node(llm, ["concierge", "archivist", "plotter", "layout_changer"])
