@@ -268,6 +268,22 @@ input:-webkit-autofill:active {
   margin-right: 8rem;
 }
 
+.assistant-text img {
+  display: none;
+}
+
+.assistant-text a {
+  color: var(--black);
+  text-decoration: underline;
+  transition: all 0.2s ease;
+}
+
+.assistant-text a:hover {
+  cursor: pointer;
+  color: var(--yellow-dark);
+  text-decoration: underline;
+}
+
 .assistant-text.single {
   width: 100%;
   margin-right: 0;
@@ -345,7 +361,7 @@ thead {
     
     --blue-highlight: #e5eef7;
     --blue-dark: #1f4a75;
-    --test: #2f4d6b;
+    --test: #051422;
   }
 }
 
@@ -357,10 +373,10 @@ thead {
     --black: #d6d6d6;
 
     --yellow-highlight: #25241f;
-    --yellow-dark: #8a7300;
+    --yellow-dark: #bb9c00;
 
     --blue-highlight: #1b1c22;
     --blue-dark: #2a3b54;
-    --test: #89b4e6;
+    --blue: #6c98c4;
   }
 }

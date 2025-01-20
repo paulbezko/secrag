@@ -168,7 +168,7 @@ async def invoke_graph(graph: CompiledStateGraph, user_id, user_profile, user_in
 
             elif type(msg) == ToolMessage:
                 if msg.name in layout_changing_tools:
-                    await socketio.emit('tool', {'name': "layout_" + msg.name}, to=socket_id)
+                    await socketio.emit('tool', {'name': "layout_" + msg.name, 'flowstep': msg.name}, to=socket_id)
                 # await socketio.emit('tool', {'name': msg.name, 'flowstep': tool_call_strings[msg.name]}, to=socket_id)
 
         # print("[TOOL_CALL_BUFFER]\n",tool_call_buffer)
