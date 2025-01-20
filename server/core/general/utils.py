@@ -112,13 +112,11 @@ def execute_query(query, params, retries=3):
             return  # Exit function after successful execution
         
         except (OperationalError, InterfaceError) as conn_error:
-            print(conn_error)
             log('warning', f'Connection error [Attempt {attempt + 1}/{retries}]: {conn_error}')
             attempt += 1
             time.sleep(2)  # Optional delay before retrying
         
         except Exception as error:
-            print(error)
             log('error', f'Error [Execute Query]: {error}')
             break  # Exit loop on unexpected exceptions
 
