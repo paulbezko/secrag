@@ -11,8 +11,8 @@ import random
 routes = APIRouter()
 
 @routes.get('/init-anon-user')
-async def initi_anon_user_get():
-
+async def init_anon_user_get():
+    
     # Generating a random 16 length token
     uuid = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16))
 
@@ -127,7 +127,7 @@ async def login_post(request: Request):
 
 
 @routes.post('/authenticate-with-supabase')
-async def authenticate_post(request: Request):
+async def authenticate_with_supabase_post(request: Request):
 
     data = await request.json()
     token = data.get("token")

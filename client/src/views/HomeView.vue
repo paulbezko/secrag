@@ -172,12 +172,10 @@ export default {
             // messaging.sendManualAssistantMessage(this, "Welcome back!");
             // this.organicSuggestions = ['Tell me more'];
           } else if (this.userStatus === 'verified') {
-            this.chat = [{ role: 'assistant', content: '' }];
             messaging.sendManualAssistantMessage(this, "Your email has been confirmed!<br>Let's set up your password now.");
             this.inputMode = 'signup_password';
             this.premadeSuggestionsShown = true;
           } else if (this.userStatus === 'registered') {
-            this.chat = [{ role: 'assistant', content: '' }];
             messaging.sendManualAssistantMessage(this, "Welcome back!");
             this.organicSuggestions = ['Tell me more'];
           }
@@ -212,11 +210,7 @@ export default {
       socket.connect();
       socket.on("connect", () => {this.socketId = socket.id});
 
-      socket.on("response_started", () => {
-        this.responseIsProcessing = true; 
-        this.responseFlowstep = 'Thinking...'; 
-        this.chat.push({ role: "assistant", content: "" })
-      });
+      socket.on("response_started", () => {console.log('response started')});
 
       socket.on("response_token", (data) => {
         messaging.processResponse(this, data.word), 
@@ -232,9 +226,9 @@ export default {
       });
 
       socket.on("suggestions", (data) => {this.organicSuggestions = data.suggestions;});
-      socket.on("flowstep", (data) => {this.responseFlowstep = data.flowstep});
+      socket.on("flowstep", (data) => {console.log('flowstep received', data.flowstep), this.responseFlowstep = data.flowstep});
       socket.on("widget", (data) => {console.log(data), messaging.processWidget(this, data)});
-      socket.on("tool", (data) => {messaging.processTool(this, data)});
+      socket.on("tool", (data) => {console.log(data), messaging.processTool(this, data)});
     },
 
     // SESSION HANDLING
@@ -268,12 +262,6 @@ export default {
         window.location.reload()
       }
       else (this.userStatus = response.data.user_status)
-    },
-
-    async getChatHistory(token) {
-      const result = await axios.get(`${config.apiUrl}/api/get-chat-history?token=` + token);
-      this.chat = result.data.chat.messages;
-      this.chatChunksLoaded += 1
     },
 
     async getXMoreMessages() {
@@ -322,6 +310,7 @@ export default {
 
     // SUGGESTING
     switchToDefaultInput() {this.inputMode = 'default';},
+    getPremadeSuggestions() {suggesting.getPremadeSuggestions(this);},
     togglePremadeSuggestionsVisibility() {this.premadeSuggestionsShown = !this.premadeSuggestionsShown},
 
     // MESSAGING

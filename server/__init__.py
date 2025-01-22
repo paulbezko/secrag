@@ -30,6 +30,7 @@ handler.setFormatter(formatter)
 config = {}
 
 def create_app(*args):
+
     app = FastAPI()
     socketio = SocketManager(app, cors_allowed_origins="*", mount_location="/socket.io")
 
@@ -51,7 +52,6 @@ def create_app(*args):
     #######################################################################
     ###                         SERVE INDEX                             ### 
     if mode == 'prod':
-
         #######################################################################
         ###                         LOAD CLIENT                             ###
         app.mount("/css", StaticFiles(directory="client/dist/css"), name="css")

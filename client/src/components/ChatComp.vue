@@ -29,6 +29,7 @@
 
             <!-- Widget generation -->
             <ApexChartsWidget v-else-if="part.type === 'treemap'" :theme="theme" :params="part.params" />
+            <LightweightChartsWidget v-else-if="part.type === 'time_series'" :theme="theme" :params="part.params" />
             <TradingViewWidget v-else-if="part.type === 'stock_price'" :theme="theme" :params="part.params" />
           </div>
         </div>
@@ -45,6 +46,7 @@
 <script>
 import { messaging } from '@/utils/messaging.js';
 import ApexChartsWidget from '@/widgets/ApexChartsWidget.vue';
+import LightweightChartsWidget from '@/widgets/LightweightChartsWidget.vue';
 import TradingViewWidget from '@/widgets/TradingViewWidget.vue';
 
 export default {
@@ -60,6 +62,7 @@ export default {
   },
   components: {
     ApexChartsWidget,
+    LightweightChartsWidget,
     TradingViewWidget
   },
   methods: {
@@ -97,7 +100,7 @@ export default {
 
     handleScroll() {
       const chatContainer = document.getElementById('chatContainer');
-      if (chatContainer.scrollTop === 0 && this.chatFullyLoaded === false) {this.$emit('get-x-more-messages')}
+      if (chatContainer.scrollTop === 0 && this.chatFullyLoaded === false) {console.log('get-x-more-messages'); this.$emit('get-x-more-messages')}
     },
 
     chatScrollToBottom() {

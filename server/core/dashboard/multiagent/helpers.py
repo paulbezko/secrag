@@ -60,10 +60,11 @@ def get_last_node_message(messages: list, node_name: Literal["concierge", "archi
 
     return last_message
 
-def flowstep_string_state_machine(tool_call_data: dict):
+def flowstep_string_state_machine(tool_call_data: dict): # Shouda make dis a dict prolly... stakk overflow sayin is faster...
         flowstep_strings = []
 
         for i in tool_call_data["buffer"]:
+            print(i)
             tool_call_buffer_data = json.loads(i)       
             if tool_call_data["name"] == "retrieve_data_from_filing":           
                 flowstep_string = f"Reading {tool_call_buffer_data['tool_input']['filing_type']} filing from {tool_call_buffer_data['tool_input']['filing_date']}... "
@@ -76,6 +77,9 @@ def flowstep_string_state_machine(tool_call_data: dict):
 
             elif tool_call_data["name"] == "ticker_news":
                 flowstep_string = f"Searching news for {tool_call_buffer_data['query']}... "
+
+            elif tool_call_data["name"] in ["login", "signup_email", "forgot_password"]:
+                flowstep_string = f"Adjusting input layout... "
 
             else:
                 flowstep_string = tool_call_strings[tool_call_data["name"]]+"... "

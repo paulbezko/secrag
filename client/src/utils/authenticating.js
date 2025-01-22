@@ -80,13 +80,13 @@ export const authenticating = {
       ctx.sendManualAssistantMessage(ctx, response.data.error);
     }
     else {
+      localStorage.setItem('_u', response.data.token);
       ctx.userStatus = response.data.user_status; 
       ctx.inputMode = 'default';
       ctx.getPremadeSuggestions()
-      ctx.organicSuggestions = ['Tell me more']
-      ctx.chat = [{ role: 'assistant', content: '' }];
+      ctx.organicSuggestions = ['Tell me more'];
+      ctx.getXMoreMessages();
       ctx.sendManualAssistantMessage(ctx, 'Welcome back!');
-      localStorage.setItem('_u', response.data.token);
     }
   },
 

@@ -26,6 +26,10 @@ export const messaging = {
     ctx.$nextTick(() => {interfacing.chatScrollToBottom(); interfacing.updateTextareaHeight(ctx)});
     ctx.input = '';
 
+    ctx.responseIsProcessing = true; 
+    ctx.responseFlowstep = 'Thinking...'; 
+    ctx.chat.push({ role: "assistant", content: "" })
+
     await axios.post(`${config.apiUrl}/api/new-message`, {
       token: localStorage.getItem('_u'), 
       role: 'user', 

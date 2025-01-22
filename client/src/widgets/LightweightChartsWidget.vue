@@ -1,79 +1,101 @@
 <template>
   <div class="widget-container">
-    <div class="widget-container-child" ref="container">
-      <div class="tradingview-widget-container__widget"></div>
+    <div class="widget-container-child">
+      <div ref="chartContainer" style="width: 100%; height: 400px;"></div>
     </div>
   </div>
 </template>
 
 <script>
-import { onMounted, ref, watch, } from 'vue';
+import { createChart } from 'lightweight-charts';
 
 export default {
-  name: 'TradingViewWidget',
+  name: 'LightweightChart',
   props: {
     params: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
+    theme: {
+      type: String,
+      default: 'light',
+    },
   },
-  setup(props) {
-    const container = ref(null);
 
-    const loadWidget = () => {
-      const script = document.createElement('script');
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
-      script.type = 'text/javascript';
-      script.async = true;
-      script.innerHTML = `{
-        "symbols": [
-          ["${props.ticker}|1M"]
-        ],
-        "chartOnly": false,
-        "width": "100%",
-        "height": "400",
-        "locale": "en",
-        "backgroundColor": ${props.theme === 'dark' ? '"#1a1a1b"' : '"#F4F6F9"'},
-        "gridColor": ${props.theme === 'dark' ? '"#2d2d30"' : '"#D1D5DB"'},
-        "colorTheme": ${props.theme === 'dark' ? '"dark"' : '"light"'},
-        "autosize": true,
-        "showVolume": true,
-        "showMA": false,
-        "hideDateRanges": false,
-        "hideMarketStatus": false,
-        "hideSymbolLogo": true,
-        "scalePosition": "left",
-        "scaleMode": "Normal",
-        "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
-        "fontSize": "10",
-        "noTimeScale": false,
-        "valuesTracking": "1",
-        "changeMode": "price-and-percent",
-        "chartType": "area",
-        "maLineColor": "#2962FF",
-        "maLineWidth": 1,
-        "maLength": 9,
-        "headerFontSize": "small",
-        "lineWidth": 2,
-        "lineType": 0,
-        "dateRanges": ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
-      }`;
+  mounted() {
+    const chartContainer = this.$refs.chartContainer;
+    const chart = createChart(chartContainer, {
+      width: chartContainer.clientWidth,
+      height: chartContainer.clientHeight,
+      layout: {
+        background: {
+          'type': 'solid',
+          'color': 'transparent',
+        },
+        textColor: this.theme === 'dark' ? "#F4F6F9" : "#1a1a1b"
+      },
 
-      if (container.value) {
-        container.value.innerHTML = '';
-        container.value.appendChild(script);
+      grid: {
+        vertLines: {
+          color: 'transparent',
+        },
+        horzLines: {
+          color: 'transparent',
+        },
+      },
+      timeScale: {
+        rightOffset: 0,
+        barSpacing: 6,
       }
-    };
-
-    onMounted(() => {
-      loadWidget();
     });
 
-    watch([() => props.ticker, () => props.theme], loadWidget);
+    const areaSeries = chart.addAreaSeries(
+      {
+        lineColor: this.theme === 'dark' ? '#1f4a75' : "#6c98c4",
+        topColor: this.theme === 'dark' ? '#1f4a75' : "#6c98c4",
+        bottomColor: this.theme === 'dark' ? "#1a1a1b" : "#F4F6F9"
+      }
+    );
 
-    return {
-      container,
-    };
+    chart.timeScale().fitContent();
+    chart.timeScale().applyOptions({borderColor: "transparent"});
+    chart.priceScale("right").applyOptions({borderColor: "transparent"});
+    areaSeries.setData(this.params.series[0].data);
+
+    const resizeObserver = new ResizeObserver(() => {
+      chart.resize(chartContainer.clientWidth, chartContainer.clientHeight);
+    });
+
+    resizeObserver.observe(chartContainer);
   },
 };
 </script>
+
+<style scoped>
+.widget-container table {
+  margin-block: 0 !important;
+}
+
+.widget-container-child {
+  width: 100%; 
+  height: 400px;
+}
+
+.widget-container-child * {
+  border: none;
+  /* overflow: hidden; */
+}
+
+.widget-container-child td {
+  margin: -1px;
+}
+
+canvas {
+  background-color: #132d4a !important;
+}
+</style>
+<style>
+.widget-container-child table {
+  margin: -1px !important;
+}
+</style>
