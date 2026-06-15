@@ -1,8 +1,9 @@
+import os
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 from typing import List, Literal
 
-model = ChatOpenAI(temperature=0, api_key="sk-proj-0U1etEdNPyfN0tEvklyVT3BlbkFJ0899XXITmyGhvlsfA7eS", model_name="gpt-4o-mini")
+model = ChatOpenAI(temperature=0, api_key=os.getenv("OPENAI_API_KEY"), model_name="gpt-4o-mini")
 
 def get_reformulated_prompt_from_history(user_prompt, history, filing_id="AAPL-10-K"):
 

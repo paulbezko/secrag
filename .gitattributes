@@ -1,1 +1,23 @@
+# Normalize line endings: store everything as LF in the repo, check out native.
+* text=auto eol=lf
 
+# Explicitly treat known text types as text.
+*.py    text
+*.js    text
+*.vue   text
+*.json  text
+*.md    text
+*.css   text
+*.html  text
+*.sh    text eol=lf
+*.yml   text
+*.yaml  text
+
+# Binary assets — never touch.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.faiss binary
+*.pkl   binary

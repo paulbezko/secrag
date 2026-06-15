@@ -1,52 +1,119 @@
-# General Info
-Client is built on Vue 3
-Server is built on node ~18
-Preferably server to be built on flask
+# secrag
 
-# How to deploy
-This file explains steps that need to be taken in order to deploy the project.
+**secrag** is a full-stack web app that lets you chat with U.S. SEC filings. Point it at a company and a filing (e.g. Apple's latest 10-K), and an LLM agent answers questions about it by retrieving the relevant passages and financial statements straight from the source document — a retrieval-augmented-generation (RAG) system purpose-built for EDGAR data.
 
-## Prerequisites
-### Google
-This skeleton uses google based SMTP emailing system.
-It is necessary to create a gmail account, set up 2fa, and then an app password.
-After set up, pass email and password to .env file of the server.
+> ⚠️ **Status:** This is an archived project, open-sourced for reference and as a portfolio piece. It is no longer actively maintained or deployed. The code is shared as-is.
 
-### Stripe
-This skeleton uses Stripe for payment system.
-It is necessary to create two products, with each having a monthly price and yearly price.
-After set up, pass prices to .env file of the server, as well as stripe and webhook keys.
-Note that webhook keys differ between development and deployment.
+---
 
-### Supabase
-This skeleton uses Supabase for db management, as well as one click authentication.
-It is necessary to create a project within Supabase, set up necessary tables, and activate authentication methods to selected providers. 
-It is also required to set up redirect URL that points to the the app/handle-supabase route after authentication.
-After set up, pass supabase URL and key to .env file of the server.
+## What it does
 
-## Preparation
-### Client
-The Vue-based client of this skeleton must be built after successful development with <code>npm run build</code>. The <code>dist</code> folder created will be used by the server afterwards.
-Before building, make sure that the <code>config.js</code> file located within client/src has the specified code:
+- **Conversational filing analysis.** Ask natural-language questions about a specific SEC filing and get grounded, cited answers streamed back token-by-token.
+- **Financial-statement retrieval.** The agent can pull structured financial tables (balance sheet, income statement, cash-flow statement, statement of changes in equity, comprehensive income) parsed from a filing's XBRL data.
+- **Filing digests.** Generate a quick markdown overview of a filing, including buy/sell indicators.
+- **Accounts, subscriptions, and usage limits.** Sign-up/login (email or OAuth), token-metered usage, and paid tiers via Stripe.
 
-<code>
-<p>const dev = {apiUrl: 'http://localhost:5000', webUrl: 'http://localhost:8080'};</p>
-<p>// const prod = {apiUrl: 'http://localhost:5000', webUrl: 'http://localhost:5000'};</p>
-<p>const prod = {apiUrl: 'https://delpoy.com', webUrl: 'https://delpoy.com'};</p>
-</code>
+## How it works
 
-The commented-out line represents testing the deployment version within localhost.
+The agent is a LangChain OpenAI-tools agent (`gpt-4o-mini`) with three tools:
 
-### Server
-The server is already configured to have access to the <code>dist</code> folder, therefore no action is needed on its side.
+| Tool | Purpose |
+| --- | --- |
+| `financial_data_filing_retriever` | Retrieves a specific financial statement from the filing's parsed XBRL data. |
+| `non-financial_data_filing_retriever` | Semantic search over the full filing text via the FAISS vector store. |
+| `google_search` | Fallback web search when the filing alone can't answer the question. |
 
-### Docker
-Dockerizing the app requires transferring the required directories into the /app folder, as well as installing all necessary node modules for the server. The Dockerfile is already configured to do all that, and run the server on the exposed 5000 port.
+Filings are fetched and parsed from SEC EDGAR using [`edgartools`](https://github.com/dgunning/edgartools), converted to markdown, chunked, and embedded with OpenAI embeddings into a FAISS index. Embedding jobs run asynchronously via Celery + Redis. Answers stream to the browser over WebSockets.
+
+## Tech stack
+
+**Frontend** — Vue 3 (Vue CLI), Vuex, Vue Router, Axios, `socket.io-client`, `markdown-it` / `marked` with KaTeX & MathJax for rendering formulas, Stripe.js, Supabase JS. The client builds to `client/dist`, which the server serves as static files.
+
+**Backend** — Python, FastAPI on Uvicorn (ASGI), `fastapi-socketio` for streaming, LangChain + OpenAI, FAISS vector store, Celery + Redis for background embedding, `edgartools` for EDGAR/XBRL parsing, Google Generative AI (Gemini) for filing digests.
+
+**Data & services** — Supabase (Postgres + auth), MongoDB (chat history), Stripe (payments), Gmail SMTP (transactional email), Logtail + Telegram (operational logging/alerts).
+
+## Repository layout
+
+```
+.
+├── app.py                  # ASGI entrypoint (FastAPI app + socket.io)
+├── wsgi.py                 # alt entrypoint
+├── filing_digest.py        # standalone filing-digest generator (Gemini)
+├── client/                 # Vue 3 single-page app
+│   └── src/                # views, components, store, router
+├── server/                 # FastAPI backend
+│   ├── __init__.py         # app factory: mounts routes, static client, services
+│   ├── globals.py          # config singleton, Mongo client
+│   ├── authentication/     # sign-up / login / account routes
+│   ├── dashboard/          # chat + RAG agent (utils/: llm, vectorstore, edgar, search)
+│   ├── subscription/       # Stripe billing + webhooks
+│   ├── general/            # shared routes + DB utils
+│   ├── github/             # GitHub auto-deploy webhook
+│   └── lib_secrag/         # vendored edgartools
+├── crons/                  # filing scraper + logging
+├── database/               # local data: vectorstore, filings, markdowns, logs
+└── .github/                # issue/PR templates
+```
+
+## Getting started
+
+### Prerequisites
+
+- Python 3.11+ and Node 18+
+- A Redis instance (for Celery)
+- Accounts/keys for: OpenAI, Google Generative AI, Supabase, Stripe, MongoDB, and a Gmail account with an [App Password](https://support.google.com/accounts/answer/185833).
+
+### 1. Configure environment
+
+All configuration is read from a `.env` file (loaded via `python-dotenv`). Copy the template and fill in your own values:
+
+```bash
+cp .env.example .env
+# then edit .env
+```
+
+See [`.env.example`](./.env.example) for the full list of variables (database, app secrets, Stripe, Supabase, LLM keys, EDGAR identity, etc.).
+
+### 2. Backend
+
+```bash
+python -m venv venv
+source venv/bin/activate            # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --port 5000
+```
+
+Background embedding tasks require a Celery worker running against your Redis broker.
+
+### 3. Frontend
+
+```bash
+cd client
+npm install
+npm run serve                       # dev server
+# or
+npm run build                       # outputs to client/dist for the server to serve
+```
+
+Set the dev/prod API and socket URLs in `client/src/config.js`.
+
+### External setup notes
+
+- **Supabase** — create a project, set up the user tables, enable your chosen auth providers, and add a redirect URL pointing to the post-auth handler route.
+- **Stripe** — create the basic and premium products (each with a monthly and yearly price) plus the token-replenish price, and configure a webhook. The webhook secret differs between dev and prod.
+- **EDGAR** — SEC requires an identifying `User-Agent`; set `EDGAR_IDENTITY` to `"Your Name your_email@domain.com"`.
 
 ## Deployment
-Having <b>onrender.com</b> as hosting platform of preference, the deployment is done there.
-The flow is relatively straightforward, with the requirement being connecting the repo to render.
-The pricing plan depends on the state of the deployment, but for production grade the <b>standard</b> plan should be fine.
-Environmet variables should be supplied to the service, as well as the path to the docker file, which is currently set by default.
 
-<code></code>
+The app is containerized (see the Docker configuration) and was deployed on [render.com](https://render.com): connect the repo, supply environment variables, and point the service at the Dockerfile. The container builds the client, installs dependencies, and runs the server on port 5000.
+
+A GitHub webhook (`/gh` route) together with `autoupdate.sh` supported pull-and-restart auto-deploys on a self-managed host via a systemd service.
+
+## License
+
+No license file is currently included. Add one (e.g. MIT) before reuse if you intend others to build on this code.
+
+---
+
+*secrag — chat with SEC filings.*

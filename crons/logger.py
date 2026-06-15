@@ -1,6 +1,10 @@
 from logtail import LogtailHandler
 import requests
 import logging
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize the logger (global)
 logger = logging.getLogger('filing_scraper')
@@ -18,7 +22,7 @@ def configure_logger(log_filename):
     file_handler.setFormatter(formatter)
 
     # Attach both Logtail and file handler to the logger
-    logtail_handler = LogtailHandler(source_token='CJ1xunGEMgN8618aoKDUVtXT')
+    logtail_handler = LogtailHandler(source_token=os.getenv('LOGTAIL_SOURCE_TOKEN'))
     logtail_handler.setLevel(logging.DEBUG)
     logtail_handler.setFormatter(formatter)
 
@@ -27,26 +31,26 @@ def configure_logger(log_filename):
 
 # Function to log messages
 def log(level, message):
-    if level.lower() == 'debug': 
+    if level.lower() == 'debug':
         logger.debug(message)
         # log_telebot("DEBUG\n\n" + message)
-    elif level.lower() == 'info': 
+    elif level.lower() == 'info':
         logger.info(message)
         # log_telebot("INFO\n\n" + message)
-    elif level.lower() == 'warning': 
+    elif level.lower() == 'warning':
         logger.warning(message)
         # log_telebot("WARNING\n\n" + message)
-    elif level.lower() == 'error': 
+    elif level.lower() == 'error':
         logger.error(message)
         log_telebot("ERROR\n\n" + message)
-    else: 
+    else:
         logger.critical(message)
         log_telebot("CRITICAL\n\n" + message)
 
 # Function to send log messages to Telegram
 def log_telebot(message):
-    chat_id = '-4506773539'
-    bot_id = "7770656451:AAFxWbl8thravZhmk4OBCDkvDBb0yDrGwl4"
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    bot_id = os.getenv('TELEGRAM_BOT_KEY')
     for i in range(0, len(message), 4000):
         chunk = message[i:i + 4000]
         requests.post(f"https://api.telegram.org/bot{bot_id}/sendMessage", data={'chat_id': chat_id, 'text': chunk})

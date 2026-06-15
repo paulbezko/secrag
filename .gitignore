@@ -4,7 +4,12 @@ server_js/node_modules
 server_js/.env
 
 .venv
+venv/
+
+# Environment / secrets — never commit real env files; keep the example template.
 .env
+.env.*
+!.env.example
 
 __pycache__
 server/__pycache__
@@ -50,3 +55,10 @@ database/filings/*
 database/markdowns/*
 database/logs/*
 autoupdate.log
+*.log
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

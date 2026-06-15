@@ -1,6 +1,7 @@
 
 
-key = "AIzaSyDQMl7clb1OI61AtDyDyUjyO7sGdcXwoog"
+import os
+key = os.getenv("GOOGLE_API_KEY")
 
 import requests
 
@@ -21,7 +22,7 @@ Input text:
 
 
 url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
-api_key = "AIzaSyDQMl7clb1OI61AtDyDyUjyO7sGdcXwoog"
+api_key = os.getenv("GOOGLE_API_KEY")
 
 headers = {
     "Content-Type": "application/json"
