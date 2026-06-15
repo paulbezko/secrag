@@ -112,7 +112,7 @@ A GitHub webhook (`/gh` route) together with `autoupdate.sh` supported pull-and-
 
 ## License
 
-No license file is currently included. Add one (e.g. MIT) before reuse if you intend others to build on this code.
+Released under the [MIT License](./LICENSE). You're free to use, modify, and distribute this code; it comes with no warranty.
 
 ---
 
